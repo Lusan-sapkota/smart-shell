@@ -65,13 +65,37 @@ check_dependencies() {
         echo -e "${GREEN}✓ pipx found (recommended for installation)${NC}"
     else
         echo -e "${YELLOW}⚠ pipx not found (recommended for better isolation)${NC}"
-        echo -e "\n${YELLOW}TL;DR for Ubuntu/Debian users:${NC}"
-        echo -e "  sudo apt install pipx"
-        echo -e "  pipx ensurepath"
-        echo -e "  source ~/.bashrc   # or ~/.zshrc depending on your shell"
-        echo -e "Then re-run the install script."
-        echo -e "${RED}pipx is required for user installation on PEP 668 systems. Please install pipx and re-run this script.${NC}"
-        exit 1
+        echo -e "  Installing pipx..."
+        
+        # Try to install pipx
+        if command -v apt-get &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y pipx
+        elif command -v dnf &> /dev/null; then
+            sudo dnf install -y pipx
+        elif command -v yum &> /dev/null; then
+            python3 -m pip install --user pipx
+        elif command -v pacman &> /dev/null; then
+            sudo pacman -S --noconfirm python-pipx
+        else
+            echo -e "  Installing pipx with pip..."
+            python3 -m pip install --user pipx
+        fi
+        
+        # Ensure pipx is in PATH
+        python3 -m pipx ensurepath
+        
+        # Check if pipx was installed successfully
+        if command -v pipx &> /dev/null; then
+            echo -e "${GREEN}✓ pipx installed successfully${NC}"
+            
+            # Try to add pipx to PATH for current session
+            export PATH="$HOME/.local/bin:$PATH"
+        else
+            echo -e "${RED}Failed to install pipx. Please install it manually:${NC}"
+            echo -e "  python3 -m pip install --user pipx"
+            echo -e "  python3 -m pipx ensurepath"
+            exit 1
+        fi
     fi
 }
 
@@ -81,9 +105,9 @@ setup_source_directory() {
     if [[ -f "$HOME/.local/bin/smart-shell" && ! -L "$HOME/.local/bin/smart-shell" ]]; then
         echo -e "${RED}WARNING: A non-symlinked smart-shell executable already exists at $HOME/.local/bin/smart-shell.${NC}"
         echo -e "This can cause pipx to fail or Smart-Shell to not run correctly."
-        echo -e "Please remove it with: ${YELLOW}rm $HOME/.local/bin/smart-shell${NC}"
-        echo -e "Then re-run this install script."
-        exit 1
+        echo -e "Removing it automatically..."
+        rm "$HOME/.local/bin/smart-shell"
+        echo -e "${GREEN}✓ Removed conflicting executable${NC}"
     fi
 
     # Check if we're running from a piped curl command or direct execution
@@ -214,18 +238,27 @@ install_smart_shell() {
             exit 1
         fi
         echo -e "\n${BLUE}Installing with pipx (recommended)...${NC}"
-        pipx install . || {
+        
+        # First ensure the dependencies are installed
+        echo -e "${BLUE}Ensuring dependencies are installed...${NC}"
+        python3 -m pip install --user --upgrade google-genai rich click pyyaml requests google-api-core || true
+        
+        pipx install . --force || {
             echo -e "${RED}pipx install failed. Please check your environment or see the FAQ.${NC}"
             echo -e "${RED}This may be due to a previous broken or conflicting install, or a pipx environment issue.${NC}"
             echo -e "${YELLOW}Attempting to fix automatically...${NC}"
             pipx uninstall smart-shell || true
             cd "$PWD"
-            pipx install . && echo -e "${GREEN}Automatic fix succeeded. Continuing...${NC}" && return 0
+            
+            # Try to install with dependencies explicitly included
+            pipx install . --force --include-deps && echo -e "${GREEN}Automatic fix succeeded. Continuing...${NC}" && return 0
+            
             echo -e "${RED}Automatic fix failed. Please try the manual steps below:${NC}"
             echo -e "  1. Uninstall any broken install: ${YELLOW}pipx uninstall smart-shell${NC}"
-            echo -e "  2. Clone the repo manually: ${YELLOW}git clone https://github.com/Lusan-sapkota/smart-shell.git && cd smart-shell${NC}"
-            echo -e "  3. Install from the repo: ${YELLOW}pipx install .${NC}"
-            echo -e "  4. Then run: ${YELLOW}smart-shell setup${NC}"
+            echo -e "  2. Install dependencies: ${YELLOW}pip install google-genai rich click pyyaml requests google-api-core${NC}"
+            echo -e "  3. Clone the repo manually: ${YELLOW}git clone https://github.com/Lusan-sapkota/smart-shell.git && cd smart-shell${NC}"
+            echo -e "  4. Install from the repo: ${YELLOW}pipx install . --include-deps${NC}"
+            echo -e "  5. Then run: ${YELLOW}smart-shell setup${NC}"
             exit 1
         }
         if command -v smart-shell &> /dev/null; then
@@ -248,61 +281,107 @@ install_smart_shell() {
         3)
             echo -e "\n${BLUE}Creating a new virtual environment...${NC}"
             python3 -m venv venv || {
-                echo -e "${RED}Failed to create virtual environment. Installing venv package...${NC}"
-                if command -v apt-get &> /dev/null; then
-                    sudo apt-get update && sudo apt-get install -y python3-venv
-                elif command -v dnf &> /dev/null; then
-                    sudo dnf install -y python3-venv
-                elif command -v yum &> /dev/null; then
-                    sudo yum install -y python3-venv
-                elif command -v pacman &> /dev/null; then
-                    sudo pacman -S --noconfirm python-virtualenv
-                fi
-                python3 -m venv venv
+                echo -e "${RED}Failed to create virtual environment. Is python3-venv installed?${NC}"
+                exit 1
             }
-            source venv/bin/activate
-            python -m pip install .
-            install_path="$PWD/venv/bin/smart-shell"
-            # Create activation script
-            cat > smart-shell-activate.sh << EOF
-#!/bin/bash
-source "$PWD/venv/bin/activate"
-smart-shell "$@"
-EOF
-            chmod +x smart-shell-activate.sh
-            echo -e "${GREEN}✓ Virtual environment created at $PWD/venv${NC}"
-            echo -e "${YELLOW}To use Smart-Shell, either:${NC}"
-            echo -e "  1. Activate the environment with: source $PWD/venv/bin/activate"
-            echo -e "  2. Or use the wrapper script: ./smart-shell-activate.sh"
+            echo -e "\n${BLUE}Installing Smart-Shell in virtual environment...${NC}"
+            ./venv/bin/pip install -e . || {
+                echo -e "${RED}Failed to install in virtual environment.${NC}"
+                exit 1
+            }
+            install_path="$(pwd)/venv/bin/smart-shell"
+            echo -e "${GREEN}✓ Smart-Shell installed in virtual environment at ${install_path}${NC}"
+            echo -e "\nTo activate this environment, run:"
+            echo -e "  source venv/bin/activate"
             ;;
         *)
-            echo -e "${RED}Invalid option. Exiting.${NC}"
+            echo -e "${RED}Invalid installation option.${NC}"
             exit 1
             ;;
     esac
+
     INSTALL_PATH="$install_path"
 }
 
-# Function to prompt for API key setup
-setup_api_key() {
-    echo -e "\n${BLUE}Setting up API key...${NC}"
-    echo -e "${YELLOW}Do you want to set up your API key now?${NC} (Recommended)"
-    read -p "Set up API key now? (Y/n): " SETUP_API_KEY
-    SETUP_API_KEY=${SETUP_API_KEY:-Y}
+# Function to apply Python module path fix
+apply_python_path_fix() {
+    echo -e "\n${BLUE}Applying Python module path fix...${NC}"
+    # Check if the smart-shell script already exists (it should if pipx installed it)
+    if [[ -f "$HOME/.local/bin/smart-shell" ]]; then
+        # Create a backup
+        cp "$HOME/.local/bin/smart-shell" "$HOME/.local/bin/smart-shell.bak"
+        
+        # Write a custom wrapper script
+        cat > "$HOME/.local/bin/smart-shell" << 'EOF'
+#!/usr/bin/env python3
+import sys
+import os
+import importlib.util
+import subprocess
+
+# Try to import smart_shell
+try:
+    import smart_shell
+    from smart_shell.main import main
     
-    if [[ "$SETUP_API_KEY" == "Y" || "$SETUP_API_KEY" == "y" ]]; then
-        if command -v smart-shell &> /dev/null; then
-            smart-shell setup
-        else
-            echo -e "${YELLOW}Please run 'smart-shell setup' after installation to configure your API key.${NC}"
-        fi
-    else
-        echo -e "${YELLOW}You can set up your API key later by running:${NC}"
-        echo -e "  smart-shell setup"
+    # If import succeeds, run the main function
+    if __name__ == '__main__':
+        sys.exit(main())
+        
+except ModuleNotFoundError:
+    # If smart_shell module is not found, try to find its location
+    print("Smart-Shell module not found in Python path. Attempting to fix...")
+    
+    # Try to find smart_shell package in pipx environment
+    pipx_path = os.path.expanduser("~/.local/share/pipx/venvs/smart-shell")
+    if os.path.exists(pipx_path):
+        # Get the Python version in the pipx environment
+        py_versions = [d for d in os.listdir(os.path.join(pipx_path, 'lib')) if d.startswith('python')]
+        if py_versions:
+            py_version = py_versions[0]
+            site_packages = os.path.join(pipx_path, 'lib', py_version, 'site-packages')
+            
+            if os.path.exists(os.path.join(site_packages, 'smart_shell')):
+                # Add site-packages to Python path
+                sys.path.insert(0, site_packages)
+                
+                try:
+                    # Try importing again
+                    import smart_shell
+                    from smart_shell.main import main
+                    
+                    print("Fixed! Running Smart-Shell...")
+                    if __name__ == '__main__':
+                        sys.exit(main())
+                except Exception as e:
+                    print(f"Failed to import smart_shell after path fix: {e}")
+            else:
+                print(f"smart_shell package not found in {site_packages}")
+        else:
+            print(f"No Python version found in {pipx_path}/lib")
+    
+    # If all else fails, try running pip install with dependencies
+    print("Attempting to reinstall Smart-Shell with dependencies...")
+    try:
+        # First install dependencies
+        subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "google-genai", "rich", "click", "pyyaml", "requests", "google-api-core"], check=True)
+        # Then install smart-shell
+        subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "smart-shell"], check=True)
+        print("Reinstallation complete. Please try running 'smart-shell' again.")
+    except Exception as e:
+        print(f"Failed to reinstall: {e}")
+        print("Please run manually: pip install google-genai rich click pyyaml requests google-api-core smart-shell")
+        
+    sys.exit(1)
+EOF
+        
+        # Make it executable
+        chmod +x "$HOME/.local/bin/smart-shell"
+        echo -e "${GREEN}✓ Applied Python module path fix${NC}"
     fi
 }
 
-# Function to verify installation
+# Function to check if installation is working
 verify_installation() {
     echo -e "\n${BLUE}Verifying installation...${NC}"
     
@@ -310,100 +389,114 @@ verify_installation() {
     if command -v smart-shell &> /dev/null; then
         echo -e "${GREEN}✓ smart-shell command is available in PATH${NC}"
         
-        # Test if we can run the command
-        if smart-shell --help &> /dev/null; then
-            echo -e "${GREEN}✓ Smart-Shell is working correctly${NC}"
+        # Try running smart-shell version
+        if smart-shell version &> /dev/null; then
+            echo -e "${GREEN}✓ Smart-Shell command runs successfully${NC}"
         else
             echo -e "${YELLOW}⚠ Smart-Shell command failed to run${NC}"
         fi
     else
-        echo -e "${YELLOW}⚠ smart-shell command not found in PATH. You may need to:${NC}"
-        echo -e "  1. Restart your terminal"
-        echo -e "  2. Add the installation directory to your PATH"
-        echo -e "  3. Use the full path to run smart-shell: $INSTALL_PATH"
+        echo -e "${RED}✗ smart-shell command not found in PATH${NC}"
+        echo -e "Try running: ${YELLOW}source ~/.bashrc${NC} or ${YELLOW}source ~/.zshrc${NC}"
     fi
     
-    # Check if we can import the module
+    # Check if python module is importable
     if python3 -c "import smart_shell" &> /dev/null; then
         echo -e "${GREEN}✓ Python module 'smart_shell' is importable${NC}"
     else
-        echo -e "${YELLOW}⚠ Python cannot import 'smart_shell'${NC}"
+        echo -e "${RED}✗ Python module 'smart_shell' is not importable${NC}"
+        echo -e "This might be due to a problem with your Python path or the installation."
     fi
 }
 
-# Main installation flow
-main() {
-    check_dependencies
-    setup_source_directory
-
-    if [[ ! -f "pyproject.toml" ]]; then
-        echo -e "${RED}Error: pyproject.toml not found. Not in Smart-Shell source directory.${NC}"
-        exit 1
-    fi
+# Function to run setup automatically
+run_smart_shell_setup() {
+    echo -e "\n${BLUE}Running Smart-Shell setup...${NC}"
     
-    echo -e "\n${YELLOW}Please select installation method:${NC}"
-    echo "1) System-wide installation (requires sudo)"
-    echo "2) User installation (recommended)"
-    echo "3) Virtual environment (for development)"
-    
-    if [ -t 0 ]; then
-        # Interactive mode
-        read -p "Enter your choice (1-3): " INSTALL_OPTION
-    else
-        # Non-interactive mode, default to user installation
-        INSTALL_OPTION=2
-        echo -e "${YELLOW}Running in non-interactive mode. Defaulting to user installation.${NC}"
-    fi
-    
-    install_smart_shell "$INSTALL_OPTION"
-    
-    # Verify Python package is importable
-    if [[ "$INSTALL_OPTION" == "3" ]]; then
-        if ! venv/bin/python -c "import smart_shell" &> /dev/null; then
-            echo -e "${RED}ERROR: Python cannot import 'smart_shell' in the virtual environment. Installation may have failed.${NC}"
-            echo -e "${YELLOW}For guaranteed success, use pipx for user installs.${NC}"
-            exit 1
-        fi
-    fi
-    
-    if ! python3 -c "import smart_shell" &> /dev/null; then
-        echo -e "${YELLOW}⚠ Python cannot import 'smart_shell' directly. This may be expected in some environments.${NC}"
-        echo -e "${YELLOW}For guaranteed success, use pipx for user installs. See: https://lusan-sapkota.github.io/smart-shell/faq/#pipx-or-pep668${NC}"
-    fi
-    
-    # Only create desktop entry for system or user installations
-    if [[ "$INSTALL_OPTION" == "1" || "$INSTALL_OPTION" == "2" ]]; then
-        create_desktop_entry "$INSTALL_PATH"
-        create_bash_completion
-    fi
-    
-    # Setup API key if interactive
-    if [ -t 0 ]; then
-        setup_api_key
-    else
-        echo -e "\n${YELLOW}Skipping API key setup in non-interactive mode.${NC}"
+    # Skip if we're in non-interactive mode
+    if [[ "$NON_INTERACTIVE" == "true" ]]; then
+        echo -e "${YELLOW}Skipping setup in non-interactive mode.${NC}"
         echo -e "Run 'smart-shell setup' to configure your API key later."
+        return
     fi
     
-    verify_installation
-
-    echo -e "\n${GREEN}✓ Smart-Shell installation complete!${NC}"
-    echo -e "${YELLOW}To get started, run:${NC} smart-shell"
-    echo -e "\n${RED}IMPORTANT:${NC} Please run 'smart-shell setup' to configure your API key."
+    # Check if smart-shell command is available
+    if command -v smart-shell &> /dev/null; then
+        echo -e "${GREEN}Starting setup wizard...${NC}"
+        echo -e "${YELLOW}You'll be asked to enter your Google AI API key.${NC}"
+        echo -e "${YELLOW}If you don't have one, get it from: https://ai.google.dev/tutorials/setup${NC}"
+        echo -e "(It's free to sign up and includes generous free quota)"
+        echo
+        
+        # Run the setup command
+        smart-shell setup || {
+            echo -e "${YELLOW}Setup wizard exited. You can run it later with 'smart-shell setup'${NC}"
+        }
+    else
+        echo -e "${YELLOW}Cannot run setup wizard yet. Please run 'smart-shell setup' after installation completes.${NC}"
+    fi
 }
 
-# Run the main function
-main
+# Check dependencies
+check_dependencies
 
-# Final instructions
-echo -e "\n${GREEN}==============================================${NC}"
+# Set up source directory (clone repo or use current directory)
+setup_source_directory
+
+# Determine if we're running in non-interactive mode
+if [[ -t 0 ]]; then
+    NON_INTERACTIVE="false"
+else
+    NON_INTERACTIVE="true"
+    echo -e "Running in non-interactive mode. Defaulting to user installation."
+fi
+
+# Prompt for installation method if in interactive mode
+if [[ "$NON_INTERACTIVE" == "false" ]]; then
+    echo -e "\nPlease select installation method:"
+    echo -e "1) System-wide installation (requires sudo)"
+    echo -e "2) User installation (recommended)"
+    echo -e "3) Virtual environment (for development)"
+    
+    read -p "Enter your choice [2]: " INSTALL_OPTION
+    
+    # Default to user installation if no input
+    INSTALL_OPTION=${INSTALL_OPTION:-2}
+else
+    # Default to user installation in non-interactive mode
+    INSTALL_OPTION=2
+    echo -e "Running in non-interactive mode. Defaulting to user installation."
+fi
+
+# Install Smart-Shell
+install_smart_shell "$INSTALL_OPTION"
+
+# Create desktop entry
+create_desktop_entry "$INSTALL_PATH"
+
+# Set up command completion
+create_bash_completion
+
+# Apply Python module path fix
+apply_python_path_fix
+
+# Verify installation
+verify_installation
+
+# Run setup automatically after successful installation
+run_smart_shell_setup
+
+# Final success message
+echo -e "\n${GREEN}✓ Smart-Shell installation complete!${NC}"
+echo -e "To get started, run: smart-shell"
+
+echo -e "\n=============================================="
 echo -e "${GREEN}Smart-Shell has been installed successfully!${NC}"
-echo -e "${GREEN}==============================================${NC}"
-echo -e "\n${YELLOW}You can now use it by typing:${NC} smart-shell"
-echo -e "\n${YELLOW}To activate tab completion, either:${NC}"
-echo "  1. Start a new terminal session, or"
-echo "  2. Run: source ~/.bashrc"
-echo -e "\n${YELLOW}To run in interactive mode:${NC}"
-echo "  smart-shell"
-echo -e "\n${RED}IMPORTANT:${NC} Please run 'smart-shell setup' to configure your API key."
+echo -e "=============================================="
+echo -e "\nYou can now use it by typing: smart-shell"
+echo -e "\nTo activate tab completion, either:"
+echo -e "  1. Start a new terminal session, or"
+echo -e "  2. Run: source ~/.bashrc"
+echo -e "\nTo run in interactive mode:"
+echo -e "  smart-shell"
 echo -e "\n${YELLOW}Enjoy using Smart-Shell!${NC}"

@@ -210,44 +210,12 @@ def run_interactive_mode(dry_run, model, api_key, config, auto_yes=False):
     
     # Detect shell type
     shell_type = detect_shell()
-    from .shell_builder import BANNER as BASE_BANNER
-    # Dynamically update the banner arrow line only
-    import re as _re
-    banner = _re.sub(r"Natural Language → [^\n]+", f"Natural Language → {shell_type.capitalize()} Commands", BASE_BANNER)
-    console.print(Panel.fit(banner, title="Powered by Google Gemini", border_style="blue"))
-    # Welcome message
-    welcome_message = (
-        f"[bold blue]Detected shell:[/bold blue] [green]{shell_type}[/green]\n"
-        "Welcome to Smart-Shell interactive mode! Type your requests in natural language.\n"
-        "Type 'exit', 'quit', or press Ctrl+C to exit.\n\n"
-        "Special commands:\n"
-        "  !help          - Show this help message\n"
-        "  !history       - Show command history\n"
-        "  !last          - Show the last generated command\n"
-        "  !redo          - Re-execute the last command\n"
-        "  !clear         - Clear the screen\n"
-        "  !models        - List available AI models\n"
-        "  !models standard - List only free standard models\n"
-        "  !models premium  - List only paid premium models\n"
-        "  !models     - List models with a limit of n\n"
-        "  !models web    - Show additional model info from web\n"
-        "  !model <n>  - Switch to a different AI model\n"
-        "  !web           - Toggle web search for commands\n"
-        "  !update        - Check for updates and install\n"
-        "  !errors        - Show the error log\n"
-        "  !forget-sudo   - Clear the session sudo password\n"
-        "  !creator       - Show information about the creator\n"
-        "  !docs          - Show link to documentation\n"
-        "\n"
-        "Note: Premium models may incur costs or have stricter rate limits.\n"
-        "\n"
-        "Configuration Commands:\n"
-        "To reconfigure settings, first exit Smart-Shell with 'exit' or Ctrl+C, then run:\n"
-        "  smart-shell setup    - Configure API key and settings\n"
-        "  smart-shell models   - List available models from command line\n"
-        "  smart-shell version  - Show version information\n"
-    )
-    console.print(Panel.fit(welcome_message, title="Smart-Shell Interactive Mode", border_style="green"))
+    console.print(f"[bold blue]Detected shell:[/bold blue] {shell_type}")
+    
+    # Display the banner and welcome message
+    from .shell_builder import display_banner, display_welcome_message
+    display_banner()
+    display_welcome_message(shell_type)
     
     # Handle Ctrl+C gracefully
     def signal_handler(sig, frame):

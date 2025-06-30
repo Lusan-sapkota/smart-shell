@@ -17,9 +17,12 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "google-generativeai",
+    "google-genai",
     "rich",
-    "click"
+    "click",
+    "requests",
+    "pyyaml",
+    "google-api-core"
 ]
 
 [project.urls]
@@ -29,5 +32,5 @@ Issues = "https://github.com/Lusan-sapkota/smart-shell/issues"
 [project.scripts]
 smart-shell = "smart_shell.main:main"
 
-[tool.setuptools]
-py-modules = ["main", "safety", "config", "utils", "shell_builder", "ai_wrapper"] 
+[tool.setuptools.packages.find]
+include = ["smart_shell", "smart_shell.*"]

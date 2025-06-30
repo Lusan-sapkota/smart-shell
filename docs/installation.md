@@ -2,7 +2,7 @@
 
 ## Quick Installation (Recommended)
 
-Smart-Shell is distributed as a standalone project and is not available on PyPI. The recommended way to install is using the official install script, which handles all dependencies and environment setup for you.
+Smart-Shell is designed for easy installation with a single command that handles all dependencies and environment setup automatically.
 
 **Quick install (recommended for most users):**
 
@@ -10,20 +10,19 @@ Smart-Shell is distributed as a standalone project and is not available on PyPI.
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
 ```
 
-> Please note: After running the install script, you may be prompted to install [pipx](https://pypa.github.io/pipx/) if you want a user-level isolated install. The script will guide you if this is needed.
->
-> **TL;DR for Ubuntu/Debian users:**
+The installation script will:
+
+1. Check and install all required dependencies
+2. Install Smart-Shell using pipx (for better isolation)
+3. Create desktop entries for easy access
+4. Set up command completion for Bash and Zsh
+5. Apply fixes for common Python module path issues
+6. Automatically run the setup wizard to configure your API key
+
+> If you're behind a corporate firewall or have restricted internet access, you might need to manually install dependencies first:
 > ```bash
-> sudo apt install pipx
-> pipx ensurepath
-> source ~/.bashrc   # or ~/.zshrc depending on your shell
+> pip install --user google-genai rich click pyyaml requests google-api-core
 > ```
-
-> Then re-run the install script.
-
-> After installation, run `smart-shell setup` to configure your API key and sudo password.
-
-> If you want to install from source for development, clone the repo and run the install script from the project directory.
 
 After installation, use Smart-Shell from any terminal:
 
@@ -33,19 +32,46 @@ smart-shell
 
 ## CLI Commands
 
+- `smart-shell` — Start Smart-Shell in interactive mode
 - `smart-shell run <prompt>` — Convert natural language to Bash/Zsh commands
-- `smart-shell --interactive` — Start interactive mode
+- `smart-shell --interactive` or `-i` — Start interactive mode explicitly
 - `smart-shell setup` — Configure API key and settings
 - `smart-shell models` — List available AI models
 - `smart-shell history` — Show command history
 - `smart-shell --help` or `smart-shell help` — Show CLI help
 - `smart-shell --version` or `smart-shell version` — Show version information
+- `smart-shell --dry-run` or `-d` — Show command without executing
 
-## Manual Installation (Advanced)
+## Manual Installation Options
 
-- **System-wide:** Use the install script and select system-wide (requires sudo).
-- **Virtualenv:** Use the install script and select virtual environment (for development).
+The install script offers three installation methods:
+
+1. **System-wide installation** (requires sudo)
+   - Installs Smart-Shell for all users on the system
+   - Requires administrator privileges
+
+2. **User installation** (recommended)
+   - Uses pipx for isolated installation in your user directory
+   - No administrator privileges required
+   - Automatically installed if pipx is not found
+
+3. **Virtual environment** (for development)
+   - Creates a dedicated virtual environment
+   - Useful for development or testing
 
 For development setup, see [Development](development.md).
 
 For troubleshooting and more, see the [FAQ](faq.md).
+
+## Dependencies
+
+Smart-Shell requires the following Python packages:
+
+- `google-genai` - Google's Gemini AI SDK
+- `rich` - For beautiful terminal formatting
+- `click` - For command-line interface
+- `pyyaml` - For configuration management
+- `requests` - For API communication
+- `google-api-core` - Core Google API functionality
+
+The installation script handles all these dependencies automatically.

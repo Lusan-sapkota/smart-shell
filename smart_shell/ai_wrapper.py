@@ -87,11 +87,25 @@ class GeminiWrapper:
         try:
             # Import the google-genai library
             try:
-                from google import genai
-                self.genai = genai
+                # Try to import the library - if it fails, attempt to install it
+                try:
+                    from google import genai
+                    self.genai = genai
+                except ImportError:
+                    console.print("[yellow]Google GenAI library not found. Attempting to install...[/yellow]")
+                    import subprocess
+                    subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "google-genai"])
+                    console.print("[green]Installation successful! Importing library...[/green]")
+                    from google import genai
+                    self.genai = genai
+                
+                # Initialize the client with the API key
                 self.client = genai.Client(api_key=api_key)
+                
             except ImportError:
-                raise ImportError("Could not import google-genai. Please install it with: pip install google-genai")
+                raise ImportError("Could not import google-genai. Please install it manually with: pip install google-genai")
+            except Exception as install_error:
+                raise Exception(f"Failed to install dependency: {str(install_error)}")
             
             # Test API key validity and internet connection
             try:
@@ -194,7 +208,7 @@ class GeminiWrapper:
                 # Check internet connection before making the API call
                 self._check_internet_connection()
                 
-                # Generate content using the new API
+                # Generate content using the google-genai API
                 from google.genai import types
                 
                 response = self.client.models.generate_content(
@@ -248,84 +262,74 @@ class GeminiWrapper:
                     elif "blocked" in error_msg or "content" in error_msg and "policy" in error_msg:
                         raise Exception("Content blocked by API safety filters. Please modify your prompt.")
                     elif "too long" in error_msg or "token" in error_msg and "limit" in error_msg:
-                        raise Exception("Prompt too long. Please shorten your request.")
+                        raise Exception("Input too long. Please shorten your prompt.")
                     else:
-                        raise Exception(f"Failed to generate content: {str(e)}")
+                        raise Exception(f"Error generating content: {str(e)}")
         
         # If we've exhausted all retries
         raise Exception("Failed to generate content after multiple attempts. Please try again later.")
-
+    
     def explain_command(self, command: str, model: str) -> Optional[str]:
         """
-        Uses the AI to generate a one-sentence explanation for a shell command.
-
+        Get an explanation for a shell command.
+        
         Args:
-            command (str): The shell command to explain.
-            model (str): The model to use for the explanation.
-
+            command (str): The shell command to explain
+            model (str): The model to use for explanation
+            
         Returns:
-            A string containing the explanation, or None on failure.
+            Optional[str]: An explanation of what the command does, or None if explanation failed
         """
-        system_prompt = (
-            "You are a concise shell command explainer. "
-            "Describe the following command in a single, simple sentence. "
-            "Do not add any introductory text, formatting, or comments. "
-            "For example, for 'ls -la', respond with 'Lists all files and directories in the current location, including hidden ones.'"
-        )
+        system_prompt = """
+        You are a helpful shell command explainer. Given a shell command, explain what it does in simple terms.
+        Keep your explanation concise but thorough, focusing on potential risks or side effects.
+        Format your response as plain text with no markdown or special formatting.
+        """
+        
+        user_prompt = f"Explain this shell command: {command}"
         
         try:
-            # Use the main generation function with a short timeout and fewer retries
-            response = self.generate_content(
-                model=model,
-                prompts=[system_prompt, command],
-                retry=False, # Don't retry on this, it's non-critical
-                temperature=0.0, # Be factual
-                max_output_tokens=100
-            )
-
-            if response and hasattr(response, 'text') and response.text:
+            response = self.generate_content(model, [system_prompt, user_prompt])
+            if response and hasattr(response, 'text'):
                 return response.text.strip()
             return None
-        except Exception:
-            # If any error occurs, just fail gracefully
+        except Exception as e:
+            console.print(f"[yellow]Could not generate command explanation: {str(e)}[/yellow]")
             return None
-
+    
     def list_available_models(self):
         """
-        List all available models from the Gemini API that support content generation.
+        List all available Gemini models.
         
         Returns:
-            list: A list of available model names.
+            list: List of available model names
         """
         try:
-            # Check internet connection
+            # Check internet connection before making the API call
             self._check_internet_connection()
             
-            # Try to get models from API
-            console.print("[blue]Fetching available models from API...[/blue]")
+            # Get all available models
             models = self.client.models.list()
-            model_names = []
             
+            # Filter for Gemini models only
+            gemini_models = []
             for model in models:
-                # The official documentation example shows using `supported_actions`
-                # to find models that can generate content. This is the correct way.
-                if (hasattr(model, 'supported_actions') and 
-                    model.supported_actions is not None and 
-                    'generateContent' in model.supported_actions):
-                    model_names.append(model.name)
+                # Safely get model name
+                if hasattr(model, 'name') and model.name:
+                    model_name = str(model.name)
+                    if "gemini" in model_name.lower():
+                        # Strip the full path if present
+                        if "/" in model_name:
+                            model_name = model_name.split("/")[-1]
+                        gemini_models.append(model_name)
             
-            if not model_names:
-                console.print("[yellow]Could not find any supported models from the API. Using defaults.[/yellow]")
+            # If no models were found, return defaults
+            if not gemini_models:
                 return ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-pro"]
                 
-            return model_names
-        except requests.exceptions.ConnectionError:
-            console.print("[yellow]Warning: Could not fetch models (no internet). Using defaults.[/yellow]")
-            return ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-pro"]
-        except requests.exceptions.Timeout:
-            console.print("[yellow]Warning: Could not fetch models (connection timed out). Using defaults.[/yellow]")
-            return ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-pro"]
+            return gemini_models
+            
         except Exception as e:
-            # If API call fails, return default supported models
-            console.print(f"[yellow]Note: Could not fetch models from API: {str(e)}[/yellow]")
+            console.print(f"[red]Error listing models: {str(e)}[/red]")
+            # Return a default list of models that are likely to be available
             return ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.0-pro"] 

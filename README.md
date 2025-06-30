@@ -66,17 +66,18 @@ Smart-Shell is an intelligent terminal assistant that converts natural language 
 
 ## Quick Install (Recommended)
 
-Smart-Shell requires [pipx](https://pypa.github.io/pipx/) for user installations on most modern Linux systems (PEP 668).
+Install Smart-Shell with a single command:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
 ```
 
-> Please note: After running the install script, you may be prompted to install [pipx](https://pypa.github.io/pipx/) if you want a user-level isolated install. The script will guide you if this is needed.
-
-> After installation, run `smart-shell setup` to configure your API key and sudo password.
-
-> If you want to install from source for development, clone the repo and run the install script from the project directory.
+Our intelligent installation script:
+- ✅ Automatically checks and installs all dependencies (including pipx if needed)
+- ✅ Handles package installation with proper isolation
+- ✅ Creates desktop entries and command completion
+- ✅ Fixes common Python module path issues
+- ✅ Runs the setup wizard to configure your API key
 
 After installation, use Smart-Shell from any terminal:
 
@@ -84,9 +85,7 @@ After installation, use Smart-Shell from any terminal:
 smart-shell
 ```
 
-### Setting up your API key
-
-After installation, you'll need to set up your Google Gemini API key (one-time setup):
+The first time you run Smart-Shell, it will guide you through setting up your Google Gemini API key. You can also run the setup wizard anytime:
 
 ```bash
 smart-shell setup

@@ -13,6 +13,9 @@ from rich.text import Text
 from rich.style import Style
 from rich.align import Align
 from rich.prompt import Confirm
+from rich.table import Table
+from rich.box import ROUNDED, DOUBLE, HEAVY
+from rich.columns import Columns
 
 # Import our AI wrapper
 from .ai_wrapper import get_wrapper
@@ -21,12 +24,12 @@ console = Console()
 
 # ASCII art banner
 BANNER = r"""
-    _____                      _      _____ _          _ _                                                     
-   / ____|                    | |    / ____| |        | | |                                                    
-  | (___  _ __ ___   __ _ _ __| |_  | (___ | |__   ___| | |                                                    
-   \___ \| '_ ` _ \ / _` | '__| __|  \___ \| '_ \ / _ \ | |                                                    
-   ____) | | | | | | (_| | |  | |_   ____) | | | |  __/ | |                                                    
-  |_____/|_| |_| |_|\__,_|_|   \__| |_____/|_| |_|\___|_|_|                                                    
+    _____                      _      _____ _          _ _                  
+   / ____|                    | |    / ____| |        | | |                 
+  | (___  _ __ ___   __ _ _ __| |_  | (___ | |__   ___| | |                 
+   \___ \| '_ ` _ \ / _` | '__| __|  \___ \| '_ \ / _ \ | |                 
+   ____) | | | | | | (_| | |  | |_   ____) | | | |  __/ | |                 
+  |_____/|_| |_| |_|\__,_|_|   \__| |_____/|_| |_|\___|_|_|                 
 
   Natural Language → Bash/Zsh Commands
 """
@@ -159,19 +162,113 @@ def generate_command_plan(prompt, api_key, model=None, os_info=None, shell_type=
     raise Exception(f"Error generating command plan: {last_error}")
 
 def display_banner():
-    """Display the Smart-Shell banner."""
-    text = Text(BANNER, justify="center")
+    """Display the Smart-Shell banner with improved styling."""
+    # Create a styled version of the banner with gradient colors
+    styled_banner = Text()
+    lines = BANNER.strip().split('\n')
+    
+    # Apply blue gradient to the ASCII art
+    for i, line in enumerate(lines):
+        if i < 6:  # The ASCII art part
+            styled_banner.append(line + "\n", style=f"bold bright_blue")
+        else:  # The tagline
+            styled_banner.append(line, style="bold cyan")
+    
+    # Create a panel with double-line border and a professional look
     panel = Panel(
-        text,
-        border_style="blue",
+        Align.center(styled_banner),
+        box=DOUBLE,
+        border_style="bright_blue",
         padding=(1, 2),
-        subtitle="Powered by Google Gemini",
+        title="[bold white]Smart-Shell[/bold white]",
+        title_align="center",
+        subtitle="[bold white]Powered by Google Gemini[/bold white]",
         subtitle_align="center"
     )
+    
     console.print(panel)
+
+def create_command_section(title, commands):
+    """Create a section of commands for the welcome message."""
+    content = ""
+    for cmd, desc in commands:
+        content += f"  [bold cyan]{cmd}[/bold cyan] - {desc}\n"
+    
+    return Panel(
+        content,
+        title=f"[bold white]{title}[/bold white]",
+        border_style="blue",
+        box=ROUNDED,
+        padding=(0, 1),
+        expand=False
+    )
+
+def display_welcome_message(shell_type="bash"):
+    """Display a welcome message with helpful information."""
+    # Main welcome panel
+    welcome_panel = Panel(
+        f"[bold blue]Detected shell:[/bold blue] [green]{shell_type}[/green]\n\n"
+        "[bold white]Welcome to Smart-Shell![/bold white]\n"
+        "Type your requests in natural language to convert them into shell commands.\n"
+        "Type [bold cyan]exit[/bold cyan], [bold cyan]quit[/bold cyan], or press [bold cyan]Ctrl+C[/bold cyan] to exit.",
+        title="[bold white]Smart Terminal Assistant[/bold white]",
+        border_style="green",
+        box=HEAVY,
+        padding=(1, 2),
+        expand=True
+    )
+    
+    # Special commands section
+    special_commands = [
+        ("!help", "Show this help message"),
+        ("!history", "Show command history"),
+        ("!last", "Show the last generated command"),
+        ("!redo", "Re-execute the last command"),
+        ("!clear", "Clear the screen"),
+        ("!models", "List available AI models"),
+        ("!model <name>", "Switch to a different AI model"),
+        ("!web", "Toggle web search for commands"),
+        ("!update", "Check for updates and install"),
+        ("!errors", "Show the error log"),
+        ("!forget-sudo", "Clear the session sudo password"),
+        ("!creator", "Show information about the creator"),
+        ("!docs", "Show link to documentation")
+    ]
+    
+    special_commands_panel = create_command_section("Special Commands", special_commands)
+    
+    # Configuration commands section
+    config_commands = [
+        ("smart-shell setup", "Configure API key and settings"),
+        ("smart-shell models", "List available models from command line"),
+        ("smart-shell version", "Show version information"),
+        ("smart-shell --help", "Show all available options")
+    ]
+    
+    config_panel = create_command_section("Configuration Commands", config_commands)
+    
+    # Notes panel
+    notes_panel = Panel(
+        "[italic]Note: Premium models may incur costs or have stricter rate limits.[/italic]\n"
+        "[italic]To reconfigure settings, first exit Smart-Shell with 'exit' or Ctrl+C.[/italic]",
+        title="[bold white]Notes[/bold white]",
+        border_style="blue",
+        box=ROUNDED,
+        padding=(0, 1),
+        expand=False
+    )
+    
+    # Display everything in a structured layout
+    console.print(welcome_panel)
+    
+    # Create a two-column layout for commands
+    columns = Columns([special_commands_panel, config_panel], equal=True, expand=True)
+    console.print(columns)
+    console.print(notes_panel)
 
 if __name__ == "__main__":
     # This allows the module to be run directly for testing
     display_banner()
+    display_welcome_message()
     console.print("[yellow]Shell Builder module - For testing only[/yellow]")
     console.print("Use 'smart-shell' command or main.py to run the application.")
