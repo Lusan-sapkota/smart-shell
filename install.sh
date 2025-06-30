@@ -77,6 +77,15 @@ check_dependencies() {
 
 # Function to handle GitHub cloning or use current directory
 setup_source_directory() {
+    # Check for broken or conflicting smart-shell executables before cloning
+    if [[ -f "$HOME/.local/bin/smart-shell" && ! -L "$HOME/.local/bin/smart-shell" ]]; then
+        echo -e "${RED}WARNING: A non-symlinked smart-shell executable already exists at $HOME/.local/bin/smart-shell.${NC}"
+        echo -e "This can cause pipx to fail or Smart-Shell to not run correctly."
+        echo -e "Please remove it with: ${YELLOW}rm $HOME/.local/bin/smart-shell${NC}"
+        echo -e "Then re-run this install script."
+        exit 1
+    fi
+
     # Check if we're running from a piped curl command or direct execution
     if [[ ! -f "pyproject.toml" ]]; then
         echo -e "\n${BLUE}Downloading Smart-Shell...${NC}"
