@@ -317,6 +317,12 @@ verify_installation() {
 main() {
     check_dependencies
     setup_source_directory
+
+    # Ensure we are in the Smart-Shell source directory for pip install
+    if [[ ! -f "pyproject.toml" ]]; then
+        echo -e "${RED}Error: pyproject.toml not found. Not in Smart-Shell source directory.${NC}"
+        exit 1
+    fi
     
     echo -e "\n${YELLOW}Please select installation method:${NC}"
     echo "1) System-wide installation (requires sudo)"
@@ -334,6 +340,13 @@ main() {
     fi
     
     install_smart_shell "$INSTALL_OPTION"
+
+    # Verify Python import after install
+    if ! python3 -c "import smart_shell" 2>/dev/null; then
+        echo -e "${RED}ERROR: Python cannot import 'smart_shell'. Installation may have failed or PYTHONPATH is not set correctly.${NC}"
+        echo -e "${YELLOW}Try running: pip3 install --user .${NC}"
+        exit 1
+    fi
     
     # Only create desktop entry for system or user installations
     if [[ "$INSTALL_OPTION" == "1" || "$INSTALL_OPTION" == "2" ]]; then
@@ -351,12 +364,10 @@ main() {
     
     # Verify the installation
     verify_installation
-    
+
     echo -e "\n${GREEN}✓ Smart-Shell installation complete!${NC}"
     echo -e "${YELLOW}To get started, run:${NC} smart-shell"
-    
-    # Clear hash to ensure the shell finds the new command
-    hash -r 2>/dev/null || true
+    echo -e "\n${RED}IMPORTANT:${NC} Please run 'smart-shell setup' to configure your API key and sudo password."
 }
 
 # Run the main function
@@ -372,4 +383,5 @@ echo -e "  1. Start a new terminal session, or"
 echo -e "  2. Run: source ~/.bashrc"
 echo -e "\n${YELLOW}To run in interactive mode:${NC}"
 echo -e "  smart-shell"
-echo -e "\n${GREEN}Enjoy using Smart-Shell!${NC}" 
+echo -e "\n${RED}IMPORTANT:${NC} Please run 'smart-shell setup' to configure your API key and sudo password."
+echo -e "\n${GREEN}Enjoy using Smart-Shell!${NC}"
