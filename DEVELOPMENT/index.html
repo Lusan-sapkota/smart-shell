@@ -962,8 +962,8 @@ flake8
 <p>The environment variable takes precedence over the config file.</p>
 <h3 id="model-support">Model Support<a class="headerlink" href="#model-support" title="Permanent link">&para;</a></h3>
 <p>Smart-Shell supports multiple Gemini models:
-- <code>gemini-2.5-pro</code> (default): Most capable model with advanced reasoning
-- <code>gemini-2.5-flash</code>: Faster model with good performance
+- <code>gemini-2.5-flash</code> (default): Fast, capable model for most use cases
+- <code>gemini-2.5-pro</code>: More advanced reasoning, but may be slower or have stricter limits
 - <code>gemini-2.0-pro</code>: Legacy model for compatibility</p>
 <p>The model validation system in <code>shell_builder.py</code> ensures that:
 1. If an invalid model is specified, it falls back to the default model
@@ -1055,7 +1055,7 @@ flake8
 <li>Add configuration options for the new provider</li>
 <li>Update documentation and help text</li>
 </ol>
-<p>Remember that different AI models may have different capabilities and limitations, so thorough testing is essential. </p>
+<p>Remember that different AI models may have different capabilities and limitations, so thorough testing is essential.</p>
 
 
 

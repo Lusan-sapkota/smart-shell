@@ -354,9 +354,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#manual-installation" class="md-nav__link">
+  <a href="#manual-installation-advanced" class="md-nav__link">
     <span class="md-ellipsis">
-      Manual Installation
+      Manual Installation (Advanced)
     </span>
   </a>
   
@@ -635,9 +635,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#manual-installation" class="md-nav__link">
+  <a href="#manual-installation-advanced" class="md-nav__link">
     <span class="md-ellipsis">
-      Manual Installation
+      Manual Installation (Advanced)
     </span>
   </a>
   
@@ -664,11 +664,14 @@
 
 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
 <h2 id="quick-installation-recommended">Quick Installation (Recommended)<a class="headerlink" href="#quick-installation-recommended" title="Permanent link">&para;</a></h2>
-<p>Run this command to install Smart-Shell system-wide:</p>
+<p>Smart-Shell is distributed as a standalone project and is not available on PyPI. The recommended way to install is using the official install script, which handles all dependencies and environment setup for you.</p>
+<p><strong>Quick install (recommended for most users):</strong></p>
 <div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sSL<span class="w"> </span>https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </code></pre></div>
 <blockquote>
-<p>Please note: Run <code>smart-shell setup</code> after this to setup your API key and sudo password.</p>
+<p>Please note: After running the install script, you may be prompted to install <a href="https://pypa.github.io/pipx/">pipx</a> if you want a user-level isolated install. The script will guide you if this is needed.
+After installation, run <code>smart-shell setup</code> to configure your API key and sudo password.</p>
+<p>If you want to install from source for development, clone the repo and run the install script from the project directory.</p>
 </blockquote>
 <p>After installation, use Smart-Shell from any terminal:</p>
 <div class="highlight"><pre><span></span><code>smart-shell
@@ -683,8 +686,13 @@
 <li><code>smart-shell --help</code> or <code>smart-shell help</code> — Show CLI help</li>
 <li><code>smart-shell --version</code> or <code>smart-shell version</code> — Show version information</li>
 </ul>
-<h2 id="manual-installation">Manual Installation<a class="headerlink" href="#manual-installation" title="Permanent link">&para;</a></h2>
-<p>For manual installation and development setup, see <a href="../development/">Development</a>.</p>
+<h2 id="manual-installation-advanced">Manual Installation (Advanced)<a class="headerlink" href="#manual-installation-advanced" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>System-wide:</strong> Use the install script and select system-wide (requires sudo).</li>
+<li><strong>Virtualenv:</strong> Use the install script and select virtual environment (for development).</li>
+</ul>
+<p>For development setup, see <a href="../development/">Development</a>.</p>
+<p>For troubleshooting and more, see the <a href="../faq/">FAQ</a>.</p>
 
 
 

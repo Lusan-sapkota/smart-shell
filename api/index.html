@@ -500,6 +500,24 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#utilspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      utils.py
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup_logicpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      setup_logic.py
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -704,6 +722,24 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#utilspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      utils.py
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup_logicpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      setup_logic.py
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -731,36 +767,54 @@
 <h1 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
 <h2 id="main-modules">Main Modules<a class="headerlink" href="#main-modules" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>smart_shell.main</code>: Entry point and CLI logic</li>
-<li><code>smart_shell.ai_wrapper</code>: Handles AI model communication</li>
-<li><code>smart_shell.safety</code>: Safety checks and command validation</li>
-<li><code>smart_shell.config</code>: Configuration and API key management</li>
-<li><code>smart_shell.shell_builder</code>: Bash/Zsh command construction</li>
-<li><code>smart_shell.utils</code>: Utility functions</li>
+<li><code>smart_shell.main</code>: Entry point, CLI logic, interactive mode, and special commands</li>
+<li><code>smart_shell.ai_wrapper</code>: Handles AI model communication (Gemini)</li>
+<li><code>smart_shell.safety</code>: Safety checks, command validation, and user confirmation logic</li>
+<li><code>smart_shell.config</code>: Configuration, API key management, and model selection</li>
+<li><code>smart_shell.shell_builder</code>: Bash/Zsh command construction and banner display</li>
+<li><code>smart_shell.utils</code>: Utility functions (execution, logging, sudo, OS detection)</li>
 <li><code>smart_shell.setup_logic</code>: Setup and installation logic</li>
 </ul>
 <h2 id="key-classes-functions">Key Classes &amp; Functions<a class="headerlink" href="#key-classes-functions" title="Permanent link">&para;</a></h2>
 <h3 id="ai_wrapperpy">ai_wrapper.py<a class="headerlink" href="#ai_wrapperpy" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>AIWrapper</code>: Main class for interacting with Gemini models</li>
+<li><code>get_wrapper(api_key)</code>: Returns an AIWrapper instance for Gemini</li>
+<li><code>AIWrapper.list_available_models()</code>: List supported Gemini models</li>
 <li><code>AIWrapper.generate_command(prompt, model)</code>: Generate Bash/Zsh command from prompt</li>
 </ul>
 <h3 id="safetypy">safety.py<a class="headerlink" href="#safetypy" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>SafetyChecker</code>: Class for command safety analysis</li>
-<li><code>SafetyChecker.check(command)</code>: Returns safety level and reason</li>
+<li><code>check_command_safety(command)</code>: Returns safety level and reason for a command</li>
+<li>(Class-based API is not used; safety is function-based)</li>
 </ul>
 <h3 id="configpy">config.py<a class="headerlink" href="#configpy" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>ConfigManager</code>: Handles config file and environment variables</li>
-<li><code>ConfigManager.get_api_key()</code>: Returns API key</li>
+<li><code>load_config()</code>: Loads config file</li>
+<li><code>save_model(model)</code>: Saves selected model</li>
+<li><code>get_current_model()</code>: Gets current model</li>
+<li><code>ENV_API_KEY</code>: Environment variable for API key</li>
 </ul>
 <h3 id="shell_builderpy">shell_builder.py<a class="headerlink" href="#shell_builderpy" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>ShellBuilder</code>: Converts structured command to Bash/Zsh</li>
+<li><code>generate_command_plan(prompt, api_key, model, os_info)</code>: Returns a list of command(s) for a prompt</li>
+<li><code>display_banner()</code>: Prints the Smart-Shell banner</li>
+<li><code>BANNER</code>: Banner string</li>
+</ul>
+<h3 id="utilspy">utils.py<a class="headerlink" href="#utilspy" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>execute_command(command)</code>: Runs a shell command</li>
+<li><code>print_plan_preview(plan, safety_results)</code>: Shows command plan and safety</li>
+<li><code>reset_sudo_password()</code>: Clears cached sudo password</li>
+<li><code>log_error(error)</code>: Logs errors</li>
+<li><code>get_os_info()</code>: Returns OS info</li>
+<li><code>detect_shell()</code>: Detects Bash or Zsh</li>
+</ul>
+<h3 id="setup_logicpy">setup_logic.py<a class="headerlink" href="#setup_logicpy" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>setup_config()</code>: Runs interactive setup</li>
 </ul>
 <hr />
-<p>For more, see the source code and inline docstrings.</p>
+<p>For more, see the source code and inline docstrings. All modules are designed for Bash and Zsh compatibility, and safety checks always prompt for confirmation on high-risk commands.</p>
 
 
 

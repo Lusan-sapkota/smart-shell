@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#usage" class="md-skip">
+        <a href="#usage-guide-smart-shell" class="md-skip">
           Skip to content
         </a>
       
@@ -358,27 +358,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#interactive-mode" class="md-nav__link">
+  <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
-      Interactive Mode
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#one-off-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      One-off Commands
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#available-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      Available Commands
+      Quick Start
     </span>
   </a>
   
@@ -394,9 +376,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
+  <a href="#system-level-cli-commands" class="md-nav__link">
     <span class="md-ellipsis">
-      Options
+      System-Level CLI Commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage Patterns
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#safety-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Safety System
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Documentation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes
     </span>
   </a>
   
@@ -635,27 +662,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#interactive-mode" class="md-nav__link">
+  <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
-      Interactive Mode
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#one-off-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      One-off Commands
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#available-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      Available Commands
+      Quick Start
     </span>
   </a>
   
@@ -671,9 +680,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
+  <a href="#system-level-cli-commands" class="md-nav__link">
     <span class="md-ellipsis">
-      Options
+      System-Level CLI Commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage Patterns
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#safety-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Safety System
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Documentation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes
     </span>
   </a>
   
@@ -698,40 +752,186 @@
   
 
 
-<h1 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h1>
-<h2 id="interactive-mode">Interactive Mode<a class="headerlink" href="#interactive-mode" title="Permanent link">&para;</a></h2>
-<p>Start Smart-Shell in interactive mode:</p>
-<div class="highlight"><pre><span></span><code>smart-shell
-</code></pre></div>
-<p>Type natural language commands and Smart-Shell will convert them to Bash/Zsh. Exit with <code>exit</code>, <code>quit</code>, or <code>Ctrl+C</code>.</p>
-<h2 id="one-off-commands">One-off Commands<a class="headerlink" href="#one-off-commands" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>smart-shell<span class="w"> </span>run<span class="w"> </span><span class="s2">&quot;list all pdf files in the current directory&quot;</span>
-smart-shell<span class="w"> </span>run<span class="w"> </span><span class="s2">&quot;delete all log files&quot;</span><span class="w"> </span>--dry-run
-smart-shell<span class="w"> </span>run<span class="w"> </span><span class="s2">&quot;find large files&quot;</span><span class="w"> </span>--model<span class="w"> </span>gemini-2.5-flash
-smart-shell<span class="w"> </span>run<span class="w"> </span><span class="s2">&quot;restart apache&quot;</span><span class="w"> </span>--yes
-</code></pre></div>
-<h2 id="available-commands">Available Commands<a class="headerlink" href="#available-commands" title="Permanent link">&para;</a></h2>
+<h1 id="usage-guide-smart-shell">Usage Guide: Smart-Shell<a class="headerlink" href="#usage-guide-smart-shell" title="Permanent link">&para;</a></h1>
+<p>This guide covers all special commands, system-level commands, and usage patterns for Smart-Shell, including both CLI and interactive modes.</p>
+<hr />
+<h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>smart-shell</code> or <code>smart-shell run</code>: Convert natural language to Bash/Zsh commands</li>
-<li><code>smart-shell setup</code>: Configure your API key</li>
-<li><code>smart-shell version</code>: Display version information</li>
-<li><code>smart-shell history</code>: Show command history</li>
+<li><strong>Interactive Mode:</strong>
+  <div class="highlight"><pre><span></span><code>smart-shell<span class="w"> </span>--interactive
+</code></pre></div></li>
+<li><strong>One-off Command:</strong>
+  <div class="highlight"><pre><span></span><code>smart-shell<span class="w"> </span>run<span class="w"> </span><span class="s2">&quot;list all PDF files in the current directory&quot;</span>
+</code></pre></div></li>
+<li><strong>Help:</strong>
+  <div class="highlight"><pre><span></span><code>smart-shell<span class="w"> </span>--help
+</code></pre></div></li>
 </ul>
+<hr />
 <h2 id="special-commands-interactive-mode">Special Commands (Interactive Mode)<a class="headerlink" href="#special-commands-interactive-mode" title="Permanent link">&para;</a></h2>
+<p>Type these at the Smart-Shell prompt (not in your system shell):</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!help</code></td>
+<td>Show help message</td>
+</tr>
+<tr>
+<td><code>!history</code></td>
+<td>Show command history</td>
+</tr>
+<tr>
+<td><code>!last</code></td>
+<td>Show the last generated command</td>
+</tr>
+<tr>
+<td><code>!redo</code></td>
+<td>Re-execute the last command</td>
+</tr>
+<tr>
+<td><code>!clear</code></td>
+<td>Clear the screen</td>
+</tr>
+<tr>
+<td><code>!models</code></td>
+<td>List available AI models</td>
+</tr>
+<tr>
+<td><code>!models standard</code></td>
+<td>List only free standard models</td>
+</tr>
+<tr>
+<td><code>!models premium</code></td>
+<td>List only paid premium models</td>
+</tr>
+<tr>
+<td><code>!models &lt;n&gt;</code></td>
+<td>List models with a limit of n</td>
+</tr>
+<tr>
+<td><code>!models web</code></td>
+<td>Show additional model info from web</td>
+</tr>
+<tr>
+<td><code>!model &lt;model-name&gt;</code></td>
+<td>Switch to a different AI model</td>
+</tr>
+<tr>
+<td><code>!web</code></td>
+<td>Toggle web search for commands</td>
+</tr>
+<tr>
+<td><code>!update</code></td>
+<td>Check for updates and install</td>
+</tr>
+<tr>
+<td><code>!errors</code></td>
+<td>Show the error log</td>
+</tr>
+<tr>
+<td><code>!forget-sudo</code></td>
+<td>Clear the session sudo password</td>
+</tr>
+<tr>
+<td><code>!creator</code></td>
+<td>Show information about the creator</td>
+</tr>
+<tr>
+<td><code>!docs</code></td>
+<td>Show link to documentation</td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li><code>!history</code> - Show command history</li>
-<li><code>!clear</code> - Clear the screen</li>
-<li><code>!help</code> - Show help</li>
-<li><code>!model &lt;model-name&gt;</code> - Change the AI model</li>
+<li><strong>Exit:</strong> Type <code>exit</code>, <code>quit</code>, <code>bye</code>, <code>q</code>, or press Ctrl+C.</li>
 </ul>
-<h2 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="system-level-cli-commands">System-Level CLI Commands<a class="headerlink" href="#system-level-cli-commands" title="Permanent link">&para;</a></h2>
+<p>Run these in your system shell:</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>smart-shell run &lt;prompt&gt;</code></td>
+<td>Run a one-off natural language command</td>
+</tr>
+<tr>
+<td><code>smart-shell --interactive</code></td>
+<td>Start interactive mode</td>
+</tr>
+<tr>
+<td><code>smart-shell setup</code></td>
+<td>Configure API key and settings</td>
+</tr>
+<tr>
+<td><code>smart-shell models</code></td>
+<td>List available models</td>
+</tr>
+<tr>
+<td><code>smart-shell history</code></td>
+<td>Show command history</td>
+</tr>
+<tr>
+<td><code>smart-shell --help</code> or <code>-h</code></td>
+<td>Show CLI help</td>
+</tr>
+<tr>
+<td><code>smart-shell --version</code></td>
+<td>Show version information</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="usage-patterns">Usage Patterns<a class="headerlink" href="#usage-patterns" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>--dry-run</code>, <code>-d</code>: Show command without executing</li>
-<li><code>--model</code>, <code>-m</code>: Specify model to use</li>
-<li><code>--interactive</code>, <code>-i</code>: Run in interactive mode</li>
-<li><code>--yes</code>, <code>-y</code>: Automatically confirm all prompts</li>
+<li><strong>Natural Language:</strong></li>
+<li>Type requests like "Find large files over 100MB" or "Create a backup of my project folder".</li>
+<li><strong>Model Selection:</strong></li>
+<li>Use <code>--model &lt;model-name&gt;</code> in CLI or <code>!model &lt;model-name&gt;</code> in interactive mode.</li>
+<li><strong>Web Search:</strong></li>
+<li>Toggle with <code>!web</code> in interactive mode.</li>
+<li><strong>Safety:</strong></li>
+<li>Commands are checked for safety before execution. High-risk commands require explicit confirmation.</li>
 </ul>
-<p>See <a href="../features/">Features</a> for more details.</p>
+<hr />
+<h2 id="safety-system">Safety System<a class="headerlink" href="#safety-system" title="Permanent link">&para;</a></h2>
+<ul>
+<li>🟢 <strong>Safe:</strong> Command is safe to run.</li>
+<li>🟡 <strong>Warning:</strong> Might have unintended consequences (requires confirmation).</li>
+<li>🔴 <strong>Blocked:</strong> Potentially harmful (requires explicit confirmation; will be executed if you confirm).</li>
+</ul>
+<hr />
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<ul>
+<li>To reconfigure, exit Smart-Shell and run:
+  <div class="highlight"><pre><span></span><code>smart-shell<span class="w"> </span>setup
+</code></pre></div></li>
+</ul>
+<hr />
+<h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Full docs: https://lusan-sapkota.github.io/smart-shell/</li>
+</ul>
+<hr />
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Premium models may incur costs or have stricter rate limits.</li>
+<li>All commands and features are available in both Bash and Zsh environments.</li>
+<li>For troubleshooting, use <code>!errors</code> or check the error log.</li>
+</ul>
+<hr />
+<p>For more details, see the full documentation or use <code>!help</code> in interactive mode.</p>
 
 
 

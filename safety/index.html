@@ -650,15 +650,18 @@
 <ul>
 <li><strong>Safe</strong> 🟢: Commands that are considered safe to run</li>
 <li><strong>Warning</strong> 🟡: Commands that might have unintended consequences (requires confirmation)</li>
-<li><strong>Blocked</strong> 🔴: Commands that are potentially harmful (will not be executed)</li>
+<li><strong>Blocked</strong> 🔴: Commands that are potentially harmful (require explicit user confirmation before execution)</li>
 </ul>
 <h2 id="safety-checks">Safety Checks<a class="headerlink" href="#safety-checks" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Blocked Commands:</strong> Explicitly blocks dangerous commands (e.g., <code>rm -rf /</code>, fork bombs, disk formatting)</li>
+<li><strong>Blocked Commands:</strong> Explicitly identifies dangerous commands (e.g., <code>rm -rf /</code>, fork bombs, disk formatting) and prompts the user for confirmation before execution. If the user confirms, the command will be executed.</li>
 <li><strong>Pattern Matching:</strong> Uses regex to identify risky command patterns (e.g., <code>sudo</code>, <code>rm -rf</code>)</li>
 <li><strong>Path Analysis:</strong> Detects operations on sensitive system paths (e.g., <code>/etc/passwd</code>)</li>
 </ul>
-<p>For more details, see the <a href="../SAFETY/">Safety System Documentation</a>.</p>
+<blockquote>
+<p><strong>Note:</strong> Even high-risk ("blocked") commands can be executed if the user explicitly confirms when prompted. This ensures user control while maintaining safety.</p>
+</blockquote>
+<p>For more details, see the <a href="SAFETY.md">Safety System Documentation</a>.</p>
 
 
 
