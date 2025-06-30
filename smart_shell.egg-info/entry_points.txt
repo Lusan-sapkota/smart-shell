@@ -1,2 +1,0 @@
-[console_scripts]
-smart-shell = smart_shell.main:main

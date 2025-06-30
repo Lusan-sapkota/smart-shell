@@ -273,6 +273,19 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Features
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -284,6 +297,34 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#smart-shell-offers-a-rich-set-of-features-to-make-your-terminal-experience-smarter-and-safer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Smart-Shell offers a rich set of features to make your terminal experience smarter and safer:
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -551,6 +592,23 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#smart-shell-offers-a-rich-set-of-features-to-make-your-terminal-experience-smarter-and-safer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Smart-Shell offers a rich set of features to make your terminal experience smarter and safer:
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -569,25 +627,73 @@
 
 
 <h1 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h1>
-<p>Smart-Shell offers a rich set of features to enhance your terminal experience:</p>
+<h2 id="smart-shell-offers-a-rich-set-of-features-to-make-your-terminal-experience-smarter-and-safer">Smart-Shell offers a rich set of features to make your terminal experience smarter and safer:<a class="headerlink" href="#smart-shell-offers-a-rich-set-of-features-to-make-your-terminal-experience-smarter-and-safer" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Interactive Mode:</strong> Continuous natural language to Bash/Zsh command conversion</li>
-<li><strong>Safety Checks:</strong> Built-in protection against dangerous commands</li>
-<li><strong>Multiple AI Models:</strong> Support for various Gemini models</li>
-<li><strong>Command History:</strong> Track and recall past commands</li>
-<li><strong>Secure API Key Management:</strong> Environment variables or config file storage</li>
-<li><strong>Tab Completion:</strong> completion for all commands and options</li>
-<li><strong>Desktop Integration</strong>: Launch from application menu</li>
-<li><strong>Web Search Support</strong>: Smart-Shell is fully capable of web search as well</li>
-<li><strong>Network Error Handling:</strong> Robust handling of connectivity issues</li>
-<li><strong>Automatic Retries:</strong> Automatic retry mechanism for transient errors</li>
-<li><strong>Dry Run Mode:</strong> Preview commands before execution</li>
-<li><strong>Model Selection:</strong> Choose between Gemini models for different needs</li>
-<li><strong>History Search:</strong> Quickly search and reuse previous commands</li>
-<li><strong>Custom Configuration:</strong> Easily manage preferences and API keys</li>
-<li><strong>Extensible:</strong> Designed for easy addition of new features</li>
+<li>
+<p>🧠 <strong>Natural Language to Command</strong><br />
+  Convert plain English into valid Bash/Zsh commands instantly.</p>
+</li>
+<li>
+<p>🐚 <strong>Shell Auto-Detection</strong><br />
+  Automatically detects and supports both <strong>Bash</strong> and <strong>Zsh</strong> environments.</p>
+</li>
+<li>
+<p>💬 <strong>Interactive Mode with Command History</strong><br />
+  Rich REPL interface with support for special commands like:<br />
+<code>!help</code>, <code>!docs</code>, <code>!models</code>, <code>!history</code>, <code>!clear</code>, <code>!redo</code>, <code>!last</code>, <code>!creator</code>, <code>!forget-sudo</code>, <code>!update</code>, <code>!errors</code>, <code>!web</code>, and more.</p>
+</li>
+<li>
+<p>🛡️ <strong>Built-in Safety System</strong><br />
+  Analyzes each command and classifies it into <strong>three risk levels</strong> - Reason also provided:</p>
+</li>
+<li>✅ <strong>Safe</strong> – Executed automatically.</li>
+<li>⚠️ <strong>Medium</strong> – Requires manual confirmation (yes/no).</li>
+<li>
+<p>❌ <strong>High</strong> – Requires manual confirmation (yes/no).<br />
+  This ensures dangerous or potentially destructive commands are never run blindly.</p>
+</li>
+<li>
+<p>🤖 <strong>AI-Powered Command Planning</strong><br />
+  Generates and refines shell commands using <strong>Google Gemini</strong> models.</p>
+</li>
+<li>
+<p>🔀 <strong>Multi-Model Support</strong><br />
+  Easily switch between Gemini <strong>Pro</strong>, <strong>Flash</strong>, and <strong>Legacy</strong> models as needed.</p>
+</li>
+<li>
+<p>🧪 <strong>Dry-Run Mode</strong><br />
+  Preview the exact command before execution for extra safety and transparency.</p>
+</li>
+<li>
+<p>📟 <strong>Standard CLI Commands</strong><br />
+  Includes <code>--help</code>, <code>--version</code>, and other CLI flags for quick access.</p>
+</li>
+<li>
+<p>🖥️ <strong>Desktop Integration</strong><br />
+  Comes with a <code>.desktop</code> entry — launch directly from your system's <strong>Application Menu</strong>.</p>
+</li>
+<li>
+<p>⌨️ <strong>Tab Completion</strong><br />
+  Supports intelligent tab completion for both <strong>Bash</strong> and <strong>Zsh</strong> shells.</p>
+</li>
+<li>
+<p>🔐 <strong>Simple Setup</strong><br />
+  Easy configuration of your API key and sudo password during first run.</p>
+</li>
+<li>
+<p>🌐 <strong>Web Search Integration</strong><br />
+  Ask questions, search documentation, or look up errors directly from the CLI.</p>
+</li>
+<li>
+<p>⚡ <strong>Modern CLI Experience</strong><br />
+  A clean and user-friendly terminal UI with colorful output and rich formatting.</p>
+</li>
+<li>
+<p>🛠️ <strong>Open Source &amp; Extensible</strong><br />
+  Easily extend functionality or contribute — fully open and developer-friendly.</p>
+</li>
 </ul>
-<p>See <a href="../usage/">Usage</a> for more details on how to use each feature.</p>
+<p>For a full list of commands and usage, see the <a href="../installation/">Installation</a> and <a href="../usage/">Usage</a> docs.</p>
 
 
 

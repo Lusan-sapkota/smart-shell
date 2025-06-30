@@ -1,6 +1,0 @@
-ai_wrapper
-config
-main
-safety
-shell_builder
-utils
