@@ -313,6 +313,8 @@ def handle_special_command(command, current_model):
     elif cmd == "!forget-sudo":
         reset_sudo_password()
         console.print("[green]Sudo password reset successfully.[/green]")
+    elif cmd == "!docs":
+        console.print("[bold blue]Documentation:[/bold blue] https://lusan-sapkota.github.io/smart-shell/")
     else:
         console.print(f"[yellow]Unknown special command: {command}[/yellow]")
     
