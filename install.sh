@@ -216,6 +216,16 @@ install_smart_shell() {
         echo -e "\n${BLUE}Installing with pipx (recommended)...${NC}"
         pipx install . || {
             echo -e "${RED}pipx install failed. Please check your environment or see the FAQ.${NC}"
+            echo -e "${RED}This may be due to a previous broken or conflicting install, or a pipx environment issue.${NC}"
+            echo -e "${YELLOW}Attempting to fix automatically...${NC}"
+            pipx uninstall smart-shell || true
+            cd "$PWD"
+            pipx install . && echo -e "${GREEN}Automatic fix succeeded. Continuing...${NC}" && return 0
+            echo -e "${RED}Automatic fix failed. Please try the manual steps below:${NC}"
+            echo -e "  1. Uninstall any broken install: ${YELLOW}pipx uninstall smart-shell${NC}"
+            echo -e "  2. Clone the repo manually: ${YELLOW}git clone https://github.com/Lusan-sapkota/smart-shell.git && cd smart-shell${NC}"
+            echo -e "  3. Install from the repo: ${YELLOW}pipx install .${NC}"
+            echo -e "  4. Then run: ${YELLOW}smart-shell setup${NC}"
             exit 1
         }
         if command -v smart-shell &> /dev/null; then
