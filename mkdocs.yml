@@ -1,7 +1,7 @@
 site_name: Smart-Shell
 repo_url: https://github.com/Lusan-sapkota/smart-shell
 docs_dir: docs
-site_url: https://lusansapkota.com.np/smart-shell/
+site_url: https://lusan-sapkota.github.io/smart-shell/
 nav:
   - Home: index.md
   - Features: features.md

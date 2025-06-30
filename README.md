@@ -22,6 +22,7 @@ Smart-Shell is an intelligent terminal assistant that converts natural language 
 - 🔑 **Secure API Key Management**: Environment variables or config file storage
 - 🔌 **Tab Completion**: completion for all commands and options
 - 🖥️ **Desktop Integration**: Launch from application menu
+- 🌐 **Web Search Support**: Smart-Shell is fully capable of web search as well
 - 🌐 **Network Error Handling**: Robust handling of connectivity issues
 - 🔄 **Automatic Retries**: Automatic retry mechanism for transient errors
 - 🧪 **Dry Run Mode**: Preview commands before execution
@@ -37,6 +38,8 @@ Simply run this single command to install Smart-Shell system-wide:
 ```bash
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
 ```
+
+> **Please note: Run smart-shell setup command after this to setup api key and sudo password.
 
 That's it! After installation, you can immediately use Smart-Shell from any terminal by typing:
 
@@ -74,6 +77,8 @@ For manual installation and development instructions, see [docs/DEVELOPMENT.md](
 - [Author](docs/author.md)
 - [Contributing](docs/contributing.md)
 - [FAQ](docs/faq.md)
+
+> 📚 **Full documentation is available at the [Smart-Shell MkDocs site](https://lusan-sapkota.github.io/smart-shell/).**
 
 ## 📜 License
 

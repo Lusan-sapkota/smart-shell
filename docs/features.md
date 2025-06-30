@@ -8,7 +8,8 @@ Smart-Shell offers a rich set of features to enhance your terminal experience:
 - **Command History:** Track and recall past commands
 - **Secure API Key Management:** Environment variables or config file storage
 - **Tab Completion:** completion for all commands and options
-- **Desktop Integration:** Launch from application menu
+- **Desktop Integration**: Launch from application menu
+- **Web Search Support**: Smart-Shell is fully capable of web search as well
 - **Network Error Handling:** Robust handling of connectivity issues
 - **Automatic Retries:** Automatic retry mechanism for transient errors
 - **Dry Run Mode:** Preview commands before execution
