@@ -54,7 +54,9 @@ Smart-Shell is an intelligent terminal assistant that converts natural language 
   Easy configuration of your API key and sudo password during first run.
 
 - 🌐 **Web Search Integration**  
-  Ask questions, search documentation, or look up errors directly from the CLI.
+  When enabled, Smart-Shell performs relevant **web searches** in real-time to enhance command accuracy.  
+  AI combines local knowledge with live web results to refine its suggestions — giving you smarter, context-aware commands.  
+  You can toggle web search anytime using the `!web` command.
 
 - ⚡ **Modern CLI Experience**  
   A clean and user-friendly terminal UI with colorful output and rich formatting.
@@ -62,28 +64,23 @@ Smart-Shell is an intelligent terminal assistant that converts natural language 
 - 🛠️ **Open Source & Extensible**  
   Easily extend functionality or contribute — fully open and developer-friendly.
 
-## 🚀 Quick Installation (One Command)
+## Quick Install (Recommended)
 
-Simply run this single command to install Smart-Shell system-wide:
+Smart-Shell requires [pipx](https://pypa.github.io/pipx/) for user installations on most modern Linux systems (PEP 668).
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
 ```
 
-> Please note: Run smart-shell setup command after this to setup api key and sudo password.
+> Please note: After running the install script, you may be prompted to install [pipx](https://pypa.github.io/pipx/) if you want a user-level isolated install. The script will guide you if this is needed.
+> After installation, run `smart-shell setup` to configure your API key and sudo password.
+> If you want to install from source for development, clone the repo and run the install script from the project directory.
 
-That's it! After installation, you can immediately use Smart-Shell from any terminal by typing:
+After installation, use Smart-Shell from any terminal:
 
 ```bash
 smart-shell
 ```
-
-The installer will:
-- Check dependencies and install them if needed
-- Install Smart-Shell globally on your system
-- Set up command completion for bash/zsh
-- Create desktop entry for launching from application menu
-- Prompt you to set up your API key (one-time setup)
 
 ### Setting up your API key
 

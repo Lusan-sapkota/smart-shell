@@ -41,13 +41,18 @@
   Easy configuration of your API key and sudo password during first run.
 
 - 🌐 **Web Search Integration**  
-  Ask questions, search documentation, or look up errors directly from the CLI.
+  When enabled, Smart-Shell performs relevant **web searches** in real-time to enhance command accuracy.  
+  AI combines local knowledge with live web results to refine its suggestions — giving you smarter, context-aware commands.  
+  You can toggle web search anytime using the `!web` command.
 
 - ⚡ **Modern CLI Experience**  
   A clean and user-friendly terminal UI with colorful output and rich formatting.
 
 - 🛠️ **Open Source & Extensible**  
   Easily extend functionality or contribute — fully open and developer-friendly.
+
+- 📦 **Reliable Installation with pipx**  
+  Install and manage Smart-Shell using `pipx` for an isolated and reliable setup, adhering to modern Linux standards (PEP 668).
 
 
 For a full list of commands and usage, see the [Installation](installation.md) and [Usage](usage.md) docs.

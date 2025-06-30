@@ -149,8 +149,8 @@ The environment variable takes precedence over the config file.
 ### Model Support
 
 Smart-Shell supports multiple Gemini models:
-- `gemini-2.5-pro` (default): Most capable model with advanced reasoning
-- `gemini-2.5-flash`: Faster model with good performance
+- `gemini-2.5-flash` (default): Fast, capable model for most use cases
+- `gemini-2.5-pro`: More advanced reasoning, but may be slower or have stricter limits
 - `gemini-2.0-pro`: Legacy model for compatibility
 
 The model validation system in `shell_builder.py` ensures that:
@@ -250,4 +250,4 @@ While Smart-Shell is currently optimized for Google Gemini models, it's designed
 3. Add configuration options for the new provider
 4. Update documentation and help text
 
-Remember that different AI models may have different capabilities and limitations, so thorough testing is essential. 
+Remember that different AI models may have different capabilities and limitations, so thorough testing is essential.
