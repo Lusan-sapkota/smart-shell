@@ -65,6 +65,13 @@ check_dependencies() {
         echo -e "${GREEN}✓ pipx found (recommended for installation)${NC}"
     else
         echo -e "${YELLOW}⚠ pipx not found (recommended for better isolation)${NC}"
+        echo -e "\n${YELLOW}TL;DR for Ubuntu/Debian users:${NC}"
+        echo -e "  sudo apt install pipx"
+        echo -e "  pipx ensurepath"
+        echo -e "  source ~/.bashrc   # or ~/.zshrc depending on your shell"
+        echo -e "Then re-run the install script."
+        echo -e "${RED}pipx is required for user installation on PEP 668 systems. Please install pipx and re-run this script.${NC}"
+        exit 1
     fi
 }
 
@@ -186,9 +193,9 @@ install_smart_shell() {
         if ! command -v pipx &> /dev/null; then
             echo -e "${RED}ERROR: pipx is required for user installation on this system (PEP 668).${NC}"
             echo -e "${YELLOW}Please install pipx with:${NC}"
-            echo -e "  python3 -m pip install --user pipx"
-            echo -e "  python3 -m pipx ensurepath"
-            echo -e "  source ~/.bashrc"
+            echo -e "  sudo apt install pipx   # (Ubuntu/Debian recommended)"
+            echo -e "  pipx ensurepath"
+            echo -e "  source ~/.bashrc   # or ~/.zshrc depending on your shell"
             echo -e "Then run the following command to install Smart-Shell:${NC}"
             echo -e "  pipx install smart-shell"
             echo -e "Or use the quick install script (recommended):"

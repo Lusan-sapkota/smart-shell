@@ -11,6 +11,16 @@ curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/insta
 ```
 
 > Please note: After running the install script, you may be prompted to install [pipx](https://pypa.github.io/pipx/) if you want a user-level isolated install. The script will guide you if this is needed.
+>
+> **TL;DR for Ubuntu/Debian users:**
+> ```bash
+> sudo apt install pipx
+> pipx ensurepath
+> source ~/.bashrc   # or ~/.zshrc depending on your shell
+> ```
+
+> Then re-run the install script.
+
 > After installation, run `smart-shell setup` to configure your API key and sudo password.
 
 > If you want to install from source for development, clone the repo and run the install script from the project directory.
