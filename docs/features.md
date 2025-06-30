@@ -1,21 +1,53 @@
 # Features
 
-Smart-Shell offers a rich set of features to enhance your terminal experience:
+## Smart-Shell offers a rich set of features to make your terminal experience smarter and safer:
 
-- **Interactive Mode:** Continuous natural language to Bash/Zsh command conversion
-- **Safety Checks:** Built-in protection against dangerous commands
-- **Multiple AI Models:** Support for various Gemini models
-- **Command History:** Track and recall past commands
-- **Secure API Key Management:** Environment variables or config file storage
-- **Tab Completion:** completion for all commands and options
-- **Desktop Integration**: Launch from application menu
-- **Web Search Support**: Smart-Shell is fully capable of web search as well
-- **Network Error Handling:** Robust handling of connectivity issues
-- **Automatic Retries:** Automatic retry mechanism for transient errors
-- **Dry Run Mode:** Preview commands before execution
-- **Model Selection:** Choose between Gemini models for different needs
-- **History Search:** Quickly search and reuse previous commands
-- **Custom Configuration:** Easily manage preferences and API keys
-- **Extensible:** Designed for easy addition of new features
+- 🧠 **Natural Language to Command**  
+  Convert plain English into valid Bash/Zsh commands instantly.
 
-See [Usage](usage.md) for more details on how to use each feature.
+- 🐚 **Shell Auto-Detection**  
+  Automatically detects and supports both **Bash** and **Zsh** environments.
+
+- 💬 **Interactive Mode with Command History**  
+  Rich REPL interface with support for special commands like:  
+  `!help`, `!docs`, `!models`, `!history`, `!clear`, `!redo`, `!last`, `!creator`, `!forget-sudo`, `!update`, `!errors`, `!web`, and more.
+
+- 🛡️ **Built-in Safety System**  
+  Analyzes each command and classifies it into **three risk levels** - Reason also provided:
+  - ✅ **Safe** – Executed automatically.
+  - ⚠️ **Medium** – Requires manual confirmation (yes/no).
+  - ❌ **High** – Requires manual confirmation (yes/no).  
+  This ensures dangerous or potentially destructive commands are never run blindly.
+
+- 🤖 **AI-Powered Command Planning**  
+  Generates and refines shell commands using **Google Gemini** models.
+
+- 🔀 **Multi-Model Support**  
+  Easily switch between Gemini **Pro**, **Flash**, and **Legacy** models as needed.
+
+- 🧪 **Dry-Run Mode**  
+  Preview the exact command before execution for extra safety and transparency.
+
+- 📟 **Standard CLI Commands**  
+  Includes `--help`, `--version`, and other CLI flags for quick access.
+
+- 🖥️ **Desktop Integration**  
+  Comes with a `.desktop` entry — launch directly from your system's **Application Menu**.
+
+- ⌨️ **Tab Completion**  
+  Supports intelligent tab completion for both **Bash** and **Zsh** shells.
+
+- 🔐 **Simple Setup**  
+  Easy configuration of your API key and sudo password during first run.
+
+- 🌐 **Web Search Integration**  
+  Ask questions, search documentation, or look up errors directly from the CLI.
+
+- ⚡ **Modern CLI Experience**  
+  A clean and user-friendly terminal UI with colorful output and rich formatting.
+
+- 🛠️ **Open Source & Extensible**  
+  Easily extend functionality or contribute — fully open and developer-friendly.
+
+
+For a full list of commands and usage, see the [Installation](installation.md) and [Usage](usage.md) docs.

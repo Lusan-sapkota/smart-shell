@@ -8,13 +8,23 @@ Run this command to install Smart-Shell system-wide:
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
 ```
 
-> **Please note: Run smart-shell setup command after this to setup api key and sudo password.
+> Please note: Run `smart-shell setup` after this to setup your API key and sudo password.
 
 After installation, use Smart-Shell from any terminal:
 
 ```bash
 smart-shell
 ```
+
+## CLI Commands
+
+- `smart-shell run <prompt>` — Convert natural language to Bash/Zsh commands
+- `smart-shell --interactive` — Start interactive mode
+- `smart-shell setup` — Configure API key and settings
+- `smart-shell models` — List available AI models
+- `smart-shell history` — Show command history
+- `smart-shell --help` or `smart-shell help` — Show CLI help
+- `smart-shell --version` or `smart-shell version` — Show version information
 
 ## Manual Installation
 

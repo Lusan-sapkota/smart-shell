@@ -17,8 +17,12 @@ Smart-Shell is an intelligent terminal assistant that converts natural language 
 
 - **Quick Install:**
   ```bash
-  curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
+  curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | 
+  bash
   ```
+
+  > Please note: Run `smart-shell setup` after this to setup your API key and sudo password.
+  
 - For manual installation and development, see [Development](development.md).
 
 ## 📚 Documentation Navigation
