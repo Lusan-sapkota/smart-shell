@@ -669,8 +669,14 @@
 <div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sSL<span class="w"> </span>https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </code></pre></div>
 <blockquote>
-<p>Please note: After running the install script, you may be prompted to install <a href="https://pypa.github.io/pipx/">pipx</a> if you want a user-level isolated install. The script will guide you if this is needed.
-After installation, run <code>smart-shell setup</code> to configure your API key and sudo password.</p>
+<p>Please note: After running the install script, you may be prompted to install <a href="https://pypa.github.io/pipx/">pipx</a> if you want a user-level isolated install. The script will guide you if this is needed.</p>
+<p><strong>TL;DR for Ubuntu/Debian users:</strong>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>pipx
+pipx<span class="w"> </span>ensurepath
+<span class="nb">source</span><span class="w"> </span>~/.bashrc<span class="w">   </span><span class="c1"># or ~/.zshrc depending on your shell</span>
+</code></pre></div></p>
+<p>Then re-run the install script.</p>
+<p>After installation, run <code>smart-shell setup</code> to configure your API key and sudo password.</p>
 <p>If you want to install from source for development, clone the repo and run the install script from the project directory.</p>
 </blockquote>
 <p>After installation, use Smart-Shell from any terminal:</p>
