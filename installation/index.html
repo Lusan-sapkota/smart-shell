@@ -354,9 +354,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#manual-installation-advanced" class="md-nav__link">
+  <a href="#manual-installation-options" class="md-nav__link">
     <span class="md-ellipsis">
-      Manual Installation (Advanced)
+      Manual Installation Options
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dependencies
     </span>
   </a>
   
@@ -635,9 +644,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#manual-installation-advanced" class="md-nav__link">
+  <a href="#manual-installation-options" class="md-nav__link">
     <span class="md-ellipsis">
-      Manual Installation (Advanced)
+      Manual Installation Options
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dependencies
     </span>
   </a>
   
@@ -664,41 +682,74 @@
 
 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
 <h2 id="quick-installation-recommended">Quick Installation (Recommended)<a class="headerlink" href="#quick-installation-recommended" title="Permanent link">&para;</a></h2>
-<p>Smart-Shell is distributed as a standalone project and is not available on PyPI. The recommended way to install is using the official install script, which handles all dependencies and environment setup for you.</p>
+<p>Smart-Shell is designed for easy installation with a single command that handles all dependencies and environment setup automatically.</p>
 <p><strong>Quick install (recommended for most users):</strong></p>
 <div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sSL<span class="w"> </span>https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </code></pre></div>
+<p>The installation script will:</p>
+<ol>
+<li>Check and install all required dependencies</li>
+<li>Install Smart-Shell using pipx (for better isolation)</li>
+<li>Create desktop entries for easy access</li>
+<li>Set up command completion for Bash and Zsh</li>
+<li>Apply fixes for common Python module path issues</li>
+<li>Automatically run the setup wizard to configure your API key</li>
+</ol>
 <blockquote>
-<p>Please note: After running the install script, you may be prompted to install <a href="https://pypa.github.io/pipx/">pipx</a> if you want a user-level isolated install. The script will guide you if this is needed.</p>
-<p><strong>TL;DR for Ubuntu/Debian users:</strong>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>pipx
-pipx<span class="w"> </span>ensurepath
-<span class="nb">source</span><span class="w"> </span>~/.bashrc<span class="w">   </span><span class="c1"># or ~/.zshrc depending on your shell</span>
+<p>If you're behind a corporate firewall or have restricted internet access, you might need to manually install dependencies first:
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>google-genai<span class="w"> </span>rich<span class="w"> </span>click<span class="w"> </span>pyyaml<span class="w"> </span>requests<span class="w"> </span>google-api-core
 </code></pre></div></p>
-<p>Then re-run the install script.</p>
-<p>After installation, run <code>smart-shell setup</code> to configure your API key and sudo password.</p>
-<p>If you want to install from source for development, clone the repo and run the install script from the project directory.</p>
 </blockquote>
 <p>After installation, use Smart-Shell from any terminal:</p>
 <div class="highlight"><pre><span></span><code>smart-shell
 </code></pre></div>
 <h2 id="cli-commands">CLI Commands<a class="headerlink" href="#cli-commands" title="Permanent link">&para;</a></h2>
 <ul>
+<li><code>smart-shell</code> — Start Smart-Shell in interactive mode</li>
 <li><code>smart-shell run &lt;prompt&gt;</code> — Convert natural language to Bash/Zsh commands</li>
-<li><code>smart-shell --interactive</code> — Start interactive mode</li>
+<li><code>smart-shell --interactive</code> or <code>-i</code> — Start interactive mode explicitly</li>
 <li><code>smart-shell setup</code> — Configure API key and settings</li>
 <li><code>smart-shell models</code> — List available AI models</li>
 <li><code>smart-shell history</code> — Show command history</li>
 <li><code>smart-shell --help</code> or <code>smart-shell help</code> — Show CLI help</li>
 <li><code>smart-shell --version</code> or <code>smart-shell version</code> — Show version information</li>
+<li><code>smart-shell --dry-run</code> or <code>-d</code> — Show command without executing</li>
 </ul>
-<h2 id="manual-installation-advanced">Manual Installation (Advanced)<a class="headerlink" href="#manual-installation-advanced" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>System-wide:</strong> Use the install script and select system-wide (requires sudo).</li>
-<li><strong>Virtualenv:</strong> Use the install script and select virtual environment (for development).</li>
-</ul>
+<h2 id="manual-installation-options">Manual Installation Options<a class="headerlink" href="#manual-installation-options" title="Permanent link">&para;</a></h2>
+<p>The install script offers three installation methods:</p>
+<ol>
+<li><strong>System-wide installation</strong> (requires sudo)</li>
+<li>Installs Smart-Shell for all users on the system</li>
+<li>
+<p>Requires administrator privileges</p>
+</li>
+<li>
+<p><strong>User installation</strong> (recommended)</p>
+</li>
+<li>Uses pipx for isolated installation in your user directory</li>
+<li>No administrator privileges required</li>
+<li>
+<p>Automatically installed if pipx is not found</p>
+</li>
+<li>
+<p><strong>Virtual environment</strong> (for development)</p>
+</li>
+<li>Creates a dedicated virtual environment</li>
+<li>Useful for development or testing</li>
+</ol>
 <p>For development setup, see <a href="../development/">Development</a>.</p>
 <p>For troubleshooting and more, see the <a href="../faq/">FAQ</a>.</p>
+<h2 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Permanent link">&para;</a></h2>
+<p>Smart-Shell requires the following Python packages:</p>
+<ul>
+<li><code>google-genai</code> - Google's Gemini AI SDK</li>
+<li><code>rich</code> - For beautiful terminal formatting</li>
+<li><code>click</code> - For command-line interface</li>
+<li><code>pyyaml</code> - For configuration management</li>
+<li><code>requests</code> - For API communication</li>
+<li><code>google-api-core</code> - Core Google API functionality</li>
+</ul>
+<p>The installation script handles all these dependencies automatically.</p>
 
 
 

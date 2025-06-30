@@ -655,16 +655,25 @@
 <p>Smart-Shell is an intelligent terminal assistant that converts natural language into executable Bash/Zsh commands using Google's Gemini AI models.</p>
 <h2 id="quick-start">🚀 Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Quick Install:</strong>
-  <div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sSL<span class="w"> </span>https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>
-bash
+<li><strong>One-Command Installation:</strong>
+  <div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sSL<span class="w"> </span>https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
 </code></pre></div></li>
 </ul>
-<blockquote>
-<p>Please note: Run <code>smart-shell setup</code> after this to setup your API key and sudo password.</p>
-</blockquote>
+<p>The installation script automatically:
+  - Installs all required dependencies
+  - Sets up Smart-Shell with pipx
+  - Creates desktop entries and command completion
+  - Runs the setup wizard for API key configuration</p>
 <ul>
-<li>For manual installation and development, see <a href="development/">Development</a>.</li>
+<li>
+<p><strong>Start Using Smart-Shell:</strong>
+  <div class="highlight"><pre><span></span><code>smart-shell
+</code></pre></div></p>
+</li>
+<li>
+<p>For detailed installation options and troubleshooting, see <a href="installation/">Installation</a>.</p>
+</li>
+<li>For development setup, see <a href="development/">Development</a>.</li>
 </ul>
 <h2 id="documentation-navigation">📚 Documentation Navigation<a class="headerlink" href="#documentation-navigation" title="Permanent link">&para;</a></h2>
 <ul>
