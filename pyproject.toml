@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smart-shell"
+version = "1.0.0"
+authors = [
+  { name="Lusan Sapkota", email="sapkotalusan@gmail.com" },
+]
+description = "An intelligent terminal assistant that converts natural language into executable Bash or Zsh commands."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "google-generativeai",
+    "rich",
+    "click"
+]
+
+[project.urls]
+Homepage = "https://github.com/Lusan-sapkota/smart-shell"
+Issues = "https://github.com/Lusan-sapkota/smart-shell/issues"
+
+[project.scripts]
+smart-shell = "smart_shell.main:main"
+
+[tool.setuptools]
+py-modules = ["main", "safety", "config", "utils", "shell_builder", "ai_wrapper"] 

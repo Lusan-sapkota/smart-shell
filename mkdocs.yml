@@ -1,0 +1,46 @@
+site_name: Smart-Shell
+repo_url: https://github.com/Lusan-sapkota/smart-shell
+docs_dir: docs
+site_url: https://lusansapkota.com.np/smart-shell/
+nav:
+  - Home: index.md
+  - Features: features.md
+  - Installation: installation.md
+  - Usage: usage.md
+  - Safety: safety.md
+  - Development: development.md
+  - Developer Docs: DEVELOPER_DOCS.md
+  - API Reference: api.md
+  - Changelog: CHANGELOG.md
+  - License: ../LICENSE
+  - Author: author.md
+  - Contributing: contributing.md
+  - FAQ: faq.md
+theme:
+  name: material
+  logo: images/logo.png
+  favicon: images/logo.png
+  palette:
+    - scheme: default
+      primary: blue
+      accent: orange
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - footnotes
+  - tables
+  - pymdownx.superfences
+  - pymdownx.details
+plugins:
+  - search
+  - mkdocstrings
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Lusan-sapkota/smart-shell
+    - icon: fontawesome/brands/python
+      link: https://www.python.org/
+    - icon: fontawesome/solid/globe
+      link: https://lusansapkota.com.np/

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Test script for Smart-Shell.
 """
@@ -11,7 +10,7 @@ from rich.console import Console
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Import Smart-Shell modules
-from shell_builder import display_banner, generate_command
+from shell_builder import display_banner, generate_command_plan
 from safety import check_command_safety
 from utils import print_command_preview
 
@@ -75,7 +74,7 @@ def test_generate_command():
         # Test command generation
         prompt = "list files in the current directory"
         console.print(f"[blue]Generating command for:[/blue] {prompt}")
-        command = generate_command(prompt, api_key)
+        command = generate_command_plan(prompt, api_key)
         console.print(f"[green]Generated command:[/green] {command}")
         
         # Check safety

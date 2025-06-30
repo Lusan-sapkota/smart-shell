@@ -2,46 +2,97 @@
 
 This document provides guidelines for developers who want to contribute to or modify the Smart-Shell project.
 
-## Project Structure
+## Manual Installation for Developers
 
+### Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package installer)
+- git (for cloning the repository)
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/Lusan-sapkota/smart-shell.git
+cd smart-shell
 ```
-smart-shell/
-├── main.py             # Main entry point and CLI interface
-├── shell_builder.py    # Core functionality for generating commands
-├── ai_wrapper.py       # Wrapper for AI model interactions
-├── safety.py           # Safety checks for commands
-├── config.py           # Configuration management
-├── utils.py            # Utility functions
-├── setup.py            # Package setup
-├── install.sh          # Installation script
-├── docs/               # Documentation
-│   ├── DEVELOPMENT.md  # This file
-│   └── SAFETY.md       # Safety documentation
-└── examples/           # Example usage
+
+### Step 2: Set Up Development Environment
+
+Choose one of the following methods:
+
+#### Method 1: Virtual Environment (Recommended for Development)
+
+```bash
+# Create a virtual environment
+python3 -m venv venv
+
+# Activate the virtual environment
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install in development mode
+pip install -e .
+```
+
+#### Method 2: User Installation
+
+```bash
+# Install for current user
+pip install --user -e .
+```
+
+#### Method 3: System-wide Installation
+
+```bash
+# Install system-wide (requires admin/sudo)
+sudo pip install -e .
+```
+
+### Step 3: Set Up Your API Key
+
+You'll need a Google Gemini API key to use Smart-Shell:
+
+1. Get your API key from [Google AI Studio](https://ai.google.dev/)
+2. Set it as an environment variable (recommended):
+   ```bash
+   export SMART_SHELL_API_KEY=your-api-key-here
+   ```
+   
+   Or configure it using the setup command:
+   ```bash
+   smart-shell setup
+   ```
+
+### Step 4: Verify Installation
+
+Test your installation by running:
+
+```bash
+# Simple test
+smart-shell run "list files in current directory" --dry-run
+
+# Run in interactive mode
+smart-shell
 ```
 
 ## Development Environment
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Lusan-sapkota/smart-shell.git
-   cd smart-shell
-   ```
+After installing, set up your development environment:
 
-2. Create a virtual environment:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. Install in development mode:
-   ```bash
-   pip install -e .
-   ```
-
-4. Install development dependencies:
+1. Install development dependencies:
    ```bash
    pip install pytest black flake8
+   ```
+
+2. Run tests:
+   ```bash
+   pytest
+   ```
+
+3. Format code before committing:
+   ```bash
+   black .
+   flake8
    ```
 
 ## Core Components
@@ -67,6 +118,7 @@ The AI wrapper provides a unified interface for interacting with AI models:
 - Handles API authentication
 - Manages model selection and fallbacks
 - Processes prompts and responses
+- Uses the google-genai package to interact with Google's Gemini models
 
 ### Safety (safety.py)
 
@@ -141,6 +193,37 @@ When adding new features:
 
 7. Submit a pull request
 
+## Package Dependencies
+
+Smart-Shell requires the following main dependencies:
+
+- `google-genai>=1.0.0`: Google's Generative AI Python SDK
+- `rich`: For enhanced terminal output
+- `click`: For command-line interface
+- `requests`: For API communication
+
+Make sure to keep `requirements.txt` and `pyproject.toml` in sync when adding new dependencies.
+
+## Troubleshooting Common Development Issues
+
+### API Connection Issues
+If you're having trouble connecting to the Gemini API:
+- Check that your API key is valid and has appropriate permissions
+- Verify your internet connection
+- Ensure the Google Gemini API is available in your region
+
+### Package Installation Problems
+If you encounter issues installing Smart-Shell:
+- Ensure your Python version is 3.8 or higher
+- Try installing with `--break-system-packages` if using Python 3.11+
+- Check that all dependencies are available in your environment
+
+### Import Errors
+If you see import errors when running Smart-Shell:
+- Verify that you've installed the package in development mode (`pip install -e .`)
+- Make sure your virtual environment is activated
+- Check that all dependencies are installed
+
 ## Safety Guidelines
 
 When modifying the safety system:
@@ -152,7 +235,7 @@ When modifying the safety system:
 
 ## Release Process
 
-1. Update version number in `setup.py`
+1. Update version number in `setup.py` and `pyproject.toml`
 2. Update `CHANGELOG.md` with changes
 3. Run full test suite
 4. Create a release tag

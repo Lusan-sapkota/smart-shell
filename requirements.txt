@@ -1,4 +1,6 @@
-google-generativeai>=0.3.0
-click>=8.0.0
-rich>=12.0.0
-pyyaml>=6.0 
+google-genai
+click
+rich
+pyyaml
+requests
+google-api-core
