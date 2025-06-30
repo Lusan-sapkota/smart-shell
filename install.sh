@@ -173,35 +173,43 @@ install_smart_shell() {
     local install_option=$1
     local install_path=""
     
+    # Prefer pipx if available
+    if command -v pipx &> /dev/null; then
+        echo -e "\n${BLUE}pipx detected. Installing with pipx for best compatibility...${NC}"
+        pipx uninstall smart-shell 2>/dev/null || true
+        pipx install . || {
+            echo -e "${RED}pipx install failed. Falling back to manual install...${NC}"
+        }
+        install_path="$HOME/.local/bin/smart-shell"
+        # If pipx worked, return early
+        if command -v smart-shell &> /dev/null; then
+            INSTALL_PATH="$install_path"
+            return 0
+        fi
+    fi
+
     case $install_option in
         1)
             echo -e "\n${BLUE}Installing Smart-Shell system-wide...${NC}"
-            # First, clean up any previous failed installations
-            sudo pip3 uninstall -y smart-shell 2>/dev/null || true
-            
-            # Install with proper package structure
-            sudo pip3 install . || {
+            sudo python3 -m pip uninstall -y smart-shell 2>/dev/null || true
+            sudo python3 -m pip install . || {
                 echo -e "${RED}Failed to install system-wide. Trying with --break-system-packages flag...${NC}"
-                sudo pip3 install --break-system-packages .
+                sudo python3 -m pip install --break-system-packages .
             }
             install_path="/usr/local/bin/smart-shell"
             ;;
         2)
             echo -e "\n${BLUE}Installing Smart-Shell for current user...${NC}"
-            # First, clean up any previous failed installations
-            pip3 uninstall -y smart-shell 2>/dev/null || true
-            
-            # Install with proper package structure
-            pip3 install --user . || {
+            python3 -m pip uninstall -y smart-shell 2>/dev/null || true
+            python3 -m pip install --user . || {
                 echo -e "${RED}Failed to install for user. Trying with --break-system-packages flag...${NC}"
-                pip3 install --user --break-system-packages .
+                python3 -m pip install --user --break-system-packages .
             }
             install_path="$HOME/.local/bin/smart-shell"
             # Make sure ~/.local/bin is in PATH
             if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
                 echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
                 echo -e "${GREEN}✓ Added ~/.local/bin to PATH in .bashrc${NC}"
-                # Also add to .zshrc if it exists
                 if [ -f "$HOME/.zshrc" ]; then
                     echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
                     echo -e "${GREEN}✓ Added ~/.local/bin to PATH in .zshrc${NC}"
@@ -249,7 +257,6 @@ EOF
             exit 1
             ;;
     esac
-    
     # Store the install path for later use
     INSTALL_PATH="$install_path"
     return 0
@@ -341,10 +348,17 @@ main() {
     
     install_smart_shell "$INSTALL_OPTION"
 
+    # Print which Python is used by the installed script
+    if [ -f "$HOME/.local/bin/smart-shell" ]; then
+        echo -e "${YELLOW}smart-shell entry point uses:${NC} $(head -1 $HOME/.local/bin/smart-shell)"
+    fi
+
     # Verify Python import after install
     if ! python3 -c "import smart_shell" 2>/dev/null; then
         echo -e "${RED}ERROR: Python cannot import 'smart_shell'. Installation may have failed or PYTHONPATH is not set correctly.${NC}"
-        echo -e "${YELLOW}Try running: pip3 install --user .${NC}"
+        echo -e "${YELLOW}Try running: python3 -m pip install --user .${NC}"
+        echo -e "${YELLOW}Or try: pipx install .${NC}"
+        echo -e "${YELLOW}If you are on Ubuntu/Debian, see: https://lusan-sapkota.github.io/smart-shell/faq/#pipx-or-pep668${NC}"
         exit 1
     fi
     
@@ -378,10 +392,4 @@ echo -e "\n${GREEN}==============================================${NC}"
 echo -e "${GREEN}Smart-Shell has been installed successfully!${NC}"
 echo -e "${GREEN}==============================================${NC}"
 echo -e "\n${YELLOW}You can now use it by typing:${NC} smart-shell"
-echo -e "\n${YELLOW}To activate tab completion, either:${NC}"
-echo -e "  1. Start a new terminal session, or"
-echo -e "  2. Run: source ~/.bashrc"
-echo -e "\n${YELLOW}To run in interactive mode:${NC}"
-echo -e "  smart-shell"
-echo -e "\n${RED}IMPORTANT:${NC} Please run 'smart-shell setup' to configure your API key and sudo password."
-echo -e "\n${GREEN}Enjoy using Smart-Shell!${NC}"
+echo -e "\n${YELLOW}To activate tab completion, either:${NC}
