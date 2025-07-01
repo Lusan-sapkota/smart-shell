@@ -241,7 +241,7 @@ install_smart_shell() {
         
         # First ensure the dependencies are installed
         echo -e "${BLUE}Ensuring dependencies are installed...${NC}"
-        python3 -m pip install --user --upgrade google-genai rich click pyyaml requests google-api-core || true
+        python3 -m pip install --user --upgrade google-genai toml rich click pyyaml requests google-api-core || true
         
         pipx install . --force || {
             echo -e "${RED}pipx install failed. Please check your environment or see the FAQ.${NC}"
@@ -255,7 +255,7 @@ install_smart_shell() {
             
             echo -e "${RED}Automatic fix failed. Please try the manual steps below:${NC}"
             echo -e "  1. Uninstall any broken install: ${YELLOW}pipx uninstall smart-shell${NC}"
-            echo -e "  2. Install dependencies: ${YELLOW}pip install google-genai rich click pyyaml requests google-api-core${NC}"
+            echo -e "  2. Install dependencies: ${YELLOW}pip install google-genai rich click pyyaml requests toml google-api-core${NC}"
             echo -e "  3. Clone the repo manually: ${YELLOW}git clone https://github.com/Lusan-sapkota/smart-shell.git && cd smart-shell${NC}"
             echo -e "  4. Install from the repo: ${YELLOW}pipx install . --include-deps${NC}"
             echo -e "  5. Then run: ${YELLOW}smart-shell setup${NC}"
@@ -370,7 +370,7 @@ except ModuleNotFoundError:
         print("Reinstallation complete. Please try running 'smart-shell' again.")
     except Exception as e:
         print(f"Failed to reinstall: {e}")
-        print("Please run manually: pip install google-genai rich click pyyaml requests google-api-core smart-shell")
+        print("Please run manually: pip install google-genai rich click pyyaml toml requests google-api-core smart-shell toml")
         
     sys.exit(1)
 EOF

@@ -11,7 +11,7 @@ Welcome to the official documentation for **Smart-Shell**!
 
 > **Smart-Shell is in active development.**
 
-Smart-Shell is an intelligent terminal assistant that converts natural language into executable Bash/Zsh commands using Google's Gemini AI models.
+Smart-Shell is an advanced AI-powered terminal assistant that converts natural language into executable Bash/Zsh commands using Google's Gemini AI models. It features comprehensive safety systems, interactive command management, and intelligent error handling.
 
 ## 🚀 Quick Start
 

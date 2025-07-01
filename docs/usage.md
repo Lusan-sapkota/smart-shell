@@ -33,13 +33,13 @@ Type these at the Smart-Shell prompt (not in your system shell):
 | `!redo`                | Re-execute the last command                      |
 | `!clear`               | Clear the screen                                 |
 | `!models`              | List available AI models                         |
-| `!models standard`     | List only free standard models                   |
-| `!models premium`      | List only paid premium models                    |
-| `!models <n>`          | List models with a limit of n                    |
-| `!models web`          | Show additional model info from web              |
-| `!model <model-name>`  | Switch to a different AI model                   |
+| `!models free`         | List only free models                            |
+| `!models premium`      | List only premium models                         |
+| `!models legacy`       | List only legacy models                          |
+| `!models refresh`      | Refresh model info from web sources             |
+| `!model <model-name>`  | Switch to a different AI model (with cost warning)|
 | `!web`                 | Toggle web search for commands                   |
-| `!update`              | Check for updates and install                    |
+| `!update`              | Check for updates from GitHub and install       |
 | `!errors`              | Show the error log                               |
 | `!forget-sudo`         | Clear the session sudo password                  |
 | `!creator`             | Show information about the creator               |
@@ -61,28 +61,31 @@ Run these in your system shell:
 | `smart-shell models`                     | List available models                       |
 | `smart-shell history`                    | Show command history                        |
 | `smart-shell --help` or `-h`             | Show CLI help                               |
-| `smart-shell --version`                  | Show version information                    |
+| `smart-shell version` or `--version`     | Show version information                    |
+| `smart-shell --dry-run` or `-d`          | Show command without executing              |
+| `smart-shell --yes` or `-y`              | Auto-confirm all prompts                    |
 
 ---
 
-## Usage Patterns
+## Advanced Features
 
-- **Natural Language:**
-  - Type requests like "Find large files over 100MB" or "Create a backup of my project folder".
-- **Model Selection:**
-  - Use `--model <model-name>` in CLI or `!model <model-name>` in interactive mode.
-- **Web Search:**
-  - Toggle with `!web` in interactive mode.
-- **Safety:**
-  - Commands are checked for safety before execution. High-risk commands require explicit confirmation.
+- **Protected Prompt:** When typing, backspacing won't delete the "Smart-Shell (model):" prefix.
+- **Smart Command Detection:** If you try to run Smart-Shell commands inside Smart-Shell, it will guide you to exit first.
+- **Robust Update System:** `!update` checks GitHub for the latest version and updates automatically.
+- **Enhanced AI:** More resilient command generation with better error handling.
+- **Y/N Confirmations:** All confirmations accept both `y`/`yes` and `n`/`no` in any case.
 
 ---
 
 ## Safety System
 
-- 🟢 **Safe:** Command is safe to run.
-- 🟡 **Warning:** Might have unintended consequences (requires confirmation).
-- 🔴 **Blocked:** Potentially harmful (requires explicit confirmation; will be executed if you confirm).
+Smart-Shell includes a comprehensive safety system with confirmation prompts:
+
+- 🟢 **Safe:** Command is safe to run (executed automatically).
+- 🟡 **Medium Risk:** Commands like `sudo` operations (requires y/n confirmation).
+- 🔴 **High Risk:** Dangerous commands like `rm -rf` (requires y/n confirmation).
+
+All medium and high-risk commands require explicit user confirmation before execution. You can respond with `y`/`yes` or `n`/`no` (case insensitive).
 
 ---
 
