@@ -262,13 +262,13 @@ def run_interactive_mode(dry_run, model, api_key, config, auto_yes=False, shell_
                 
                 # Create a truly protected prompt using a custom approach
                 def get_protected_input():
-                    # Display the prompt prefix
-                    console.print(f"\n[bold blue]Smart-Shell[/bold blue] [dim]({display_model})[/dim]: ", end="")
-                    
-                    # Use a simple input() which will respect the displayed prompt
+                    # Use input() with the prompt parameter to make it non-deletable
                     try:
-                        line = input()
-                        return line.strip()
+                        # Create the prompt string without Rich formatting for input()
+                        prompt_text = f"\nSmart-Shell ({display_model}): "
+                        line = input(prompt_text)
+                        # Only strip trailing whitespace, preserve intentional leading spaces and line breaks
+                        return line.rstrip()
                     except KeyboardInterrupt:
                         raise
                     except EOFError:
@@ -288,8 +288,8 @@ def run_interactive_mode(dry_run, model, api_key, config, auto_yes=False, shell_
                 console.print("[green]Exiting Smart-Shell. Goodbye![/green]")
                 break
             
-            # Skip empty prompts
-            if not user_prompt.strip():
+            # Skip empty prompts (check if there's any non-whitespace content)
+            if not user_prompt or not user_prompt.strip():
                 continue
             
             # Check for Smart-Shell CLI commands that should be run outside
