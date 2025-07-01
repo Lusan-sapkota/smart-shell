@@ -385,9 +385,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#usage-patterns" class="md-nav__link">
+  <a href="#advanced-features" class="md-nav__link">
     <span class="md-ellipsis">
-      Usage Patterns
+      Advanced Features
     </span>
   </a>
   
@@ -689,9 +689,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#usage-patterns" class="md-nav__link">
+  <a href="#advanced-features" class="md-nav__link">
     <span class="md-ellipsis">
-      Usage Patterns
+      Advanced Features
     </span>
   </a>
   
@@ -803,24 +803,24 @@
 <td>List available AI models</td>
 </tr>
 <tr>
-<td><code>!models standard</code></td>
-<td>List only free standard models</td>
+<td><code>!models free</code></td>
+<td>List only free models</td>
 </tr>
 <tr>
 <td><code>!models premium</code></td>
-<td>List only paid premium models</td>
+<td>List only premium models</td>
 </tr>
 <tr>
-<td><code>!models &lt;n&gt;</code></td>
-<td>List models with a limit of n</td>
+<td><code>!models legacy</code></td>
+<td>List only legacy models</td>
 </tr>
 <tr>
-<td><code>!models web</code></td>
-<td>Show additional model info from web</td>
+<td><code>!models refresh</code></td>
+<td>Refresh model info from web sources</td>
 </tr>
 <tr>
 <td><code>!model &lt;model-name&gt;</code></td>
-<td>Switch to a different AI model</td>
+<td>Switch to a different AI model (with cost warning)</td>
 </tr>
 <tr>
 <td><code>!web</code></td>
@@ -828,7 +828,7 @@
 </tr>
 <tr>
 <td><code>!update</code></td>
-<td>Check for updates and install</td>
+<td>Check for updates from GitHub and install</td>
 </tr>
 <tr>
 <td><code>!errors</code></td>
@@ -887,30 +887,37 @@
 <td>Show CLI help</td>
 </tr>
 <tr>
-<td><code>smart-shell --version</code></td>
+<td><code>smart-shell version</code> or <code>--version</code></td>
 <td>Show version information</td>
+</tr>
+<tr>
+<td><code>smart-shell --dry-run</code> or <code>-d</code></td>
+<td>Show command without executing</td>
+</tr>
+<tr>
+<td><code>smart-shell --yes</code> or <code>-y</code></td>
+<td>Auto-confirm all prompts</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="usage-patterns">Usage Patterns<a class="headerlink" href="#usage-patterns" title="Permanent link">&para;</a></h2>
+<h2 id="advanced-features">Advanced Features<a class="headerlink" href="#advanced-features" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Natural Language:</strong></li>
-<li>Type requests like "Find large files over 100MB" or "Create a backup of my project folder".</li>
-<li><strong>Model Selection:</strong></li>
-<li>Use <code>--model &lt;model-name&gt;</code> in CLI or <code>!model &lt;model-name&gt;</code> in interactive mode.</li>
-<li><strong>Web Search:</strong></li>
-<li>Toggle with <code>!web</code> in interactive mode.</li>
-<li><strong>Safety:</strong></li>
-<li>Commands are checked for safety before execution. High-risk commands require explicit confirmation.</li>
+<li><strong>Protected Prompt:</strong> When typing, backspacing won't delete the "Smart-Shell (model):" prefix.</li>
+<li><strong>Smart Command Detection:</strong> If you try to run Smart-Shell commands inside Smart-Shell, it will guide you to exit first.</li>
+<li><strong>Robust Update System:</strong> <code>!update</code> checks GitHub for the latest version and updates automatically.</li>
+<li><strong>Enhanced AI:</strong> More resilient command generation with better error handling.</li>
+<li><strong>Y/N Confirmations:</strong> All confirmations accept both <code>y</code>/<code>yes</code> and <code>n</code>/<code>no</code> in any case.</li>
 </ul>
 <hr />
 <h2 id="safety-system">Safety System<a class="headerlink" href="#safety-system" title="Permanent link">&para;</a></h2>
+<p>Smart-Shell includes a comprehensive safety system with confirmation prompts:</p>
 <ul>
-<li>🟢 <strong>Safe:</strong> Command is safe to run.</li>
-<li>🟡 <strong>Warning:</strong> Might have unintended consequences (requires confirmation).</li>
-<li>🔴 <strong>Blocked:</strong> Potentially harmful (requires explicit confirmation; will be executed if you confirm).</li>
+<li>🟢 <strong>Safe:</strong> Command is safe to run (executed automatically).</li>
+<li>🟡 <strong>Medium Risk:</strong> Commands like <code>sudo</code> operations (requires y/n confirmation).</li>
+<li>🔴 <strong>High Risk:</strong> Dangerous commands like <code>rm -rf</code> (requires y/n confirmation).</li>
 </ul>
+<p>All medium and high-risk commands require explicit user confirmation before execution. You can respond with <code>y</code>/<code>yes</code> or <code>n</code>/<code>no</code> (case insensitive).</p>
 <hr />
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <ul>

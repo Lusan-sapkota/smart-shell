@@ -568,17 +568,25 @@
 
 <h1 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h1>
 <p><strong>Q: What is Smart-Shell?</strong>
-A: An AI-powered terminal assistant that converts natural language to Bash/Zsh commands using Gemini models.</p>
+A: Smart-Shell is an advanced AI-powered terminal assistant that converts natural language to Bash/Zsh commands using Google Gemini models. It's not just a wrapper - it's a comprehensive tool with safety systems, interactive features, and intelligent command generation.</p>
 <p><strong>Q: Is it safe to use?</strong>
-A: Yes, Smart-Shell includes robust safety checks to prevent dangerous commands.</p>
+A: Yes, Smart-Shell includes a robust 4-level safety system (Safe, Info Leak, Medium, High) that analyzes commands and requires confirmation for potentially risky operations. You maintain full control over what gets executed.</p>
 <p><strong>Q: How do I install it?</strong>
-A: Use the quick install command or see <a href="../installation/">Installation</a>.</p>
+A: Use the quick install command: <code>curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash</code> or see <a href="../installation/">Installation</a> for other options.</p>
 <p><strong>Q: How do I set my API key?</strong>
-A: Run <code>smart-shell setup</code> or set the <code>SMART_SHELL_API_KEY</code> environment variable.</p>
+A: Run <code>smart-shell setup</code> for interactive configuration, or set the <code>SMART_SHELL_API_KEY</code> environment variable directly.</p>
+<p><strong>Q: Can I update Smart-Shell automatically?</strong>
+A: Yes! Use the <code>!update</code> command in interactive mode to check for and install updates from GitHub automatically.</p>
+<p><strong>Q: What special commands are available?</strong>
+A: Interactive mode supports many commands like <code>!help</code>, <code>!history</code>, <code>!models</code>, <code>!update</code>, <code>!clear</code>, <code>!web</code>, and more. See <a href="../usage/">Usage</a> for the complete list.</p>
+<p><strong>Q: How does the prompt protection work?</strong>
+A: The interactive prompt prevents accidental deletion of the "Smart-Shell (model):" prefix when backspacing, so you can only edit your actual input.</p>
 <p><strong>Q: Can I contribute?</strong>
-A: Absolutely! See <a href="../contributing/">Contributing</a>.</p>
+A: Absolutely! See <a href="../contributing/">Contributing</a> for guidelines on how to contribute to the project.</p>
 <p><strong>Q: Where can I get help?</strong>
-A: Open an issue on GitHub or check the <a href="../development/">Development Guide</a>.</p>
+A: Use <code>!help</code> in interactive mode, check the documentation, or open an issue on GitHub for support.</p>
+<p><strong>Q: Does Smart-Shell work with both Bash and Zsh?</strong>
+A: Yes! Smart-Shell automatically detects your shell and generates compatible commands for both Bash and Zsh environments.</p>
 
 
 

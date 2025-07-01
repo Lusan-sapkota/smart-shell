@@ -523,6 +523,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#special-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Special Commands
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -745,6 +754,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#special-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Special Commands
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -784,8 +802,8 @@
 </ul>
 <h3 id="safetypy">safety.py<a class="headerlink" href="#safetypy" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>check_command_safety(command)</code>: Returns safety level and reason for a command</li>
-<li>(Class-based API is not used; safety is function-based)</li>
+<li><code>check_command_safety(command)</code>: Returns safety analysis with status ("safe", "medium", "high", "info_leak") and detailed reason</li>
+<li>Safety levels trigger appropriate confirmation prompts in the main application</li>
 </ul>
 <h3 id="configpy">config.py<a class="headerlink" href="#configpy" title="Permanent link">&para;</a></h3>
 <ul>
@@ -802,16 +820,37 @@
 </ul>
 <h3 id="utilspy">utils.py<a class="headerlink" href="#utilspy" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>execute_command(command)</code>: Runs a shell command</li>
-<li><code>print_plan_preview(plan, safety_results)</code>: Shows command plan and safety</li>
+<li><code>execute_command(command)</code>: Runs a shell command safely</li>
+<li><code>print_plan_preview(plan, safety_results)</code>: Shows command plan with safety analysis</li>
 <li><code>reset_sudo_password()</code>: Clears cached sudo password</li>
-<li><code>log_error(error)</code>: Logs errors</li>
-<li><code>get_os_info()</code>: Returns OS info</li>
-<li><code>detect_shell()</code>: Detects Bash or Zsh</li>
+<li><code>log_error(error)</code>: Logs errors to file</li>
+<li><code>get_os_info()</code>: Returns detailed OS information</li>
+<li><code>detect_shell()</code>: Detects current shell (Bash or Zsh)</li>
+<li><code>validate_sudo_password(password)</code>: Validates sudo credentials</li>
 </ul>
 <h3 id="setup_logicpy">setup_logic.py<a class="headerlink" href="#setup_logicpy" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>setup_config()</code>: Runs interactive setup</li>
+<li><code>setup_config()</code>: Runs interactive setup wizard</li>
+<li><code>setup_api_key(config)</code>: Handles API key configuration with validation</li>
+<li><code>setup_sudo_password(config)</code>: Handles sudo password setup with security warnings</li>
+<li><code>set_default_model(api_key, config)</code>: Interactive model selection during setup</li>
+</ul>
+<h2 id="special-commands">Special Commands<a class="headerlink" href="#special-commands" title="Permanent link">&para;</a></h2>
+<p>The interactive mode supports various special commands:</p>
+<ul>
+<li><code>!help</code>: Show comprehensive help</li>
+<li><code>!history</code>: Display command history</li>
+<li><code>!last</code>: Show last generated command  </li>
+<li><code>!redo</code>: Re-execute last command</li>
+<li><code>!clear</code>: Clear the screen</li>
+<li><code>!models</code>: List available AI models</li>
+<li><code>!model &lt;name&gt;</code>: Switch AI model</li>
+<li><code>!web</code>: Toggle web search integration</li>
+<li><code>!update</code>: Check for and install updates from GitHub</li>
+<li><code>!errors</code>: Show error log</li>
+<li><code>!forget-sudo</code>: Clear cached sudo password</li>
+<li><code>!creator</code>: Show creator information</li>
+<li><code>!docs</code>: Show documentation link</li>
 </ul>
 <hr />
 <p>For more, see the source code and inline docstrings. All modules are designed for Bash and Zsh compatibility, and safety checks always prompt for confirmation on high-risk commands.</p>

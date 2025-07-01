@@ -639,26 +639,31 @@
 </li>
 <li>
 <p>💬 <strong>Interactive Mode with Command History</strong><br />
-  Rich REPL interface with support for special commands like:<br />
+  Rich REPL interface with protected prompt and support for special commands like:<br />
 <code>!help</code>, <code>!docs</code>, <code>!models</code>, <code>!history</code>, <code>!clear</code>, <code>!redo</code>, <code>!last</code>, <code>!creator</code>, <code>!forget-sudo</code>, <code>!update</code>, <code>!errors</code>, <code>!web</code>, and more.</p>
 </li>
 <li>
 <p>🛡️ <strong>Built-in Safety System</strong><br />
-  Analyzes each command and classifies it into <strong>three risk levels</strong> - Reason also provided:</p>
+  Analyzes each command and classifies it into <strong>four risk levels</strong> with detailed reasoning:</p>
 </li>
 <li>✅ <strong>Safe</strong> – Executed automatically.</li>
-<li>⚠️ <strong>Medium</strong> – Requires manual confirmation (yes/no).</li>
+<li>🔵 <strong>Info Leak</strong> – May expose sensitive data (requires confirmation).</li>
+<li>🟡 <strong>Medium</strong> – Sudo operations and system changes (requires y/n confirmation).</li>
 <li>
-<p>❌ <strong>High</strong> – Requires manual confirmation (yes/no).<br />
-  This ensures dangerous or potentially destructive commands are never run blindly.</p>
+<p>🔴 <strong>High</strong> – Dangerous operations like file deletion (requires y/n confirmation).<br />
+  This ensures potentially destructive commands are never run without user awareness.</p>
 </li>
 <li>
 <p>🤖 <strong>AI-Powered Command Planning</strong><br />
   Generates and refines shell commands using <strong>Google Gemini</strong> models.</p>
 </li>
 <li>
-<p>🔀 <strong>Multi-Model Support</strong><br />
-  Easily switch between Gemini <strong>Pro</strong>, <strong>Flash</strong>, and <strong>Legacy</strong> models as needed.</p>
+<p>🔀 <strong>Multi-Model Support with Smart Warnings</strong><br />
+  Easily switch between Gemini <strong>Pro</strong>, <strong>Flash</strong>, and <strong>Legacy</strong> models with detailed cost information and confirmation prompts for premium models.</p>
+</li>
+<li>
+<p>💳 <strong>Smart Cost Awareness</strong><br />
+  Real-time model pricing information with detailed cost breakdowns and confirmation prompts when switching to premium models.</p>
 </li>
 <li>
 <p>🧪 <strong>Dry-Run Mode</strong><br />
@@ -697,6 +702,26 @@
 <li>
 <p>📦 <strong>Reliable Installation with pipx</strong><br />
   Install and manage Smart-Shell using <code>pipx</code> for an isolated and reliable setup, adhering to modern Linux standards (PEP 668).</p>
+</li>
+<li>
+<p>🔄 <strong>Smart Update System</strong><br />
+  Real-time version checking against GitHub releases with automatic updates using <code>!update</code> command.</p>
+</li>
+<li>
+<p>🔒 <strong>Protected Interactive Prompt</strong><br />
+  Smart prompt protection prevents accidental deletion of the "Smart-Shell (model):" prefix when backspacing.</p>
+</li>
+<li>
+<p>🚨 <strong>Smart Command Detection</strong><br />
+  Detects when users try to run Smart-Shell CLI commands within the interactive mode and provides helpful guidance.</p>
+</li>
+<li>
+<p>⚡ <strong>Enhanced AI Performance</strong><br />
+  Optimized generation parameters and more resilient error handling for faster, more reliable command generation.</p>
+</li>
+<li>
+<p>🎯 <strong>Flexible Confirmation System</strong><br />
+  All confirmations accept both <code>y</code>/<code>yes</code> and <code>n</code>/<code>no</code> responses in any case for better user experience.</p>
 </li>
 </ul>
 <p>For a full list of commands and usage, see the <a href="../installation/">Installation</a> and <a href="../usage/">Usage</a> docs.</p>
