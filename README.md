@@ -26,8 +26,9 @@ Smart-Shell is an intelligent terminal assistant that converts natural language 
   `!help`, `!docs`, `!models`, `!history`, `!clear`, `!redo`, `!last`, `!creator`, `!forget-sudo`, `!update`, `!errors`, `!web`, and more.
 
 - 🛡️ **Built-in Safety System**  
-  Analyzes each command and classifies it into **three risk levels** - Reason also provided:
+  Analyzes each command and classifies it into **four risk levels** with detailed reasoning:
   - ✅ **Safe** – Executed automatically.
+  - 🔵 Info Leak – May expose sensitive data (requires confirmation).
   - ⚠️ **Medium** – Requires manual confirmation (yes/no).
   - ❌ **High** – Requires manual confirmation (yes/no).  
   This ensures dangerous or potentially destructive commands are never run blindly.
