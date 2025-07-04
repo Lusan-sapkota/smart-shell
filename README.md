@@ -72,8 +72,14 @@ Smart-Shell is an intelligent terminal assistant that converts natural language 
 
 Install Smart-Shell with a single command:
 
+### Bash + PipX
 ```bash
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
+```
+
+### UV
+```bash
+! command -v uv && pip install --user uv; uv tool install https://github.com/Lusan-sapkota/smart-shell.git
 ```
 
 Our intelligent installation script:
