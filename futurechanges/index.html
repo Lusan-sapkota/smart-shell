@@ -1,0 +1,1476 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://lusan-sapkota.github.io/smart-shell/futurechanges/">
+      
+      
+      
+      
+      <link rel="icon" href="../images/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Future Changes - Smart-Shell v1.1.0 - Smart-Shell</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#future-changes-smart-shell-v110" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Smart-Shell" class="md-header__button md-logo" aria-label="Smart-Shell" data-md-component="logo">
+      
+  <img src="../images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Smart-Shell
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Future Changes - Smart-Shell v1.1.0
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Lusan-sapkota/smart-shell" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Smart-Shell" class="md-nav__button md-logo" aria-label="Smart-Shell" data-md-component="logo">
+      
+  <img src="../images/logo.png" alt="logo">
+
+    </a>
+    Smart-Shell
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Lusan-sapkota/smart-shell" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Safety
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEVELOPER_DOCS.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Developer Docs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LICENSE" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    License
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../author/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Author
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#release-target-v110" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Release Target: v1.1.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offline-mode-zero-cloud-dependency" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚫 Offline Mode (Zero Cloud Dependency)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚫 Offline Mode (Zero Cloud Dependency)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-offline-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Offline Mode?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Architecture
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supported-local-llm-backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      Supported Local LLM Backends
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Supported Local LLM Backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-planned-integrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Current &amp; Planned Integrations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interactive-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interactive Setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration File
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Benefits
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#safe-continuous-repl-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔁 Safe Continuous REPL Mode
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔁 Safe Continuous REPL Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problem-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      Problem Statement
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#smart-shells-solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Smart-Shell's Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Features
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execution-flowchart" class="md-nav__link">
+    <span class="md-ellipsis">
+      Execution Flowchart
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-risk-classification" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Risk Classification
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#privacy-by-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      Privacy by Design
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Privacy by Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-never-sent-to-llm-online-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Never Sent to LLM (Online Mode)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instead-only-safe-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Instead, Only Safe Summaries
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enhanced-safety-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛡️ Enhanced Safety System
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🛡️ Enhanced Safety System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multi-layer-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-Layer Protection
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#safety-improvements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Safety Improvements
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technical-implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Technical Implementation Details
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔧 Technical Implementation Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Compatibility
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎯 Use Cases
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🎯 Use Cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-environments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enterprise Environments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#developer-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Developer Workflows
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#system-administration" class="md-nav__link">
+    <span class="md-ellipsis">
+      System Administration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-expectations" class="md-nav__link">
+    <span class="md-ellipsis">
+      📊 Performance Expectations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📊 Performance Expectations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#offline-mode-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Offline Mode Performance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#continuous-repl-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Continuous REPL Performance
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migration-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔄 Migration Path
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔄 Migration Path">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-v10x-to-v110" class="md-nav__link">
+    <span class="md-ellipsis">
+      From v1.0.x to v1.1.0
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-upgrade-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended Upgrade Process
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      🗓️ Development Timeline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🗓️ Development Timeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-core-infrastructure-q1-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase 1: Core Infrastructure (Q1 2025)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-repl-implementation-q2-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase 2: REPL Implementation (Q2 2025)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-polish-optimization-q3-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase 3: Polish &amp; Optimization (Q3 2025)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#community-involvement" class="md-nav__link">
+    <span class="md-ellipsis">
+      🤝 Community Involvement
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🤝 Community Involvement">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#beta-testing-program" class="md-nav__link">
+    <span class="md-ellipsis">
+      Beta Testing Program
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contributing-opportunities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contributing Opportunities
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#beta-testing-for-the-community" class="md-nav__link">
+    <span class="md-ellipsis">
+      📅 Beta Testing for the Community
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-version-release-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      📦 Full Version Release Timeline
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-full-release-of-smart-shell-v110-is-expected-around-july-21-or-last-week-of-july-2025-stay-tuned" class="md-nav__link">
+    <span class="md-ellipsis">
+      The full release of Smart-Shell v1.1.0 is expected around July 21 or last week of july, 2025. Stay tuned.
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      📚 Documentation Updates
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📚 Documentation Updates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-documentation-for-v110" class="md-nav__link">
+    <span class="md-ellipsis">
+      New Documentation for v1.1.0
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-existing-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updated Existing Documentation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎉 Conclusion
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="future-changes-smart-shell-v110">Future Changes - Smart-Shell v1.1.0<a class="headerlink" href="#future-changes-smart-shell-v110" title="Permanent link">&para;</a></h1>
+<p>This document outlines the major features and improvements planned for Smart-Shell v1.1.0, focusing on enhanced privacy, offline capabilities, and advanced multi-command execution.</p>
+<h2 id="release-target-v110">🚀 Release Target: v1.1.0<a class="headerlink" href="#release-target-v110" title="Permanent link">&para;</a></h2>
+<p>The following features represent a significant evolution of Smart-Shell's core architecture, introducing privacy-first design and advanced command execution capabilities.</p>
+<hr />
+<h2 id="offline-mode-zero-cloud-dependency">🚫 Offline Mode (Zero Cloud Dependency)<a class="headerlink" href="#offline-mode-zero-cloud-dependency" title="Permanent link">&para;</a></h2>
+<h3 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h3>
+<p>Smart-Shell v1.1.0 introduces <strong>Offline Mode</strong>, allowing users to leverage Smart-Shell's capabilities without sending any data to cloud APIs like Google Gemini.</p>
+<h3 id="why-offline-mode">Why Offline Mode?<a class="headerlink" href="#why-offline-mode" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Maximum Privacy</strong>: No terminal output or prompt logs reach external servers</li>
+<li><strong>Enterprise-Ready</strong>: Meets strict data governance requirements</li>
+<li><strong>Network Independence</strong>: Works without internet connectivity</li>
+<li><strong>Cost Control</strong>: No API usage costs for offline operations</li>
+</ul>
+<h3 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>[User Input] 
+    ↓
+[Local NLP / LLM (Ollama, LM Studio, GGUF, etc)]
+    ↓
+[Command Generator]
+    ↓
+[Safety System (Layered Classifier)]
+    ↓
+[Execution / Dry Run / Confirmation]
+</code></pre></div>
+<h3 id="supported-local-llm-backends">Supported Local LLM Backends<a class="headerlink" href="#supported-local-llm-backends" title="Permanent link">&para;</a></h3>
+<h4 id="current-planned-integrations">Current &amp; Planned Integrations<a class="headerlink" href="#current-planned-integrations" title="Permanent link">&para;</a></h4>
+<ul>
+<li>✅ <strong>Ollama</strong> with models like <code>phi</code>, <code>codellama</code>, <code>mistral</code></li>
+<li>✅ <strong>LM Studio</strong> (via REST API)</li>
+<li>🔄 <strong>Planned</strong>: <code>ggml</code>, <code>llamacpp</code>, custom-trained distilled models</li>
+</ul>
+<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
+<h4 id="interactive-setup">Interactive Setup<a class="headerlink" href="#interactive-setup" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>smart-shell<span class="w"> </span>setup
+<span class="c1"># Choose: Local Model</span>
+<span class="c1"># Specify: Ollama / LM Studio / Other</span>
+</code></pre></div>
+<h4 id="configuration-file">Configuration File<a class="headerlink" href="#configuration-file" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># ~/.config/smart-shell/config.toml</span>
+<span class="n">llm_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;offline&quot;</span>
+<span class="n">model_backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ollama&quot;</span>
+<span class="n">model_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;codellama&quot;</span>
+<span class="n">offline_model_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;http://localhost:11434&quot;</span><span class="w">  </span><span class="c1"># Ollama default</span>
+</code></pre></div>
+<h3 id="benefits">Benefits<a class="headerlink" href="#benefits" title="Permanent link">&para;</a></h3>
+<ul>
+<li>🔐 <strong>Complete Privacy</strong>: No data leaves your machine</li>
+<li>⚡ <strong>Low Latency</strong>: Direct local model inference</li>
+<li>💰 <strong>Cost-Free</strong>: No API charges</li>
+<li>🌐 <strong>Offline Capable</strong>: Works without internet</li>
+</ul>
+<hr />
+<h2 id="safe-continuous-repl-mode">🔁 Safe Continuous REPL Mode<a class="headerlink" href="#safe-continuous-repl-mode" title="Permanent link">&para;</a></h2>
+<h3 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h3>
+<p>Many tasks require multiple command steps that depend on each other:</p>
+<ul>
+<li>Example: "Set up nginx and start server"</li>
+<li>Each step might depend on the output of the previous step</li>
+<li>Sending multiple terminal outputs to cloud LLMs creates privacy risks</li>
+</ul>
+<h3 id="smart-shells-solution">Smart-Shell's Solution<a class="headerlink" href="#smart-shells-solution" title="Permanent link">&para;</a></h3>
+<p><strong>Safety-Aware, Output-Controlled Multi-Step Execution</strong></p>
+<h3 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✅ <strong>Command Execution Plan</strong> generation from a single natural prompt</li>
+<li>✅ <strong>4-tier Safety Classification</strong> for each step</li>
+<li>✅ <strong>Privacy Protection</strong>: No logs or raw output sent to LLM</li>
+<li>✅ <strong>Context-Safe Summaries</strong>: Only sanitized summaries used for context</li>
+</ul>
+<h3 id="execution-flowchart">Execution Flowchart<a class="headerlink" href="#execution-flowchart" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>[User Prompt]
+    ↓
+[LLM (Offline or Online)] → Generates plan of steps
+    ↓
+[SmartShell Execution Engine]
+    For each step:
+        - Classify command (Safe, Info_Leak, Medium, High)
+        - Ask for confirmation if needed
+        - Execute (or dry run)
+        - Summarize result (NOT full logs)
+    ↓
+If next command depends on prior:
+    - Gemini: only summary is sent
+    - Offline: full control
+    ↓
+[Loop Until Complete / Canceled]
+</code></pre></div>
+<h3 id="command-risk-classification">Command Risk Classification<a class="headerlink" href="#command-risk-classification" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Risk Level</th>
+<th>Behavior</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅ <strong>Safe</strong></td>
+<td>Executed automatically</td>
+<td><code>ls</code>, <code>pwd</code>, <code>echo</code></td>
+</tr>
+<tr>
+<td>🔵 <strong>Info Leak</strong></td>
+<td>Confirmation required</td>
+<td><code>env</code>, <code>cat .bashrc</code>, <code>ps aux</code></td>
+</tr>
+<tr>
+<td>🟡 <strong>Medium</strong></td>
+<td>sudo or system-altering → y/n required</td>
+<td><code>sudo apt install</code>, <code>systemctl start</code></td>
+</tr>
+<tr>
+<td>🔴 <strong>High</strong></td>
+<td>Dangerous → extra warning + confirm</td>
+<td><code>rm -rf</code>, <code>mkfs</code>, <code>dd</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="privacy-by-design">Privacy by Design<a class="headerlink" href="#privacy-by-design" title="Permanent link">&para;</a></h3>
+<h4 id="data-never-sent-to-llm-online-mode">Data Never Sent to LLM (Online Mode)<a class="headerlink" href="#data-never-sent-to-llm-online-mode" title="Permanent link">&para;</a></h4>
+<ul>
+<li>❌ Terminal environment variables</li>
+<li>❌ Raw command output</li>
+<li>❌ File content</li>
+<li>❌ stdout/stderr logs</li>
+<li>❌ System information</li>
+</ul>
+<h4 id="instead-only-safe-summaries">Instead, Only Safe Summaries<a class="headerlink" href="#instead-only-safe-summaries" title="Permanent link">&para;</a></h4>
+<ul>
+<li>✅ "Previous step: sudo apt install nginx — status: success"</li>
+<li>✅ "Directory creation: completed"</li>
+<li>✅ "Service status: running"</li>
+</ul>
+<hr />
+<h2 id="enhanced-safety-system">🛡️ Enhanced Safety System<a class="headerlink" href="#enhanced-safety-system" title="Permanent link">&para;</a></h2>
+<h3 id="multi-layer-protection">Multi-Layer Protection<a class="headerlink" href="#multi-layer-protection" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Pre-execution Analysis</strong>: Command intent classification</li>
+<li><strong>Risk Assessment</strong>: Dynamic risk scoring based on context</li>
+<li><strong>User Confirmation</strong>: Intelligent prompting for risky operations</li>
+<li><strong>Output Sanitization</strong>: Clean summaries for context preservation</li>
+</ol>
+<h3 id="safety-improvements">Safety Improvements<a class="headerlink" href="#safety-improvements" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Contextual Risk Assessment</strong>: Commands evaluated based on current system state</li>
+<li><strong>Learning Safety Patterns</strong>: System learns from user confirmations</li>
+<li><strong>Audit Trail</strong>: Optional logging of safety decisions (local only)</li>
+</ul>
+<hr />
+<h2 id="technical-implementation-details">🔧 Technical Implementation Details<a class="headerlink" href="#technical-implementation-details" title="Permanent link">&para;</a></h2>
+<h3 id="configuration-management">Configuration Management<a class="headerlink" href="#configuration-management" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Unified Config</strong>: Single configuration file for all modes</li>
+<li><strong>Profile Support</strong>: Multiple configuration profiles (work, personal, etc.)</li>
+<li><strong>Environment Variables</strong>: Override support for CI/CD environments</li>
+</ul>
+<h3 id="model-management">Model Management<a class="headerlink" href="#model-management" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Automatic Detection</strong>: Smart-Shell detects available local models</li>
+<li><strong>Model Switching</strong>: Easy switching between online/offline modes</li>
+<li><strong>Performance Optimization</strong>: Model-specific prompt optimization</li>
+</ul>
+<h3 id="api-compatibility">API Compatibility<a class="headerlink" href="#api-compatibility" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Backward Compatibility</strong>: Existing configurations continue to work</li>
+<li><strong>Migration Tools</strong>: Automatic migration from v1.0.x configurations</li>
+<li><strong>Fallback Modes</strong>: Graceful degradation when preferred models unavailable</li>
+</ul>
+<hr />
+<h2 id="use-cases">🎯 Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
+<h3 id="enterprise-environments">Enterprise Environments<a class="headerlink" href="#enterprise-environments" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Data Governance Compliance</strong>: No external data transmission</li>
+<li><strong>Air-Gapped Systems</strong>: Full functionality without internet</li>
+<li><strong>Custom Models</strong>: Use organization-specific trained models</li>
+</ul>
+<h3 id="developer-workflows">Developer Workflows<a class="headerlink" href="#developer-workflows" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Multi-Step Deployments</strong>: Safe execution of complex deployment sequences</li>
+<li><strong>Environment Setup</strong>: Automated development environment configuration</li>
+<li><strong>Debugging Sessions</strong>: Interactive troubleshooting with command chains</li>
+</ul>
+<h3 id="system-administration">System Administration<a class="headerlink" href="#system-administration" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Server Maintenance</strong>: Guided multi-step maintenance procedures</li>
+<li><strong>Security Audits</strong>: Safe exploration of system configurations</li>
+<li><strong>Automation Testing</strong>: Dry-run complex administrative tasks</li>
+</ul>
+<hr />
+<h2 id="performance-expectations">📊 Performance Expectations<a class="headerlink" href="#performance-expectations" title="Permanent link">&para;</a></h2>
+<h3 id="offline-mode-performance">Offline Mode Performance<a class="headerlink" href="#offline-mode-performance" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Latency</strong>: 2-5x faster than cloud API calls (depending on hardware)</li>
+<li><strong>Throughput</strong>: Limited by local hardware capabilities</li>
+<li><strong>Memory Usage</strong>: 2-8GB RAM depending on model size</li>
+</ul>
+<h3 id="continuous-repl-performance">Continuous REPL Performance<a class="headerlink" href="#continuous-repl-performance" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Plan Generation</strong>: 1-3 seconds for complex multi-step tasks</li>
+<li><strong>Step Execution</strong>: Near-instantaneous for safe commands</li>
+<li><strong>Context Management</strong>: Minimal overhead for summary generation</li>
+</ul>
+<hr />
+<h2 id="migration-path">🔄 Migration Path<a class="headerlink" href="#migration-path" title="Permanent link">&para;</a></h2>
+<h3 id="from-v10x-to-v110">From v1.0.x to v1.1.0<a class="headerlink" href="#from-v10x-to-v110" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Automatic Config Migration</strong>: Existing configurations preserved</li>
+<li><strong>Feature Opt-in</strong>: New features disabled by default</li>
+<li><strong>Gradual Adoption</strong>: Users can enable features incrementally</li>
+</ol>
+<h3 id="recommended-upgrade-process">Recommended Upgrade Process<a class="headerlink" href="#recommended-upgrade-process" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Backup current configuration</span>
+cp<span class="w"> </span>~/.config/smart-shell/config.json<span class="w"> </span>~/.config/smart-shell/config.json.backup
+
+<span class="c1"># Upgrade Smart-Shell</span>
+pipx<span class="w"> </span>upgrade<span class="w"> </span>smart-shell
+
+<span class="c1"># Run migration wizard</span>
+smart-shell<span class="w"> </span>migrate
+
+<span class="c1"># Configure new features</span>
+smart-shell<span class="w"> </span>setup<span class="w"> </span>--enable-offline<span class="w"> </span>--enable-continuous-repl
+</code></pre></div>
+<hr />
+<h2 id="development-timeline">🗓️ Development Timeline<a class="headerlink" href="#development-timeline" title="Permanent link">&para;</a></h2>
+<h3 id="phase-1-core-infrastructure-q1-2025">Phase 1: Core Infrastructure (Q1 2025)<a class="headerlink" href="#phase-1-core-infrastructure-q1-2025" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✅ Offline mode architecture</li>
+<li>✅ Local LLM integration framework</li>
+<li>✅ Enhanced safety classification system</li>
+</ul>
+<h3 id="phase-2-repl-implementation-q2-2025">Phase 2: REPL Implementation (Q2 2025)<a class="headerlink" href="#phase-2-repl-implementation-q2-2025" title="Permanent link">&para;</a></h3>
+<ul>
+<li>🔄 Multi-step execution engine</li>
+<li>🔄 Context-safe output summarization</li>
+<li>🔄 Enhanced user confirmation flows</li>
+</ul>
+<h3 id="phase-3-polish-optimization-q3-2025">Phase 3: Polish &amp; Optimization (Q3 2025)<a class="headerlink" href="#phase-3-polish-optimization-q3-2025" title="Permanent link">&para;</a></h3>
+<ul>
+<li>🔄 Performance optimizations</li>
+<li>🔄 Additional local model support</li>
+<li>🔄 Comprehensive testing and documentation</li>
+</ul>
+<hr />
+<h2 id="community-involvement">🤝 Community Involvement<a class="headerlink" href="#community-involvement" title="Permanent link">&para;</a></h2>
+<h3 id="beta-testing-program">Beta Testing Program<a class="headerlink" href="#beta-testing-program" title="Permanent link">&para;</a></h3>
+<p>Smart-Shell v1.1.0 will include a comprehensive beta testing program:
+- <strong>Early Access</strong>: Available to active community members
+- <strong>Feedback Integration</strong>: Regular feedback sessions with beta testers
+- <strong>Documentation</strong>: Community-driven documentation improvements</p>
+<h3 id="contributing-opportunities">Contributing Opportunities<a class="headerlink" href="#contributing-opportunities" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Model Integration</strong>: Help add support for new local LLM backends</li>
+<li><strong>Safety Patterns</strong>: Contribute to the safety classification database</li>
+<li><strong>Testing</strong>: Help test offline mode across different environments</li>
+</ul>
+<h3 id="beta-testing-for-the-community">📅 Beta Testing for the Community<a class="headerlink" href="#beta-testing-for-the-community" title="Permanent link">&para;</a></h3>
+<p>Smart-Shell v1.1.0 will enter community beta testing in <strong>mid-July 2025</strong>. Active community members are invited to participate, provide feedback, and help shape the final release. Stay tuned.</p>
+<h2 id="full-version-release-timeline">📦 Full Version Release Timeline<a class="headerlink" href="#full-version-release-timeline" title="Permanent link">&para;</a></h2>
+<h2 id="the-full-release-of-smart-shell-v110-is-expected-around-july-21-or-last-week-of-july-2025-stay-tuned">The full release of Smart-Shell v1.1.0 is expected around <strong>July 21 or last week of july, 2025</strong>. Stay tuned.<a class="headerlink" href="#the-full-release-of-smart-shell-v110-is-expected-around-july-21-or-last-week-of-july-2025-stay-tuned" title="Permanent link">&para;</a></h2>
+<h2 id="documentation-updates">📚 Documentation Updates<a class="headerlink" href="#documentation-updates" title="Permanent link">&para;</a></h2>
+<h3 id="new-documentation-for-v110">New Documentation for v1.1.0<a class="headerlink" href="#new-documentation-for-v110" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Offline Mode Guide</strong>: Complete setup and configuration guide</li>
+<li><strong>Continuous REPL Tutorial</strong>: Step-by-step tutorial for multi-command workflows</li>
+<li><strong>Privacy Guide</strong>: Detailed explanation of privacy protections</li>
+<li><strong>Local Model Setup</strong>: Instructions for various local LLM backends</li>
+<li><strong>Troubleshooting</strong>: Common issues and solutions for new features</li>
+</ul>
+<h3 id="updated-existing-documentation">Updated Existing Documentation<a class="headerlink" href="#updated-existing-documentation" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Installation Guide</strong>: Updated with offline mode requirements</li>
+<li><strong>Configuration Reference</strong>: Expanded with new configuration options</li>
+<li><strong>Safety Guide</strong>: Enhanced with new safety classification details</li>
+</ul>
+<hr />
+<h2 id="conclusion">🎉 Conclusion<a class="headerlink" href="#conclusion" title="Permanent link">&para;</a></h2>
+<p>Smart-Shell v1.1.0 represents a major step forward in bringing AI-powered shell assistance to privacy-conscious users and enterprise environments. With offline mode and safe continuous REPL, users gain powerful new capabilities while maintaining complete control over their data and execution environment.</p>
+<p>These features establish Smart-Shell as the leading privacy-first AI shell assistant, suitable for everything from personal development workflows to enterprise-grade system administration tasks.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Lusan-sapkota/smart-shell" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.python.org/" target="_blank" rel="noopener" title="www.python.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 404c11.1 0 20.1 9.1 20.1 20.3 0 11.3-9 20.4-20.1 20.4-11 0-20.1-9.2-20.1-20.4.1-11.3 9.1-20.3 20.1-20.3M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.7-142.6c-11.1 0-20.1-9.1-20.1-20.3.1-11.3 9-20.4 20.1-20.4 11 0 20.1 9.2 20.1 20.4s-9 20.3-20.1 20.3"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://lusansapkota.com.np/" target="_blank" rel="noopener" title="lusansapkota.com.np" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M352 256c0 22.2-1.2 43.6-3.3 64H163.4c-2.2-20.4-3.3-41.8-3.3-64s1.2-43.6 3.3-64h185.3c2.2 20.4 3.3 41.8 3.3 64m28.8-64h123.1c5.3 20.5 8.1 41.9 8.1 64s-2.8 43.5-8.1 64H380.8c2.1-20.6 3.2-42 3.2-64s-1.1-43.4-3.2-64m112.6-32H376.7c-10-63.9-29.8-117.4-55.3-151.6 78.3 20.7 142 77.5 171.9 151.6zm-149.1 0H167.7c6.1-36.4 15.5-68.6 27-94.7 10.5-23.6 22.2-40.7 33.5-51.5C239.4 3.2 248.7 0 256 0s16.6 3.2 27.8 13.8c11.3 10.8 23 27.9 33.5 51.5 11.6 26 20.9 58.2 27 94.7m-209 0H18.6c30-74.1 93.6-130.9 172-151.6-25.5 34.2-45.3 87.7-55.3 151.6M8.1 192h123.1c-2.1 20.6-3.2 42-3.2 64s1.1 43.4 3.2 64H8.1C2.8 299.5 0 278.1 0 256s2.8-43.5 8.1-64m186.6 254.6c-11.6-26-20.9-58.2-27-94.6h176.6c-6.1 36.4-15.5 68.6-27 94.6-10.5 23.6-22.2 40.7-33.5 51.5-11.2 10.7-20.5 13.9-27.8 13.9s-16.6-3.2-27.8-13.8c-11.3-10.8-23-27.9-33.5-51.5zM135.3 352c10 63.9 29.8 117.4 55.3 151.6-78.4-20.7-142-77.5-172-151.6zm358.1 0c-30 74.1-93.6 130.9-171.9 151.6 25.5-34.2 45.2-87.7 55.3-151.6h116.7z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

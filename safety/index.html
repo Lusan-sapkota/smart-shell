@@ -397,15 +397,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#confirmation-system" class="md-nav__link">
-    <span class="md-ellipsis">
-      Confirmation System
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -634,15 +625,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#confirmation-system" class="md-nav__link">
-    <span class="md-ellipsis">
-      Confirmation System
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -666,29 +648,20 @@
 <p>Smart-Shell includes a comprehensive safety system to protect users from potentially harmful commands.</p>
 <h2 id="safety-levels">Safety Levels<a class="headerlink" href="#safety-levels" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Safe</strong> 🟢: Commands that are considered safe to run (executed automatically)</li>
-<li><strong>Medium</strong> 🟡: Commands that might have consequences like sudo operations (requires y/n confirmation)</li>
-<li><strong>High</strong> 🔴: Commands that are potentially dangerous like file deletion (requires y/n confirmation)</li>
-<li><strong>Info Leak</strong> 🔵: Commands that might expose sensitive information (requires confirmation)</li>
+<li><strong>Safe</strong> 🟢: Commands that are considered safe to run</li>
+<li><strong>Warning</strong> 🟡: Commands that might have unintended consequences (requires confirmation)</li>
+<li><strong>Blocked</strong> 🔴: Commands that are potentially harmful (require explicit user confirmation before execution)</li>
 </ul>
 <h2 id="safety-checks">Safety Checks<a class="headerlink" href="#safety-checks" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Risk Assessment:</strong> All commands are analyzed for potential risks before execution</li>
-<li><strong>Pattern Matching:</strong> Uses regex to identify risky command patterns (e.g., <code>sudo</code>, <code>rm -rf</code>, <code>dd</code>, <code>chmod 777</code>)</li>
-<li><strong>Path Analysis:</strong> Detects operations on sensitive system paths (e.g., <code>/etc/passwd</code>, system directories)</li>
-<li><strong>User Confirmation:</strong> Medium and high-risk commands require explicit y/n confirmation</li>
-<li><strong>Command Editing:</strong> Users can edit blocked commands before execution</li>
-</ul>
-<h2 id="confirmation-system">Confirmation System<a class="headerlink" href="#confirmation-system" title="Permanent link">&para;</a></h2>
-<ul>
-<li>All confirmations accept <code>y</code>/<code>yes</code> or <code>n</code>/<code>no</code> (case insensitive)</li>
-<li>Users maintain full control - even high-risk commands can be executed with confirmation</li>
-<li>Clear explanations are provided for why commands are flagged</li>
+<li><strong>Blocked Commands:</strong> Explicitly identifies dangerous commands (e.g., <code>rm -rf /</code>, fork bombs, disk formatting) and prompts the user for confirmation before execution. If the user confirms, the command will be executed.</li>
+<li><strong>Pattern Matching:</strong> Uses regex to identify risky command patterns (e.g., <code>sudo</code>, <code>rm -rf</code>)</li>
+<li><strong>Path Analysis:</strong> Detects operations on sensitive system paths (e.g., <code>/etc/passwd</code>)</li>
 </ul>
 <blockquote>
-<p><strong>Note:</strong> The safety system is designed to inform and protect, not restrict. Users have final control over command execution after being informed of potential risks.</p>
+<p><strong>Note:</strong> Even high-risk ("blocked") commands can be executed if the user explicitly confirms when prompted. This ensures user control while maintaining safety.</p>
 </blockquote>
-<p>For more details, see the full documentation.</p>
+<p>For more details, see the <a href="SAFETY.md">Safety System Documentation</a>.</p>
 
 
 

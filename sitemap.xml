@@ -2,50 +2,58 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/CHANGELOG/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/DEVELOPMENT/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/api/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/author/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/contributing/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/development/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/faq/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/features/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
+    </url>
+    <url>
+         <loc>https://lusan-sapkota.github.io/smart-shell/futurechanges/</loc>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/installation/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/safety/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
+    </url>
+    <url>
+         <loc>https://lusan-sapkota.github.io/smart-shell/uninstall/</loc>
+         <lastmod>2025-07-07</lastmod>
     </url>
     <url>
          <loc>https://lusan-sapkota.github.io/smart-shell/usage/</loc>
-         <lastmod>2025-07-01</lastmod>
+         <lastmod>2025-07-07</lastmod>
     </url>
 </urlset>
