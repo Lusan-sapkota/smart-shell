@@ -1,8 +1,6 @@
 # Smart-Shell
 
-[![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen)## 🗑️ Uninstall
-
-To completely remove Smart-Shell from your system, run this single command:ttps://github.com/Lusan-sapkota/smart-shell)
+[![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen)]
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-orange)](https://ai.google.dev/)
