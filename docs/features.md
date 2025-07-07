@@ -1,33 +1,149 @@
 # Features
 
-## Smart-Shell offers a rich set of features to make your terminal experience smarter and safer:
+Smart-Shell is packed with powerful features designed to make your terminal experience smarter, safer, and more efficient. Here's what makes Smart-Shell special:
 
-- 🧠 **Natural Language to Command**  
-  Convert plain English into valid Bash/Zsh commands instantly.
+## 🧠 Core AI Features
 
-- 🐚 **Shell Auto-Detection**  
-  Automatically detects and supports both **Bash** and **Zsh** environments.
+### Natural Language Processing
+- **Plain English to Commands**: Convert natural language descriptions into executable shell commands
+- **Context Understanding**: Smart-Shell understands the context of your requests
+- **Command Refinement**: AI continuously improves command suggestions based on your environment
 
-- 💬 **Interactive Mode with Command History**  
-  Rich REPL interface with protected prompt and support for special commands like:  
-  `!help`, `!docs`, `!models`, `!history`, `!clear`, `!redo`, `!last`, `!creator`, `!forget-sudo`, `!update`, `!errors`, `!web`, and more.
+### Multi-Model AI Support
+- **Google Gemini Integration**: Powered by Google's latest Gemini AI models
+- **Model Selection**: Choose between Gemini Pro, Flash, and Legacy models
+- **Smart Cost Awareness**: Real-time pricing information with confirmation prompts for premium models
+- **Performance Optimization**: Automatic model selection based on query complexity
 
-- 🛡️ **Built-in Safety System**  
-  Analyzes each command and classifies it into **four risk levels** with detailed reasoning:
-  - ✅ **Safe** – Executed automatically.
-  - 🔵 **Info Leak** – May expose sensitive data (requires confirmation).
-  - 🟡 **Medium** – Sudo operations and system changes (requires y/n confirmation).
-  - 🔴 **High** – Dangerous operations like file deletion (requires y/n confirmation).  
-  This ensures potentially destructive commands are never run without user awareness.
+## 🛡️ Advanced Safety System
 
-- 🤖 **AI-Powered Command Planning**  
-  Generates and refines shell commands using **Google Gemini** models.
+### Four-Tier Risk Classification
+Smart-Shell analyzes every command and provides detailed safety assessment:
 
-- 🔀 **Multi-Model Support with Smart Warnings**  
-  Easily switch between Gemini **Pro**, **Flash**, and **Legacy** models with detailed cost information and confirmation prompts for premium models.
+- ✅ **Safe** – Commands that are completely safe to execute automatically
+  - Examples: `ls`, `pwd`, `echo`, `cat` (for non-sensitive files)
+  
+- 🔵 **Info Leak** – Commands that may expose sensitive system information
+  - Examples: `env`, `ps aux`, `cat ~/.bashrc`, `history`
+  - Requires user confirmation before execution
+  
+- 🟡 **Medium Risk** – Commands requiring elevated privileges or system modifications
+  - Examples: `sudo apt install`, `systemctl start`, `chmod`, `chown`
+  - Requires explicit y/n confirmation
+  
+- � **High Risk** – Potentially destructive or dangerous operations
+  - Examples: `rm -rf`, `dd`, `mkfs`, `format`
+  - Shows detailed warning and requires explicit confirmation
 
-- 💳 **Smart Cost Awareness**  
-  Real-time model pricing information with detailed cost breakdowns and confirmation prompts when switching to premium models.
+### Safety Features
+- **Real-time Analysis**: Every command is analyzed before execution
+- **Detailed Reasoning**: Understand why a command is classified at a certain risk level
+- **User Control**: Full control over what gets executed and when
+- **Audit Trail**: Track command execution and safety decisions
+
+## 🐚 Shell Integration
+
+### Multi-Shell Support
+- **Bash Compatibility**: Full support for Bash environments
+- **Zsh Integration**: Native Zsh support with advanced features
+- **Auto-Detection**: Automatically detects your current shell environment
+- **Cross-Platform**: Works on Linux, macOS, and WSL
+
+### Desktop Integration
+- **Application Menu**: Launch Smart-Shell from your desktop environment
+- **Desktop Files**: Proper .desktop integration for Linux systems
+- **Command Completion**: Intelligent tab completion for both Bash and Zsh
+- **Shell History**: Integrates with your existing shell history
+
+## 💬 Interactive Experience
+
+### Rich REPL Interface
+- **Command History**: Access and replay previous commands
+- **Special Commands**: Built-in commands for enhanced functionality
+- **Protected Prompt**: Safe prompt handling that prevents command injection
+- **Session Management**: Persistent sessions with state management
+
+### Special Commands
+Access powerful built-in commands with the `!` prefix:
+
+- `!help` - Show available commands and usage information
+- `!docs` - Open documentation links
+- `!models` - List and switch between AI models
+- `!history` - View command execution history
+- `!clear` - Clear the terminal screen
+- `!redo` - Re-execute the last command
+- `!last` - Show the last executed command
+- `!creator` - Information about Smart-Shell's creator
+- `!forget-sudo` - Clear stored sudo password
+- `!update` - Check for Smart-Shell updates
+- `!errors` - View recent error logs
+- `!web` - Toggle web search integration
+- `!exit` - Exit Smart-Shell safely
+
+## 🌐 Web Search Integration
+
+### Real-Time Enhancement
+- **Live Web Search**: Performs relevant web searches to enhance command accuracy
+- **Context-Aware Results**: AI combines local knowledge with live web results
+- **Smart Filtering**: Only relevant technical information is used
+- **Privacy Control**: Toggle web search on/off as needed
+
+### Enhanced Accuracy
+- **Up-to-Date Information**: Access latest command syntax and options
+- **Platform-Specific**: Results tailored to your operating system
+- **Error Resolution**: Web search helps resolve command errors
+
+## 🔧 Advanced Features
+
+### Dry-Run Mode
+- **Preview Commands**: See exactly what will be executed before running
+- **Safety Testing**: Test commands without actually executing them
+- **Command Validation**: Verify command syntax and parameters
+
+### Configuration Management
+- **API Key Management**: Secure storage and management of API keys
+- **Sudo Password**: Optional encrypted storage of sudo password
+- **Model Preferences**: Save preferred AI models and settings
+- **Web Search Settings**: Control web search behavior
+
+### Error Handling
+- **Intelligent Error Analysis**: AI analyzes command failures and suggests fixes
+- **Error History**: Track and learn from previous errors
+- **Recovery Suggestions**: Get suggestions for fixing failed commands
+
+## 🚀 Performance Features
+
+### Optimized Operation
+- **Fast Response**: Optimized for quick command generation
+- **Efficient API Usage**: Smart API call management to minimize costs
+- **Local Caching**: Cache frequently used commands and patterns
+- **Background Processing**: Non-blocking operations where possible
+
+### Resource Management
+- **Memory Efficient**: Minimal memory footprint
+- **CPU Optimization**: Efficient processing of natural language queries
+- **Network Optimization**: Optimized API calls and web searches
+
+## � Coming Soon (v1.1.0)
+
+### Offline Mode
+- **Complete Privacy**: Local LLM support for offline operation
+- **Zero Cloud Dependency**: No data sent to external servers
+- **Local Model Integration**: Support for Ollama, LM Studio, and custom models
+
+### Safe Continuous REPL
+- **Multi-Step Execution**: Handle complex multi-command workflows
+- **Command Chaining**: Safe execution of dependent commands
+- **Context Preservation**: Maintain context across command sequences
+- **Enhanced Privacy**: Summarized outputs instead of raw terminal data
+
+## 📊 Usage Statistics
+
+Smart-Shell provides insights into your usage patterns:
+- **Command Statistics**: Track most-used command types
+- **Safety Metrics**: Monitor safety system effectiveness
+- **Performance Metrics**: Response times and success rates
+- **Cost Tracking**: Monitor AI API usage and costs
 
 - 🧪 **Dry-Run Mode**  
   Preview the exact command before execution for extra safety and transparency.

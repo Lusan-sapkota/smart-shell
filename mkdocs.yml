@@ -4,18 +4,23 @@ docs_dir: docs
 site_url: https://lusan-sapkota.github.io/smart-shell/
 nav:
   - Home: index.md
-  - Features: features.md
-  - Installation: installation.md
-  - Usage: usage.md
-  - Safety: safety.md
-  - Development: development.md
-  - Developer Docs: DEVELOPER_DOCS.md
-  - API Reference: api.md
-  - Changelog: CHANGELOG.md
-  - License: ../LICENSE
-  - Author: author.md
-  - Contributing: contributing.md
-  - FAQ: faq.md
+  - Getting Started:
+    - Features: features.md
+    - Installation: installation.md
+    - Usage: usage.md
+    - Uninstall: uninstall.md
+  - Documentation:
+    - Safety: safety.md
+    - API Reference: api.md
+    - FAQ: faq.md
+  - Development:
+    - Development Guide: DEVELOPMENT.md
+    - Contributing: contributing.md
+  - Project Info:
+    - Changelog: CHANGELOG.md
+    - Future Changes: futurechanges.md
+    - License: license.md
+    - Author: author.md
 theme:
   name: material
   logo: images/logo.png

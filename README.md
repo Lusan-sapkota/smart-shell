@@ -163,6 +163,7 @@ After completing these steps, restart your terminal or run `source ~/.bashrc` (o
 
 - [Features](docs/features.md)
 - [Installation](docs/installation.md)
+- [Uninstall](docs/uninstall.md)
 - [Usage](docs/usage.md)
 - [Safety](docs/safety.md)
 - [Development](docs/development.md)
@@ -172,7 +173,6 @@ After completing these steps, restart your terminal or run `source ~/.bashrc` (o
 - [Author](docs/author.md)
 - [Contributing](docs/contributing.md)
 - [FAQ](docs/faq.md)
-- [Uninstall](docs/uninstall.md)
 - [New-Version](docs/futurechanges.md)
 
 > 📚 **Full documentation is available at the [Smart-Shell MkDocs site](https://lusan-sapkota.github.io/smart-shell/).**
