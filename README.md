@@ -1,6 +1,8 @@
 # Smart-Shell
 
-[![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen)](https://github.com/Lusan-sapkota/smart-shell)
+[![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen)## 🗑️ Uninstall
+
+To completely remove Smart-Shell from your system, run this single command:ttps://github.com/Lusan-sapkota/smart-shell)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-orange)](https://ai.google.dev/)
@@ -93,7 +95,69 @@ smart-shell setup
 
 For manual installation and development instructions, see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
-## 📖 Documentation
+## �️ Uninstall
+
+To completely remove Smart-Shell from your system, run this single command:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash -s -- --uninstall
+```
+
+### Manual Uninstall
+
+If you prefer to uninstall manually, follow these steps:
+
+**1. Remove the Smart-Shell package:**
+
+```bash
+# If installed with pipx (recommended)
+pipx uninstall smart-shell
+
+# If installed system-wide
+sudo pip3 uninstall smart-shell
+
+# If installed in a virtual environment
+rm -rf ./venv  # (from the project directory)
+```
+
+**2. Remove configuration files:**
+
+```bash
+rm -rf ~/.config/smart-shell
+```
+
+**3. Remove desktop entry:**
+
+```bash
+rm -f ~/.local/share/applications/smart-shell.desktop
+```
+
+**4. Remove shell completion:**
+
+```bash
+rm -f ~/.local/share/bash-completion/completions/smart-shell-completion.bash
+```
+
+**5. Clean up shell configuration:**
+
+```bash
+# Remove from .bashrc
+sed -i '/# Smart-Shell completion/,+1d' ~/.bashrc
+
+# Remove from .zshrc (if exists)
+sed -i '/# Smart-Shell completion/,+1d' ~/.zshrc
+```
+
+**6. Remove any remaining executables:**
+
+```bash
+rm -f ~/.local/bin/smart-shell
+rm -f ~/.local/bin/smart-shell.bak
+```
+
+After completing these steps, restart your terminal or run `source ~/.bashrc` (or `source ~/.zshrc`) to reload your shell configuration.
+
+## �📖 Documentation
 
 - [Features](docs/features.md)
 - [Installation](docs/installation.md)
@@ -106,6 +170,8 @@ For manual installation and development instructions, see [docs/DEVELOPMENT.md](
 - [Author](docs/author.md)
 - [Contributing](docs/contributing.md)
 - [FAQ](docs/faq.md)
+- [Uninstall](docs/uninstall.md)
+- [New-Version](docs/futurechanges.md)
 
 > 📚 **Full documentation is available at the [Smart-Shell MkDocs site](https://lusan-sapkota.github.io/smart-shell/).**
 
