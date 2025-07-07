@@ -4,3 +4,4 @@ rich
 pyyaml
 requests
 google-api-core
+toml

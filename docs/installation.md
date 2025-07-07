@@ -41,6 +41,8 @@ smart-shell
 - `smart-shell --help` or `smart-shell help` — Show CLI help
 - `smart-shell --version` or `smart-shell version` — Show version information
 - `smart-shell --dry-run` or `-d` — Show command without executing
+- `smart-shell --yes` or `-y` — Auto-confirm all prompts (for automation)
+- `smart-shell --model <name>` or `-m <name>` — Use specific AI model
 
 ## Manual Installation Options
 

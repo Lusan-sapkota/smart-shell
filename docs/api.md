@@ -18,8 +18,8 @@
 - `AIWrapper.generate_command(prompt, model)`: Generate Bash/Zsh command from prompt
 
 ### safety.py
-- `check_command_safety(command)`: Returns safety level and reason for a command
-- (Class-based API is not used; safety is function-based)
+- `check_command_safety(command)`: Returns safety analysis with status ("safe", "medium", "high", "info_leak") and detailed reason
+- Safety levels trigger appropriate confirmation prompts in the main application
 
 ### config.py
 - `load_config()`: Loads config file
@@ -33,15 +33,37 @@
 - `BANNER`: Banner string
 
 ### utils.py
-- `execute_command(command)`: Runs a shell command
-- `print_plan_preview(plan, safety_results)`: Shows command plan and safety
+- `execute_command(command)`: Runs a shell command safely
+- `print_plan_preview(plan, safety_results)`: Shows command plan with safety analysis
 - `reset_sudo_password()`: Clears cached sudo password
-- `log_error(error)`: Logs errors
-- `get_os_info()`: Returns OS info
-- `detect_shell()`: Detects Bash or Zsh
+- `log_error(error)`: Logs errors to file
+- `get_os_info()`: Returns detailed OS information
+- `detect_shell()`: Detects current shell (Bash or Zsh)
+- `validate_sudo_password(password)`: Validates sudo credentials
 
 ### setup_logic.py
-- `setup_config()`: Runs interactive setup
+- `setup_config()`: Runs interactive setup wizard
+- `setup_api_key(config)`: Handles API key configuration with validation
+- `setup_sudo_password(config)`: Handles sudo password setup with security warnings
+- `set_default_model(api_key, config)`: Interactive model selection during setup
+
+## Special Commands
+
+The interactive mode supports various special commands:
+
+- `!help`: Show comprehensive help
+- `!history`: Display command history
+- `!last`: Show last generated command  
+- `!redo`: Re-execute last command
+- `!clear`: Clear the screen
+- `!models`: List available AI models
+- `!model <name>`: Switch AI model
+- `!web`: Toggle web search integration
+- `!update`: Check for and install updates from GitHub
+- `!errors`: Show error log
+- `!forget-sudo`: Clear cached sudo password
+- `!creator`: Show creator information
+- `!docs`: Show documentation link
 
 ---
 

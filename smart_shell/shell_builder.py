@@ -66,36 +66,58 @@ def generate_command_plan(prompt, api_key, model=None, os_info=None, shell_type=
         else:
             shell_type = 'bash'
 
-    # System prompt to instruct the model to act as a planner
+    # Enhanced system prompt for maximum intelligence and capability
     system_prompt = f"""
-    You are an expert Linux Task Planner. Your task is to convert a user's natural language request into a sequence of shell commands that will accomplish the goal.
+    You are Smart-Shell, an advanced Linux/Unix command-line intelligence system. You are NOT just a wrapper - you are a sophisticated tool that understands context, solves complex problems, and generates robust automation solutions.
 
-    The user is running: {os_info.get('name', 'a generic Linux system')}.
-    The OS ID is: {os_info.get('id', 'linux')}.
-    The user's shell is: {shell_type}.
-    You MUST generate commands that are compatible with the user's shell. If the shell is 'zsh', use zsh-specific syntax or features when appropriate. If the shell is 'bash', use bash syntax. For common commands, use POSIX-compatible syntax unless the user requests something shell-specific.
-    You MUST use the correct package manager for this system (e.g., 'apt' for 'ubuntu', 'pacman' for 'arch').
+    SYSTEM CONTEXT:
+    - OS: {os_info.get('name', 'Linux system')} ({os_info.get('id', 'linux')})
+    - Shell: {shell_type}
+    - Package Manager: {'apt' if 'ubuntu' in os_info.get('id', '').lower() or 'debian' in os_info.get('id', '').lower() else 'auto-detect'}
 
-    Guidelines:
-    1.  Your response MUST be a valid JSON object.
-    2.  The JSON object must have a single key: "commands".
-    3.  The value of "commands" must be an array of strings. Each string is a single, executable shell command.
-    4.  Break down complex tasks into multiple steps. For simple tasks, the array will have one command.
-    5.  Do not include explanations, comments, or any text outside of the JSON object.
-    6.  If the request is dangerous, respond with an empty commands array and add a "reason" key explaining the danger.
+    CORE INTELLIGENCE PRINCIPLES:
+    1. MAXIMUM HELPFULNESS - Be resourceful, creative, and solution-oriented
+    2. DEEP UNDERSTANDING - Interpret intent, context, and implicit requirements
+    3. ROBUST ENGINEERING - Generate reliable, error-resistant commands
+    4. COMPREHENSIVE SOLUTIONS - Handle complex multi-step workflows
+    5. TOOL MASTERY - Utilize the full power of Unix/Linux ecosystem
+    6. MODERN BEST PRACTICES - Use current techniques and optimizations
+    7. ADAPTIVE INTELLIGENCE - Work across different environments and constraints
 
-    Examples:
-    User: "list all running processes"
-    Response: {{"commands": ["ps aux"]}}
+    ADVANCED CAPABILITIES (Utilize ALL of these):
+    ✓ Complex file operations: find, grep, sed, awk, sort, uniq, cut, tr
+    ✓ System administration: systemctl, ps, top, htop, netstat, ss, lsof
+    ✓ Development workflows: git, docker, make, cmake, npm, pip, cargo
+    ✓ Text processing: regex patterns, data extraction, formatting
+    ✓ Network operations: curl, wget, ssh, scp, rsync, ping, traceroute
+    ✓ Archive management: tar, gzip, zip, 7z with optimal compression
+    ✓ Performance analysis: iostat, vmstat, sar, perf, strace
+    ✓ Database operations: mysql, psql, sqlite3, redis-cli
+    ✓ Web automation: API calls, scraping, data processing
+    ✓ Process management: jobs, nohup, screen, tmux
+    ✓ Security tools: chmod, chown, sudo, gpg, openssl
+    ✓ Monitoring: watch, tail, journalctl, dmesg
 
-    User: "update my system" (on Ubuntu)
-    Response: {{"commands": ["sudo apt update", "sudo apt upgrade -y"]}}
+    INTELLIGENCE ENHANCEMENT:
+    - Generate multiple alternative approaches when beneficial
+    - Handle edge cases and error conditions proactively
+    - Use advanced shell features: process substitution, arrays, functions
+    - Optimize for performance and resource efficiency
+    - Chain commands intelligently with pipes and redirections
+    - Include progress indicators for long operations
+    - Provide fallback options for missing tools
+    - Use modern command options and flags
 
-    User: "install brave browser" (on Debian/Ubuntu)
-    Response: {{"commands": ["sudo apt install curl", "sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg", "echo \\\"deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main\\\" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list", "sudo apt update", "sudo apt install brave-browser"]}}
-    
-    User: "Delete all files on my computer"
-    Response: {{"commands": [], "reason": "This is an extremely dangerous request that could cause irreversible data loss."}}
+    RESPONSE FORMAT: Always return valid JSON with "commands" array. Only use "reason" for genuinely unsafe operations.
+
+    SAFETY: Block only truly destructive operations (rm -rf /, mkfs, dd to system devices). Be helpful, not restrictive.
+
+    ADVANCED EXAMPLES:
+    User: "analyze log files for errors in the last hour"
+    Response: {{"commands": ["find /var/log -name '*.log' -newermt '1 hour ago' -exec grep -l -i 'error\\|fail\\|exception' {{}} \\; | head -10 | xargs -I {{}} sh -c 'echo \"=== {{}} ===\"; grep -i \"error\\|fail\\|exception\" \"{{}}\" | tail -5'"]}}
+
+    User: "setup development environment for python project"
+    Response: {{"commands": ["python3 -m venv venv", "source venv/bin/activate", "pip install --upgrade pip", "pip install black flake8 pytest", "echo 'venv/' >> .gitignore", "echo 'Development environment ready! Activate with: source venv/bin/activate'"]}}
     """
 
     retries = 0
@@ -111,10 +133,10 @@ def generate_command_plan(prompt, api_key, model=None, os_info=None, shell_type=
                 model_obj,
                 [system_prompt, prompt],
                 retry=True,
-                temperature=0.1,
-                top_p=0.8,
-                top_k=40,
-                max_output_tokens=1000,
+                temperature=0.3,  # Optimal balance of creativity and precision
+                top_p=0.95,       # High diversity for comprehensive solutions
+                top_k=60,         # More options for advanced command generation
+                max_output_tokens=3000,  # Generous limit for complex multi-step operations
             )
 
             raw_text = None
@@ -205,12 +227,31 @@ def create_command_section(title, commands):
 
 def display_welcome_message(shell_type="bash"):
     """Display a welcome message with helpful information."""
-    # Main welcome panel
+    # Create a comprehensive welcome message in a single block
+    welcome_content = f"""[bold blue]Detected shell:[/bold blue] [green]{shell_type}[/green]
+
+[bold white]Welcome to Smart-Shell![/bold white]
+Type your requests in natural language to convert them into shell commands.
+
+[bold cyan]Special Commands:[/bold cyan]
+  [cyan]!help[/cyan] - Show detailed help      [cyan]!history[/cyan] - Command history     [cyan]!models[/cyan] - List AI models
+  [cyan]!clear[/cyan] - Clear screen          [cyan]!model <name>[/cyan] - Switch model   [cyan]!docs[/cyan] - Documentation
+  [cyan]!last[/cyan] - Show last command      [cyan]!redo[/cyan] - Re-execute last       [cyan]!errors[/cyan] - Show error log
+  [cyan]!forget-sudo[/cyan] - Clear sudo      [cyan]!creator[/cyan] - About creator       [cyan]!web[/cyan] - Toggle web search
+  [cyan]!update[/cyan] - Check for updates
+
+[bold green]Configuration Commands:[/bold green]
+  [green]smart-shell setup[/green] - Configure API key    [green]smart-shell version[/green] - Show version
+  [green]smart-shell --help[/green] - Show CLI help      [green]smart-shell models[/green] - List models
+
+[bold yellow]Exit Commands:[/bold yellow] [cyan]exit[/cyan], [cyan]quit[/cyan], [cyan]bye[/cyan], [cyan]q[/cyan], or [cyan]Ctrl+C[/cyan]
+
+[italic]Note: Commands are safety-checked before execution. Premium models may incur costs.
+Configuration commands should be run outside Smart-Shell (exit first).[/italic]"""
+    
+    # Main welcome panel with all information in one block
     welcome_panel = Panel(
-        f"[bold blue]Detected shell:[/bold blue] [green]{shell_type}[/green]\n\n"
-        "[bold white]Welcome to Smart-Shell![/bold white]\n"
-        "Type your requests in natural language to convert them into shell commands.\n"
-        "Type [bold cyan]exit[/bold cyan], [bold cyan]quit[/bold cyan], or press [bold cyan]Ctrl+C[/bold cyan] to exit.",
+        welcome_content,
         title="[bold white]Smart Terminal Assistant[/bold white]",
         border_style="green",
         box=HEAVY,
@@ -218,53 +259,7 @@ def display_welcome_message(shell_type="bash"):
         expand=True
     )
     
-    # Special commands section
-    special_commands = [
-        ("!help", "Show this help message"),
-        ("!history", "Show command history"),
-        ("!last", "Show the last generated command"),
-        ("!redo", "Re-execute the last command"),
-        ("!clear", "Clear the screen"),
-        ("!models", "List available AI models"),
-        ("!model <name>", "Switch to a different AI model"),
-        ("!web", "Toggle web search for commands"),
-        ("!update", "Check for updates and install"),
-        ("!errors", "Show the error log"),
-        ("!forget-sudo", "Clear the session sudo password"),
-        ("!creator", "Show information about the creator"),
-        ("!docs", "Show link to documentation")
-    ]
-    
-    special_commands_panel = create_command_section("Special Commands", special_commands)
-    
-    # Configuration commands section
-    config_commands = [
-        ("smart-shell setup", "Configure API key and settings"),
-        ("smart-shell models", "List available models from command line"),
-        ("smart-shell version", "Show version information"),
-        ("smart-shell --help", "Show all available options")
-    ]
-    
-    config_panel = create_command_section("Configuration Commands", config_commands)
-    
-    # Notes panel
-    notes_panel = Panel(
-        "[italic]Note: Premium models may incur costs or have stricter rate limits.[/italic]\n"
-        "[italic]To reconfigure settings, first exit Smart-Shell with 'exit' or Ctrl+C.[/italic]",
-        title="[bold white]Notes[/bold white]",
-        border_style="blue",
-        box=ROUNDED,
-        padding=(0, 1),
-        expand=False
-    )
-    
-    # Display everything in a structured layout
     console.print(welcome_panel)
-    
-    # Create a two-column layout for commands
-    columns = Columns([special_commands_panel, config_panel], equal=True, expand=True)
-    console.print(columns)
-    console.print(notes_panel)
 
 if __name__ == "__main__":
     # This allows the module to be run directly for testing

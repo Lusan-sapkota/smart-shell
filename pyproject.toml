@@ -22,7 +22,8 @@ dependencies = [
     "click",
     "requests",
     "pyyaml",
-    "google-api-core"
+    "google-api-core",
+    "toml"
 ]
 
 [project.urls]
