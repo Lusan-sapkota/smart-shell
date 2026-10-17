@@ -11,6 +11,8 @@ from rich.console import Console
 from rich.table import Table
 from datetime import datetime
 
+from .config import load_config
+
 console = Console()
 
 ERROR_LOG_DIR = os.path.expanduser("~/.local/share/smart-shell")
@@ -137,6 +139,17 @@ def print_plan_preview(command_plan: list[str], safety_results: list[dict[str, A
         )
     
     console.print(table)
+
+
+def notify(message: str) -> None:
+    """Alert the user that Smart-Shell is waiting: terminal bell, plus desktop notifications where supported."""
+    if not sys.stdout.isatty() or load_config().get("notify") is False:
+        return
+    # BEL: most terminals flash, beep or mark the tab. OSC 777: GNOME Terminal and other VTE terminals.
+    # OSC 9: iTerm2, Windows Terminal, kitty. Terminals ignore escape codes they don't know.
+    message = message.replace("\a", "").replace("\033", "")
+    sys.stdout.write(f"\a\033]777;notify;Smart-Shell;{message}\a\033]9;Smart-Shell: {message}\a")
+    sys.stdout.flush()
 
 
 def log_error(error_message):

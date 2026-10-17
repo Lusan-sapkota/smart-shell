@@ -14,8 +14,8 @@ from rich.markdown import Markdown
 from .shell_builder import generate_command_plan, explain_command
 from .safety import check_command_safety
 from .setup_logic import setup_config
-from .config import load_config, ENV_API_KEY
-from .utils import execute_command, print_plan_preview, reset_sudo_password, ERROR_LOG_FILE, get_os_info, detect_shell
+from .config import load_config, save_config, ENV_API_KEY
+from .utils import execute_command, notify, print_plan_preview, reset_sudo_password, ERROR_LOG_FILE, get_os_info, detect_shell
 from .ai_wrapper import PROVIDERS, get_client, resolve_model, is_configured, override_provider, AIError
 from .history import HISTORY_DIR, save_to_history, update_history_result, show_command_history, show_last_command, redo_last_command
 from .updater import handle_update_command, get_current_version
@@ -152,6 +152,8 @@ def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry, a
 
         if worst == "blocked":
             console.print("[bold red]Blocked: this plan will not run.[/bold red] You can edit it or cancel.")
+            if not auto_yes:
+                notify("A blocked plan is waiting: edit or cancel")
             choice = "n" if auto_yes else Prompt.ask(r"\[e]dit or \[n]o", choices=["e", "n"], default="n")
         elif auto_yes:
             choice = "y"
@@ -165,6 +167,7 @@ def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry, a
                     if r["status"] == worst:
                         console.print(f"[{color}]{worst.upper()} risk:[/{color}] {cmd}  [dim]({r['notes']})[/dim]")
             default = "n" if worst in ("high", "medium") else "y"
+            notify(f"Waiting for you: run {plan[0][:60]}{' ...' if len(plan) > 1 else ''}?")
             choice = Prompt.ask(r"Run it? \[y]es / \[n]o / \[e]dit", choices=["y", "n", "e"], default=default, show_choices=False)
 
         if choice == "n":
@@ -182,6 +185,8 @@ def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry, a
         success, error_tail = execute_command(command)
         update_history_result(history_id, success)
         entry.update(commands=plan, result="succeeded" if success else "failed")
+        if not success and not auto_yes:
+            notify("A command failed: ask the AI to fix it?")
         if success or auto_yes or not Confirm.ask("Ask the AI to fix it?", default=True):
             return success
 
@@ -285,6 +290,11 @@ def handle_special_command(command, state, client):
             console.print(text)
         except AIError as e:
             console.print(f"[bold red]Error:[/bold red] {e}")
+    elif name == "/notify":
+        config = load_config()
+        config["notify"] = config.get("notify") is False
+        save_config(config)
+        console.print(f"Notifications {'on' if config['notify'] else 'off'} (bell and desktop notification when Smart-Shell waits for you).")
     elif name == "/forget-sudo":
         reset_sudo_password()
         console.print("[green]Sudo credentials cleared.[/green]")

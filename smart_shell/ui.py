@@ -23,6 +23,7 @@ COMMANDS = {
     "/redo": "run the last plan again",
     "/errors": "show the error log",
     "/clear": "clear the screen",
+    "/notify": "turn waiting-for-you notifications on or off",
     "/forget-sudo": "drop cached sudo credentials",
     "/update": "check for a new version",
     "/docs": "show the documentation link",
