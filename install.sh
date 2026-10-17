@@ -5,7 +5,7 @@
 set -euo pipefail
 
 PACKAGE="smart-shell-cli"
-SOURCE="${SMART_SHELL_SOURCE:-git+https://github.com/Lusan-sapkota/smart-shell}"
+SOURCE="${SMART_SHELL_SOURCE:-$PACKAGE}"
 DATA_DIR="$HOME/.local/share/smart-shell"
 DESKTOP_FILE="$HOME/.local/share/applications/smart-shell.desktop"
 RC_MARKER="# Smart-Shell completion"
@@ -15,23 +15,36 @@ ok()   { echo -e "\033[0;32m$*\033[0m"; }
 fail() { echo -e "\033[0;31m$*\033[0m" >&2; exit 1; }
 
 remove_rc_lines() {
+    # awk instead of `sed -i`: works on macOS too, and writing back with `cat >` keeps symlinked dotfiles intact.
     for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
-        [ -f "$rc" ] && sed -i "/$RC_MARKER/,+1d" "$rc"
+        if [ -f "$rc" ] && grep -qF "$RC_MARKER" "$rc"; then
+            awk -v m="$RC_MARKER" '$0 == m { skip = 1; next } skip { skip = 0; next } 1' "$rc" > "$rc.smart-shell.tmp"
+            cat "$rc.smart-shell.tmp" > "$rc"
+            rm -f "$rc.smart-shell.tmp"
+        fi
     done
-    return 0
 }
 
 remove_package() {
-    # "smart-shell" is the package name used before v1.1.0.
-    for name in "$PACKAGE" smart-shell; do
+    # "smart-shell" is the package name used before v1.1.0. On install only that one is removed:
+    # --force replaces the current package, and removing it first would leave nothing if the install fails.
+    local names="smart-shell"
+    [ "${1:-}" = all ] && names="$PACKAGE smart-shell"
+    for name in $names; do
         if command -v uv &>/dev/null; then uv tool uninstall "$name" &>/dev/null || true; fi
         if command -v pipx &>/dev/null; then pipx uninstall "$name" &>/dev/null || true; fi
     done
+    # Leftovers from the pre-1.1.0 installer: a launcher into a broken pipx venv, and its backup.
+    local old="$HOME/.local/bin/smart-shell"
+    if [ -L "$old" ] && { [ ! -e "$old" ] || readlink "$old" | grep -q "/pipx/venvs/smart-shell/"; }; then
+        rm -f "$old"
+    fi
+    rm -f "$HOME/.local/bin/smart-shell.bak"
 }
 
 uninstall() {
     info "Uninstalling Smart-Shell..."
-    remove_package
+    remove_package all
     remove_rc_lines
     rm -f "$DESKTOP_FILE" "$DATA_DIR"/completion.* "$HOME/.bash_completion.d/smart-shell-completion.bash"
     ok "Smart-Shell removed."
@@ -69,7 +82,10 @@ install_completion() {
         _SMART_SHELL_COMPLETE="${shell}_source" "$BIN" > "$DATA_DIR/completion.$shell"
         rc="$HOME/.${shell}rc"
         if [ "$shell" = bash ] || [ -f "$rc" ]; then
-            printf '%s\n[ -f %s ] && source %s\n' "$RC_MARKER" "$DATA_DIR/completion.$shell" "$DATA_DIR/completion.$shell" >> "$rc"
+            # zsh completion needs compdef (from compinit); skip quietly where it isn't loaded.
+            guard='[ -f "$__smart_shell_rc" ]'
+            [ "$shell" = zsh ] && guard='(( $+functions[compdef] )) && [ -f "$__smart_shell_rc" ]'
+            printf '%s\n__smart_shell_rc=%q; %s && source "$__smart_shell_rc"; unset __smart_shell_rc\n' "$RC_MARKER" "$DATA_DIR/completion.$shell" "$guard" >> "$rc"
         fi
     done
     ok "Tab completion added for bash$([ -f "$HOME/.zshrc" ] && echo " and zsh")."

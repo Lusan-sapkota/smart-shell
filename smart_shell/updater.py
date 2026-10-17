@@ -18,7 +18,7 @@ PACKAGE = "smart-shell-cli"
 
 
 def handle_update_command():
-    """Handle the !update command."""
+    """Handle the /update command."""
     current = get_current_version()
     latest = get_latest_version()
     console.print(f"[blue]Current version: {current}[/blue]")

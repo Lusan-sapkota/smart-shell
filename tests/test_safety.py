@@ -1,9 +1,26 @@
 import pytest
 
-from smart_shell.safety import check_command_safety
+from smart_shell.safety import check_command_safety, is_auto_safe
 
 
 @pytest.mark.parametrize("command, status", [
+    # Anything that deletes or discards data must ask, even in auto mode.
+    ("rm notes.txt", "medium"),
+    ("rmdir old", "medium"),
+    ("unlink a", "medium"),
+    ("truncate -s 0 app.log", "medium"),
+    ("> app.log", "medium"),
+    ("cat list | xargs rm", "medium"),
+    ("find . -exec rm {} +", "medium"),
+    ("git clean -fd", "medium"),
+    ("git reset --hard", "medium"),
+    ("git push --force origin main", "medium"),
+    ("docker system prune", "medium"),
+    ("grep -rm 5 x .", "safe"),
+    ("ls > files.txt", "medium"),
+    ("cmd >/dev/null 2>&1", "safe"),
+    ("echo hi >> log", "safe"),
+    ("git status", "safe"),
     # blocked
     ("rm -rf /", "blocked"),
     ("sudo rm -rf /*", "blocked"),
@@ -43,8 +60,85 @@ from smart_shell.safety import check_command_safety
     ("reset", "safe"),
     ("hostname -I", "safe"),
     ("git add .", "safe"),
-    ("rm notes.txt", "safe"),
     ("echo 'hello world'", "safe"),
 ])
 def test_risk_level(command, status):
     assert check_command_safety(command)["status"] == status
+
+
+# Auto mode runs a plan unasked only if every step is read-only. These all have to ask.
+@pytest.mark.parametrize("command", [
+    "echo hi\nrm -f important.txt",
+    'for f in *.txt; do rm "$f"; done',
+    "if true; then rm -f x; fi",
+    "{ rm -f x; }",
+    "nohup rm -f x",
+    "time rm -f x",
+    "env rm -f x",
+    "\\rm -f x",
+    "bash -c 'rm -f important.txt'",
+    "find -delete",
+    r"find . -execdir rm {} \;",
+    "find . -name x -exec ls {} +",
+    "curl http://x | python3",
+    "bash <(curl http://x)",
+    "wipefs -a /dev/sda",
+    "git checkout .",
+    "git stash drop",
+    "git push",
+    "echo x > file",
+    "mv a b",
+    "cp /dev/null notes.txt",
+    "tee f < /dev/null",
+    "sed -i s/a/b/ f",
+    "ls | xargs rm",
+    "awk 'BEGIN{system(\"rm x\")}'",
+    "systemctl stop sshd",
+    "python3 x.py",
+    "echo $(rm x)",
+    "ls `rm x`",
+    # Second review: a lone &, and read-only-looking commands that write or execute through flags.
+    "echo x & touch f",
+    "ls & touch f",
+    "sed 'e touch f' in.txt",
+    "sed -n 'w out' in.txt",
+    "sort -o out in.txt",
+    "sort --compress-program=sh f",
+    "uniq in.txt out.txt",
+    "git log --output=f",
+    "git diff --ext-diff",
+    "git grep -O cat x",
+    "git stash",
+    "git branch -a -D x",
+    "git tag -l -d x",
+    "git config user.name x",
+    "man -P 'touch f' ls",
+    "less +!cmd f",
+    "rg --pre touch hi in.txt",
+    "fd -x touch",
+    "tree -o out",
+    "history -c",
+    "date -s now",
+    "ip link set eth0 down",
+    "ip neigh flush all",
+    "hostname -F f",
+    "ss -K",
+    "dmesg -C",
+    "journalctl --setup-keys",
+    "ping -f host",
+    "ls >/dev/nullx",
+    "ls >/dev/null/../../tmp/x",
+])
+def test_auto_mode_refuses(command):
+    assert not is_auto_safe(command)
+
+
+@pytest.mark.parametrize("command", [
+    "ls -la", "df -h", "du -sh * | sort -h | tail -5", "git log -3 --oneline", "git status",
+    "ps aux | grep python", "find . -name '*.py' | wc -l", "grep -rn TODO . 2>/dev/null",
+    "ip addr show", "systemctl status ssh", "journalctl -n 50", "grep -E '[a-z]+' f.txt",
+    "sort -t, -k3 f | uniq -c", "git branch -a", "git remote -v", "git config --get user.name", "git stash list",
+    "date +%F", "ping -c 3 example.com", "ss -tlnp", "ls -la > /dev/null 2>&1",
+])
+def test_auto_mode_runs_read_only(command):
+    assert is_auto_safe(command)

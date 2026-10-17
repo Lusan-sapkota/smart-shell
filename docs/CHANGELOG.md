@@ -5,6 +5,50 @@ All notable changes to Smart-Shell will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-10-17
+
+### Added
+- Every plan asks **yes / no / edit** before running, so you can change a command first. Edits are checked again.
+- Fix on failure: after a failed command, Smart-Shell offers to send the command and its error output to the model and shows a corrected plan.
+- Spinner showing the provider and model while the AI is working.
+- `smart-shell "<prompt>"` works without the `run` subcommand.
+- New interactive prompt (prompt_toolkit): `/` command menu with descriptions, model-name completion after `/model`, status bar with provider, model, shell, folder and dry-run state, multi-line input, `Ctrl+R` history search. `Ctrl+C` clears the line or stops a running command instead of quitting.
+- Modes, cycled with Shift+Tab or set with `/mode`: `ask` (every plan asks), `auto` (only read-only plans run without asking, checked against an allowlist of read-only commands; everything else asks), `plan` (show plans, run nothing).
+- Notifications when Smart-Shell is waiting for an answer: terminal bell, plus a desktop notification after 5 seconds away from the keyboard (`notify-send` for Konsole and most Linux terminals, terminal escape codes for GNOME Terminal, Ghostty, WezTerm, iTerm2 and Windows Terminal, Notification Center on macOS). `/notify` turns it off.
+- `.coderabbit.yaml` turns off CodeRabbit reviews.
+
+### Changed
+- Rules now also catch commands inside loops, `if` blocks, after newlines and behind `nohup`/`time`/`env`/`command`, plus `bash -c`, `<(curl ...)`, piping into Python/Perl/Ruby/Node, `wipefs`, `blkdiscard`, `sed -i`, `ln -sf` and `> file` overwrites.
+- Any `rm`, `rmdir`, `unlink`, `truncate`, emptying a file with `>`, `git reset --hard`, `git clean -f`, `git push --force`, `git branch -D` and `docker rm`/`prune` are rated **medium**, so they always ask. Plain `rm file` used to count as safe.
+- Interactive commands use `/` (`/help`, `/model`, ...). The `!` spelling still works.
+- Startup shows a two-line header instead of the ASCII banner and welcome panel.
+- Safe and info-leak plans now ask before running (default yes) instead of running immediately.
+- Local providers (Ollama, LM Studio) are listed first, and a fresh setup defaults to Ollama.
+- New dependency: `prompt_toolkit`.
+- Python 3.10 or newer is required (3.9 reached end of life).
+- Shorter system prompt: small local models return valid JSON far more often, and the detected package manager (apt, dnf, pacman, zypper, apk, brew) is passed to the model.
+- History (and the new input history) is capped at 1000 entries and written with `0600` permissions.
+- CI also runs `ruff`.
+- Install docs lead with `pipx install smart-shell-cli` / `uv tool install smart-shell-cli`; the install script is the alternative. The script installs from PyPI.
+
+
+### Fixed
+- `!history` and `!last` printed an object name instead of the command.
+- A corrupt history file no longer crashes `!history`, `!last` or saving.
+- `!redo` checks single-string commands for blocked patterns too.
+- The installer cleans up the launcher left by pre-1.1.0 installs.
+- Commands containing `[...]` (regex classes, globs, arrays) were shown wrongly in the plan preview and some crashed the session; they are now shown exactly as they run.
+- A command that starts a background program (`app &`, `xdg-open`) no longer blocks Smart-Shell until that program exits.
+- `--provider` / `--base-url` before `run` or `models` were ignored; they now apply, and `--base-url` beats `SMART_SHELL_BASE_URL`.
+- `smart-shell -d` on its own starts interactive plan mode.
+- `/redo` goes through the normal preview and confirmation; after Ctrl+C, no "fix it?" offer.
+- Prose after the model's JSON, and blank steps, no longer break plans.
+- Installer: works with symlinked dotfiles and BSD sed (macOS), keeps the old install if the new one fails, and only loads zsh completion when `compinit` is active.
+- Startup failed with "Invalid argument" when the old readline history file came from a different readline build (for example after moving to uv's Python). Input history now lives in `input_history`, managed by prompt_toolkit.
+
+### Removed
+- `!creator`, the `help` command (use `--help`), and the REPL check that refused any request mentioning `smart-shell` commands.
+
 ## [1.1.0] - 2026-10-17
 
 ### Added

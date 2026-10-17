@@ -40,13 +40,13 @@ Check the API key and base URL. For Ollama, make sure `ollama serve` is running 
 ## Usage
 
 ### How do I switch models?
-`smart-shell models` or `!models` lists what the provider offers. Use `--model <name>` for one run, `!model <name>` in interactive mode, or `smart-shell setup` to change the default.
+`smart-shell models` or `/models` lists what the provider offers. Use `--model <name>` for one run, `/model <name>` in interactive mode, or `smart-shell setup` to change the default.
 
 ### Can I use it in scripts?
 Yes, with `smart-shell run "<prompt>"`. Add `-y` to skip confirmations (blocked commands still never run). Review generated commands carefully before automating them.
 
 ### How do I update?
-Use `!update` in interactive mode, or `uv tool upgrade smart-shell-cli` / `pipx upgrade smart-shell-cli`.
+Use `/update` in interactive mode, or `uv tool upgrade smart-shell-cli` / `pipx upgrade smart-shell-cli`.
 
 ### What is sent to the AI provider?
 Your prompt plus basic OS and shell information so the command fits your system. In interactive mode, your last five requests from the same session (prompt, generated commands, and whether they succeeded) are included so follow-ups work. Command output and file contents are not sent. With a local model, nothing leaves your machine.

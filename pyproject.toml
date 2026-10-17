@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smart-shell-cli"
-version = "1.1.0"
+version = "1.2.0"
 authors = [
   { name="Lusan Sapkota", email="sapkotalusan@gmail.com" },
 ]
-description = "An intelligent terminal assistant that converts natural language into executable Bash or Zsh commands."
+description = "Natural language to Bash/Zsh commands with a local AI (Ollama, LM Studio) or any OpenAI-compatible API, with safety checks."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -21,6 +21,7 @@ dependencies = [
     "rich",
     "click",
     "requests",
+    "prompt_toolkit>=3.0",
 ]
 
 [project.urls]

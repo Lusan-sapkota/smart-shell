@@ -3,13 +3,21 @@ Utility functions for Smart-Shell
 """
 
 import os
+import json
+import shutil
+import time
 import sys
+import select
 import subprocess
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 from rich.console import Console
+from rich.markup import escape
 from rich.table import Table
+from rich.text import Text
 from datetime import datetime
+
+from .config import load_config
 
 console = Console()
 
@@ -54,9 +62,9 @@ def detect_shell() -> str:
     else:
         return "bash"  # Default fallback
 
-def execute_command(command: str) -> bool:
-    """Execute a shell command, handling sudo and displaying output."""
-    console.print(f"[bold green]Executing:[/bold green] {command}")
+def execute_command(command: str) -> Tuple[bool, str]:
+    """Run a shell command with live output. Returns (success, tail of stderr)."""
+    console.print(f"[bold green]Executing:[/bold green] {escape(command)}")
     console.print("─" * console.width)
 
     try:
@@ -67,11 +75,26 @@ def execute_command(command: str) -> bool:
         # stderr is echoed live too, keeping the tail for the error hints below.
         process = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, executable=shell_executable)
         tail = b""
-        for chunk in iter(lambda: os.read(process.stderr.fileno(), 4096), b""):
-            sys.stderr.buffer.write(chunk)
-            sys.stderr.flush()
-            tail = (tail + chunk)[-4096:]
-        process.wait()
+        fd = process.stderr.fileno()
+        try:
+            # Read until the shell exits, not until EOF: a background child (`app &`, xdg-open)
+            # keeps the pipe open and would otherwise block us until it quits.
+            while True:
+                ready, _, _ = select.select([fd], [], [], 0.1)
+                chunk = os.read(fd, 4096) if ready else b""
+                if chunk:
+                    sys.stderr.buffer.write(chunk)
+                    sys.stderr.flush()
+                    tail = (tail + chunk)[-4096:]
+                elif ready or process.poll() is not None:
+                    break
+            process.wait()
+        except KeyboardInterrupt:
+            # Ctrl+C already reached the command (same process group); stop it, keep Smart-Shell running.
+            process.kill()
+            process.wait()
+            console.print("\n[yellow]Interrupted.[/yellow]")
+            return False, "interrupted by user"
         stderr_text = tail.decode(errors="replace")
 
         console.print("─" * console.width)
@@ -86,18 +109,18 @@ def execute_command(command: str) -> bool:
             elif "command not found" in stderr_text.lower():
                 missing_command = extract_missing_command(stderr_text)
                 if missing_command:
-                    console.print(f"[bold yellow]✗ Command '{missing_command}' not found. You may need to install it.[/bold yellow]")
+                    console.print(f"[bold yellow]✗ Command '{escape(missing_command)}' not found. You may need to install it.[/bold yellow]")
             else:
                 console.print(f"[bold red]✗ Command failed with exit code {process.returncode}[/bold red]")
-            return False
+            return False, stderr_text
         else:
             console.print("[bold green]✓ Command executed successfully[/bold green]")
-            return True
+            return True, stderr_text
 
     except Exception as e:
         log_error(f"Failed to execute command '{command}': {e}")
-        console.print(f"[bold red]Error during command execution: {e}[/bold red]")
-        return False
+        console.print(f"[bold red]Error during command execution: {escape(str(e))}[/bold red]")
+        return False, str(e)
 
 def extract_missing_command(error_text: str) -> Optional[str]:
     """Extract the missing command from an error message."""
@@ -124,12 +147,50 @@ def print_plan_preview(command_plan: list[str], safety_results: list[dict[str, A
         color = color_map.get(status, "white")
         table.add_row(
             str(i + 1),
-            command,
+            Text(command),
             f"[{color}]{status.upper()}[/{color}]",
             notes
         )
     
     console.print(table)
+
+
+NOTIFY_AFTER = 5  # seconds without input before a desktop notification is worth sending
+_last_input = time.monotonic()
+
+
+def mark_input() -> None:
+    """Record that the user just typed something."""
+    global _last_input
+    _last_input = time.monotonic()
+
+
+def notify(message: str) -> None:
+    """Tell the user Smart-Shell is waiting, in whatever way their terminal supports."""
+    if not sys.stdout.isatty() or load_config().get("notify") is False:
+        return
+    # Plan text comes from the model: strip every control character (C0, DEL, C1) so it can't end the escape code.
+    message = re.sub(r"[\x00-\x1f\x7f-\x9f]", " ", message)
+    env = os.environ
+    escape = ""
+    if env.get("VTE_VERSION") or env.get("TERM_PROGRAM") in ("ghostty", "WezTerm"):
+        escape = f"\033]777;notify;Smart-Shell;{message}\a"
+    elif env.get("TERM_PROGRAM") == "iTerm.app" or env.get("WT_SESSION"):
+        escape = f"\033]9;Smart-Shell: {message}\a"
+    # The bell always: terminals flash, beep or mark the tab.
+    sys.stdout.write("\a" + escape)
+    sys.stdout.flush()
+    if escape or time.monotonic() - _last_input < NOTIFY_AFTER or env.get("SSH_CONNECTION"):
+        return
+    # Konsole, kitty, Alacritty, xterm, Terminal.app...: no escape code, so use the desktop's notifier.
+    if sys.platform == "darwin" and shutil.which("osascript"):
+        command = ["osascript", "-e", f"display notification {json.dumps(message)} with title \"Smart-Shell\""]
+    elif (env.get("DISPLAY") or env.get("WAYLAND_DISPLAY")) and shutil.which("notify-send"):
+        command = ["notify-send", "--app-name=Smart-Shell", "--icon=utilities-terminal", "--expire-time=8000",
+                   "Smart-Shell", message]
+    else:
+        return
+    subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
 
 
 def log_error(error_message):

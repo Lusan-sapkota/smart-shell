@@ -6,13 +6,14 @@ An overview of the modules in `smart_shell/`. See the source for details.
 
 | Module | Purpose |
 |--------|---------|
-| `main` | Click CLI (`run`, `setup`, `models`, `history`, `version`, `help`), the interactive REPL and `!` commands |
+| `main` | Click CLI (`run`, `setup`, `models`, `history`, `version`), the interactive REPL and `/` commands |
 | `ai_wrapper` | `AIClient` for OpenAI-compatible APIs and the provider presets |
 | `setup_logic` | The `smart-shell setup` wizard |
-| `shell_builder` | System prompt, plan parsing, banner and welcome message |
+| `shell_builder` | System prompt, plan parsing, session context, command explanations |
 | `safety` | Command risk classification |
 | `history` | Command history in `~/.local/share/smart-shell/history.json` |
-| `updater` | `!update`: version check against PyPI (GitHub releases as fallback), upgrade via uv, pipx or pip |
+| `ui` | Interactive prompt (prompt_toolkit): `/` command menu, model completion, status bar, input history |
+| `updater` | `/update`: version check against PyPI (GitHub releases as fallback), upgrade via uv, pipx or pip |
 | `utils` | Command execution, OS and shell detection, previews, error log |
 | `config` | Load and save `~/.config/smart-shell/config.json` |
 

@@ -4,7 +4,7 @@ Notes for contributors working on Smart-Shell itself.
 
 ## Setup
 
-Requires Python 3.9 or newer and git.
+Requires Python 3.10 or newer and git.
 
 ```bash
 git clone https://github.com/Lusan-sapkota/smart-shell.git
@@ -33,7 +33,7 @@ smart-shell run "list files in current directory" --dry-run
 pytest -q
 ```
 
-Tests live in `tests/`. CI (`.github/workflows/test.yml`) runs them on Python 3.9 and 3.13 for pushes to `development` and `main` and for pull requests. Add a test for any new safety rule in `tests/test_safety.py`.
+Tests live in `tests/`. CI (`.github/workflows/test.yml`) runs ruff and the tests (Python 3.10 and 3.14) for pushes to `development` and `main` and for pull requests. Add a test for any new safety rule in `tests/test_safety.py`.
 
 ## Project structure
 
@@ -42,10 +42,11 @@ smart_shell/
   main.py           CLI (click) and the interactive REPL
   ai_wrapper.py     requests-based client for OpenAI-compatible APIs, provider presets
   setup_logic.py    `smart-shell setup` wizard
-  shell_builder.py  system prompt, plan parsing, banner
+  shell_builder.py  system prompt, plan parsing, explanations
   safety.py         command risk classification
   history.py        command history
-  updater.py        `!update` (PyPI version check, upgrade via uv/pipx/pip)
+  updater.py        `/update` (PyPI version check, upgrade via uv/pipx/pip)
+  ui.py             interactive prompt: / menu, completion, status bar, history
   utils.py          command execution, OS/shell detection, error log
   config.py         load/save ~/.config/smart-shell/config.json
 tests/              pytest suite
@@ -53,7 +54,7 @@ docs/               this documentation (MkDocs)
 install.sh          installer
 ```
 
-Dependencies are `rich`, `click` and `requests`. Keep `requirements.txt` and `pyproject.toml` in sync if that changes.
+Dependencies are `rich`, `click`, `requests` and `prompt_toolkit`. Keep `requirements.txt` and `pyproject.toml` in sync if that changes.
 
 ## Adding a provider
 
