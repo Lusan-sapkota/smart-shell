@@ -85,7 +85,7 @@ install_completion() {
             # zsh completion needs compdef (from compinit); skip quietly where it isn't loaded.
             guard='[ -f "$__smart_shell_rc" ]'
             [ "$shell" = zsh ] && guard='(( $+functions[compdef] )) && [ -f "$__smart_shell_rc" ]'
-            printf '%s\n__smart_shell_rc=%s; %s && source "$__smart_shell_rc"; unset __smart_shell_rc\n' "$RC_MARKER" "$DATA_DIR/completion.$shell" "$guard" >> "$rc"
+            printf '%s\n__smart_shell_rc=%q; %s && source "$__smart_shell_rc"; unset __smart_shell_rc\n' "$RC_MARKER" "$DATA_DIR/completion.$shell" "$guard" >> "$rc"
         fi
     done
     ok "Tab completion added for bash$([ -f "$HOME/.zshrc" ] && echo " and zsh")."
