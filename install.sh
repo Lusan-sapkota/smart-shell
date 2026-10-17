@@ -3,14 +3,12 @@
 
 set -e  # Exit immediately if a command exits with a non-zero status
 
-# Color codes for better readability
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Print banner
 print_banner() {
     echo -e "${BLUE}"
     echo "    _____                      _      _____ _          _ _"
@@ -26,7 +24,6 @@ print_banner() {
 
 print_banner
 
-# Function to check dependencies
 check_dependencies() {
     echo -e "\n${BLUE}Checking dependencies...${NC}"
     
@@ -66,7 +63,7 @@ check_dependencies() {
     elif command -v pipx &> /dev/null; then
         echo -e "${GREEN}✓ pipx found (recommended for installation)${NC}"
     else
-        echo -e "${YELLOW}⚠ pipx not found (recommended for better isolation)${NC}"
+        echo -e "${YELLOW}pipx not found (recommended for better isolation)${NC}"
         echo -e "  Installing pipx..."
         
         # Try to install pipx
@@ -101,7 +98,6 @@ check_dependencies() {
     fi
 }
 
-# Function to handle GitHub cloning or use current directory
 setup_source_directory() {
     # Check for broken or conflicting smart-shell executables before cloning
     if [[ -f "$HOME/.local/bin/smart-shell" && ! -L "$HOME/.local/bin/smart-shell" ]]; then
@@ -130,7 +126,6 @@ setup_source_directory() {
     fi
 }
 
-# Function to create desktop entry
 create_desktop_entry() {
     local install_path=$1
     
@@ -158,7 +153,6 @@ EOF
     fi
 }
 
-# Function to create bash completion
 create_bash_completion() {
     echo -e "\n${BLUE}Setting up command completion...${NC}"
     COMPLETION_DIR="$HOME/.bash_completion.d"
@@ -218,7 +212,6 @@ EOF
     fi
 }
 
-# Function to install Smart-Shell
 install_smart_shell() {
     local install_option=$1
     local install_path=""
@@ -310,7 +303,6 @@ install_smart_shell() {
     INSTALL_PATH="$install_path"
 }
 
-# Function to apply Python module path fix
 apply_python_path_fix() {
     echo -e "\n${BLUE}Applying Python module path fix...${NC}"
     # Check if the smart-shell script already exists (it should if pipx installed it)
@@ -388,7 +380,6 @@ EOF
     fi
 }
 
-# Function to check if installation is working
 verify_installation() {
     echo -e "\n${BLUE}Verifying installation...${NC}"
     
@@ -400,7 +391,7 @@ verify_installation() {
         if smart-shell version &> /dev/null; then
             echo -e "${GREEN}✓ Smart-Shell command runs successfully${NC}"
         else
-            echo -e "${YELLOW}⚠ Smart-Shell command failed to run${NC}"
+            echo -e "${YELLOW}Smart-Shell command failed to run${NC}"
         fi
     else
         echo -e "${RED}✗ smart-shell command not found in PATH${NC}"
@@ -416,7 +407,6 @@ verify_installation() {
     fi
 }
 
-# Function to run setup automatically
 run_smart_shell_setup() {
     echo -e "\n${BLUE}Running Smart-Shell setup...${NC}"
     
@@ -444,13 +434,10 @@ run_smart_shell_setup() {
     fi
 }
 
-# Check dependencies
 check_dependencies
 
-# Set up source directory (clone repo or use current directory)
 setup_source_directory
 
-# Determine if we're running in non-interactive mode
 if [[ -t 0 ]]; then
     NON_INTERACTIVE="false"
 else
@@ -460,7 +447,6 @@ fi
 # Prefer uv when it is installed, otherwise pipx
 if command -v uv &> /dev/null; then DEFAULT_OPTION=4; else DEFAULT_OPTION=2; fi
 
-# Prompt for installation method if in interactive mode
 if [[ "$NON_INTERACTIVE" == "false" ]]; then
     echo -e "\nPlease select installation method:"
     echo -e "1) System-wide installation (requires sudo)"
@@ -475,25 +461,18 @@ else
     echo -e "Running in non-interactive mode. Using option $DEFAULT_OPTION."
 fi
 
-# Install Smart-Shell
 install_smart_shell "$INSTALL_OPTION"
 
-# Create desktop entry
 create_desktop_entry "$INSTALL_PATH"
 
-# Set up command completion
 create_bash_completion
 
-# Apply Python module path fix
 apply_python_path_fix
 
-# Verify installation
 verify_installation
 
-# Run setup automatically after successful installation
 run_smart_shell_setup
 
-# Final success message
 echo -e "\n${GREEN}✓ Smart-Shell installation complete!${NC}"
 echo -e "To get started, run: smart-shell"
 

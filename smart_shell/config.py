@@ -8,7 +8,6 @@ from rich.console import Console
 
 console = Console()
 
-# Configuration paths
 CONFIG_DIR = os.path.expanduser("~/.config/smart-shell")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 ENV_API_KEY = "SMART_SHELL_API_KEY"

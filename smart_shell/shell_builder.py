@@ -13,7 +13,6 @@ from rich.box import ROUNDED, DOUBLE, HEAVY
 
 console = Console()
 
-# ASCII art banner
 BANNER = r"""
     _____                      _      _____ _          _ _                  
    / ____|                    | |    / ____| |        | | |                 
@@ -29,22 +28,10 @@ BANNER = r"""
 MAX_RETRIES = 2
 
 def generate_command_plan(prompt, client, model, os_info=None):
-    """
-    Generates a sequence of shell commands (a plan) from a natural language prompt.
-
-    Args:
-        prompt (str): Natural language prompt.
-        client (AIClient): Client for the configured provider.
-        model (str): Model to use.
-        os_info (dict, optional): Information about the user's OS.
-
-    Returns:
-        list[str]: A list of shell commands.
-    """
+    """Generates a sequence of shell commands (a plan) from a natural language prompt."""
     if os_info is None:
         os_info = {"name": "a generic Linux system", "id": "linux"}
 
-    # Detect shell type (bash or zsh) from os_info or environment
     shell_type = os_info.get('shell', None)
     if not shell_type:
         shell_type = os.environ.get('SHELL', '/bin/bash')
@@ -53,7 +40,6 @@ def generate_command_plan(prompt, client, model, os_info=None):
         else:
             shell_type = 'bash'
 
-    # Enhanced system prompt for maximum intelligence and capability
     system_prompt = f"""
     You are Smart-Shell, an advanced Linux/Unix command-line intelligence system. You are NOT just a wrapper - you are a sophisticated tool that understands context, solves complex problems, and generates robust automation solutions.
 
@@ -135,18 +121,15 @@ def generate_command_plan(prompt, client, model, os_info=None):
 
 def display_banner():
     """Display the Smart-Shell banner with improved styling."""
-    # Create a styled version of the banner with gradient colors
     styled_banner = Text()
     lines = BANNER.strip().split('\n')
     
-    # Apply blue gradient to the ASCII art
     for i, line in enumerate(lines):
         if i < 6:  # The ASCII art part
             styled_banner.append(line + "\n", style=f"bold bright_blue")
         else:  # The tagline
             styled_banner.append(line, style="bold cyan")
     
-    # Create a panel with double-line border and a professional look
     panel = Panel(
         Align.center(styled_banner),
         box=DOUBLE,
@@ -177,7 +160,6 @@ def create_command_section(title, commands):
 
 def display_welcome_message(shell_type="bash"):
     """Display a welcome message with helpful information."""
-    # Create a comprehensive welcome message in a single block
     welcome_content = f"""[bold blue]Detected shell:[/bold blue] [green]{shell_type}[/green]
 
 [bold white]Welcome to Smart-Shell![/bold white]
@@ -199,7 +181,6 @@ Type your requests in natural language to convert them into shell commands.
 [italic]Note: Commands are safety-checked before execution. Cloud providers may bill per request.
 Configuration commands should be run outside Smart-Shell (exit first).[/italic]"""
     
-    # Main welcome panel with all information in one block
     welcome_panel = Panel(
         welcome_content,
         title="[bold white]Smart Terminal Assistant[/bold white]",
@@ -212,7 +193,6 @@ Configuration commands should be run outside Smart-Shell (exit first).[/italic]"
     console.print(welcome_panel)
 
 if __name__ == "__main__":
-    # This allows the module to be run directly for testing
     display_banner()
     display_welcome_message()
     console.print("[yellow]Shell Builder module - For testing only[/yellow]")

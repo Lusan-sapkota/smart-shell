@@ -14,31 +14,23 @@ from datetime import datetime
 
 console = Console()
 
-# Error log file
 ERROR_LOG_DIR = os.path.expanduser("~/.local/share/smart-shell")
 ERROR_LOG_FILE = os.path.join(ERROR_LOG_DIR, "error.log")
 
 def get_os_info() -> Dict[str, str]:
-    """
-    Parses /etc/os-release to get Linux distribution information.
-
-    Returns:
-        A dictionary containing the OS 'id' and 'name'.
-    """
+    """Parses /etc/os-release to get Linux distribution information."""
     os_info = {"id": "unknown", "name": "Unknown Linux"}
     try:
         with open("/etc/os-release") as f:
             for line in f:
                 if "=" in line:
                     key, value = line.strip().split("=", 1)
-                    # Remove quotes from value
                     value = value.strip('"')
                     if key == "ID":
                         os_info["id"] = value
                     elif key == "PRETTY_NAME":
                         os_info["name"] = value
     except FileNotFoundError:
-        # For non-Linux systems or if the file is missing
         import platform
         os_info["id"] = platform.system().lower()
         os_info["name"] = platform.system()
@@ -64,15 +56,7 @@ def detect_shell() -> str:
         return "bash"  # Default fallback
 
 def execute_command(command: str) -> bool:
-    """
-    Execute a shell command, handling sudo and displaying output.
-    
-    Args:
-        command (str): The command to execute.
-        
-    Returns:
-        bool: True if command executed successfully, False otherwise.
-    """
+    """Execute a shell command, handling sudo and displaying output."""
     console.print(f"[bold green]Executing:[/bold green] {command}")
     console.print("─" * console.width)
 
@@ -89,7 +73,6 @@ def execute_command(command: str) -> bool:
             executable=shell_executable # Use detected shell
         )
 
-        # Stream output
         stdout_text, stderr_text = process.communicate()
 
         if stdout_text:
@@ -134,7 +117,6 @@ def extract_missing_command(error_text: str) -> Optional[str]:
 
 def suggest_package(command: str) -> Optional[str]:
     """Suggest a package that might provide the missing command."""
-    # Common command to package mappings
     command_map = {
         "curl": "curl",
         "wget": "wget",
@@ -169,13 +151,7 @@ def suggest_package(command: str) -> Optional[str]:
     return command_map.get(command, command)
 
 def print_plan_preview(command_plan: list[str], safety_results: list[dict[str, Any]]) -> None:
-    """
-    Prints a preview of the entire command plan in a table.
-
-    Args:
-        command_plan (list[str]): The list of commands to be executed.
-        safety_results (list[dict[str, Any]]): The safety check results for each command.
-    """
+    """Prints a preview of the entire command plan in a table."""
     table = Table(title="[bold]Execution Plan[/bold]", show_header=True, header_style="bold magenta")
     table.add_column("Step", style="dim", width=5)
     table.add_column("Command", style="cyan")
@@ -209,7 +185,6 @@ def print_command_preview(command: str, safety_result: Dict[str, Any]) -> None:
     }
     color = color_map.get(status, "white")
 
-    # Create a panel with the safety info
     preview_panel = Panel(
         f"[bold]Command:[/bold] [cyan]{command}[/cyan]\n"
         f"[bold]Safety Level:[/bold] [{color}]{status.upper()}[/{color}]\n"
