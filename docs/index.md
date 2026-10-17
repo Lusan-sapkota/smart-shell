@@ -1,6 +1,6 @@
 # Smart-Shell
 
-![Smart-Shell Logo](images/image.png)
+![Smart-Shell: plan preview, yes/no/edit prompt, live output and the / command menu](images/image.png)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](license.md)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
