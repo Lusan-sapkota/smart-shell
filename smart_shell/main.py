@@ -360,19 +360,20 @@ Examples:
 Type `exit`, `quit`, `bye`, `q` or press Ctrl+C to exit.
 
 ## Safety
-Commands are checked for safety before execution:
-- 🟢 **Safe**: Commands that are considered safe to run
-- 🟡 **Warning**: Commands that might have unintended consequences (requires confirmation)
-- 🔴 **Blocked**: Commands that are potentially harmful (will not be executed)
+Every step is checked before execution:
+- **Blocked**: never runs (e.g. `rm -rf /`, fork bombs, formatting disks); you can only edit it
+- **High**: destructive, asks y/n (e.g. `rm -rf dir`, piping into a shell)
+- **Medium**: changes the system, asks y/n (e.g. `sudo`, package installs, `kill`)
+- **Info leak**: may print secrets, flagged in the preview
+- **Safe**: runs directly
 
 ## CLI Usage
-- `smart-shell --help` or `smart-shell -h` — Show CLI help
-- `smart-shell --version` — Show version information
-- `smart-shell run <prompt>` — Run a one-off natural language command
-- `smart-shell --interactive` — Start interactive mode
-- `smart-shell setup` — Configure provider, API key and model
-- `smart-shell models` — List available models
-- `smart-shell history` — Show command history
+- `smart-shell` - Start interactive mode
+- `smart-shell run <prompt>` - Run a one-off command (`-d` dry run, `-m <model>`, `-y` skip prompts)
+- `smart-shell setup` - Configure provider, API key and model
+- `smart-shell models` - List available models
+- `smart-shell history` - Show command history
+- `smart-shell version` - Show version information
 
 For more, see the documentation or run `smart-shell --help`.
 """
