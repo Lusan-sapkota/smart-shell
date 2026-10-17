@@ -6,17 +6,17 @@ Every generated command is checked by pattern rules in `smart_shell/safety.py` b
 
 | Level       | Behavior                                  | Examples |
 |-------------|-------------------------------------------|----------|
-| `blocked`   | Never runs. You can edit the command; the edited version is checked again. | `rm -rf /`, `rm -rf ~` or `$HOME`, `--no-preserve-root`, fork bomb, `mkfs` on `/dev/...`, `dd of=/dev/sda`, `> /dev/sda` |
-| `high`      | Asks y/n (default no)                     | `rm` with recursive and force flags in any spelling (`-rf`, `-fr`, `-r -f`, `--recursive --force`), piping anything into `sh`/`bash`/`zsh`, `dd`, `shred` on disks, overwriting `/etc/passwd` |
-| `medium`    | Asks y/n (default no)                     | `sudo`, package installs and removals, `kill`, `chmod`/`chown`, `eval`, stopping or disabling services, user and group changes, firewall rules, mounts |
-| `info_leak` | Flagged in the preview                    | `env`, `printenv`, `echo $API_KEY` (any `TOKEN`/`KEY`/`PASS`/`SECRET` variable), `cat ~/.bash_history`, `cat .env` |
-| `safe`      | Runs directly                             | `ls`, `pwd`, `df -h` |
+| `blocked`   | Never runs. You can edit it or cancel; the edited version is checked again. | `rm -rf /`, `rm -rf ~` or `$HOME`, `--no-preserve-root`, fork bomb, `mkfs` on `/dev/...`, `dd of=/dev/sda`, `> /dev/sda` |
+| `high`      | Asks yes/no/edit (default no)             | `rm` with recursive and force flags in any spelling (`-rf`, `-fr`, `-r -f`, `--recursive --force`), piping anything into `sh`/`bash`/`zsh`, `dd`, `shred` on disks, overwriting `/etc/passwd` |
+| `medium`    | Asks yes/no/edit (default no)             | `sudo`, package installs and removals, `kill`, `chmod`/`chown`, `eval`, stopping or disabling services, user and group changes, firewall rules, mounts |
+| `info_leak` | Asks yes/no/edit (default yes)            | `env`, `printenv`, `echo $API_KEY` (any `TOKEN`/`KEY`/`PASS`/`SECRET` variable), `cat ~/.bash_history`, `cat .env` |
+| `safe`      | Asks yes/no/edit (default yes)            | `ls`, `pwd`, `df -h` |
 
-If a plan contains several commands, the highest level among them decides whether you are asked.
+If a plan contains several commands, the highest level among them sets the default answer. Every plan is shown before it runs, and you can edit it first.
 
 ## Auto-confirm
 
-`smart-shell run ... -y` skips the high and medium confirmations. Blocked commands still never run.
+`smart-shell "..." -y` skips the confirmation and the fix offer. Blocked commands still never run.
 
 ## Sudo
 

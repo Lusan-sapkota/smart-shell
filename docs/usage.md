@@ -4,8 +4,8 @@
 
 ```bash
 smart-shell                                   # interactive mode
-smart-shell run "list all PDF files here"     # one-off prompt
-smart-shell run "free up disk space" --dry-run
+smart-shell "list all PDF files here"         # one-off prompt
+smart-shell "free up disk space" --dry-run
 ```
 
 ## CLI commands
@@ -13,7 +13,7 @@ smart-shell run "free up disk space" --dry-run
 | Command                           | Description                                   |
 |-----------------------------------|-----------------------------------------------|
 | `smart-shell`                     | Start interactive mode                        |
-| `smart-shell run "<prompt>"`      | Run a single prompt                           |
+| `smart-shell "<prompt>"`          | Run a single prompt (same as `smart-shell run "<prompt>"`) |
 | `smart-shell setup`               | Configure provider, API key and default model |
 | `smart-shell models`              | List models from the configured provider      |
 | `smart-shell --list-models`       | Same as `models`                              |
@@ -60,9 +60,9 @@ Exit with `exit`, `quit`, `bye`, `q`, Ctrl+C or Ctrl+D.
 
 1. The model returns one or more commands.
 2. Each command is classified (see [Safety](safety.md)) and shown in a preview.
-3. Blocked commands stop the run; you can edit the command instead.
-4. High or medium risk commands ask for y/n confirmation (unless `-y`).
-5. The plan runs in one shell joined with `&&`, stopping at the first failure. Output appears live, and interactive prompts (like `apt`'s y/n) work.
+3. You answer **yes / no / edit**. The default is no for high or medium risk, yes otherwise. Blocked plans can only be edited or cancelled. `-y` answers yes, except for blocked plans.
+4. The plan runs in one shell joined with `&&`, stopping at the first failure. Output appears live, and interactive prompts (like `apt`'s y/n) work.
+5. If it fails, Smart-Shell offers to ask the AI for a fix. It sends the command and the last lines of its error output, then shows the corrected plan for review.
 
 In interactive mode, your last few requests and their commands are sent along with each new one, so follow-ups work: "list the biggest files in ~/Downloads", then "now delete the ones older than a year".
 

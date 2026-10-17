@@ -28,10 +28,12 @@ Models are listed live from the provider (`!models`, `smart-shell models`) and c
 Every generated command is classified before it runs:
 
 - **blocked**: never runs, can only be edited (e.g. `rm -rf /`, fork bombs, `mkfs` on a disk)
-- **high**: destructive operations, needs y/n confirmation
-- **medium**: sudo, package installs, permission and service changes, needs y/n confirmation
-- **info_leak**: may print secrets (`env`, `printenv`, `echo $API_KEY`), flagged in the preview
-- **safe**: runs directly
+- **high**: destructive operations, defaults to no
+- **medium**: sudo, package installs, permission and service changes, defaults to no
+- **info_leak**: may print secrets (`env`, `printenv`, `echo $API_KEY`), defaults to yes
+- **safe**: defaults to yes
+
+Every plan is shown first with **yes / no / edit**, so you can tweak a command before it runs.
 
 See [Safety](safety.md) for details.
 
@@ -46,6 +48,7 @@ A REPL with readline history, a prompt that shows the current model, and `!` com
 - **Error log** of failures, viewable with `!errors`.
 - **Readable errors**: common failures (command not found, permission denied, missing file) get a one-line explanation.
 - **Sudo**: Smart-Shell never stores your sudo password. `sudo` prompts in the terminal; `!forget-sudo` runs `sudo -k`.
+- **Fix on failure**: when a command fails, Smart-Shell offers to send the command and the last lines of its error output to the model and proposes a corrected plan, checked and confirmed like any other. Nothing is sent unless you say yes.
 - **Follow-ups**: in interactive mode, recent requests are passed as context, so "now do the same for /var/log" works.
 - **Live output**: commands print as they run, and interactive prompts work.
 - **One-off providers**: `--provider` / `--base-url` switch provider for a single run.
