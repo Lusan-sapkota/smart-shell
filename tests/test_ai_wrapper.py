@@ -78,3 +78,18 @@ def test_resolve_model_falls_back_to_first_listed(calls):
     assert resolve_model(client, "explicit", {}) == "explicit"
     assert resolve_model(client, None, {"provider": "deepseek"}) == "deepseek-chat"
     assert resolve_model(client, None, {"provider": "ollama"}) == "qwen2.5:0.5b"
+
+
+def test_override_provider():
+    from smart_shell.ai_wrapper import override_provider
+    saved = {"provider": "gemini", "base_url": "https://g", "api_key": "secret", "default_model": "gemini-x"}
+    assert override_provider(saved) is saved
+    local = override_provider(saved, "ollama")
+    assert local["base_url"] == "http://localhost:11434/v1"
+    assert "api_key" not in local and "default_model" not in local
+    assert "api_key" not in override_provider(saved, base_url="http://evil.example/v1")
+    assert override_provider(saved, "gemini")["api_key"] == "secret"
+    with pytest.raises(AIError):
+        override_provider(saved, "custom")
+    legacy = {"api_key": "AIza-old"}
+    assert override_provider(legacy, "gemini")["api_key"] == "AIza-old"

@@ -27,7 +27,34 @@ BANNER = r"""
 # Retries when the model's reply is not valid JSON (network retries live in the client)
 MAX_RETRIES = 2
 
-def generate_command_plan(prompt, client, model, os_info=None):
+def parse_plan(text):
+    """Pull {"commands": [...]} out of a model reply, tolerating common small-model mistakes."""
+    match = re.search(r'\{.*\}', text, re.DOTALL)
+    if match:
+        raw = match.group(0)
+        for candidate in (raw, re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', raw)):
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                pass
+    # Ignored the JSON instruction and answered with a ```bash block instead.
+    fence = re.search(r'```(?:bash|sh|zsh|shell)?\n(.*?)```', text, re.DOTALL)
+    if fence:
+        commands = [l.strip() for l in fence.group(1).splitlines() if l.strip() and not l.strip().startswith("#")]
+        if commands:
+            return {"commands": commands}
+    return None
+
+
+def format_session_context(session, limit=5):
+    """Earlier requests this session, so follow-ups like "same for /var/log" resolve."""
+    lines = []
+    for entry in session[-limit:]:
+        lines.append(f"- Request: {entry['prompt']}\n  Commands: {' && '.join(entry['commands'])}\n  Result: {entry['result']}")
+    return "Earlier in this session:\n" + "\n".join(lines) if lines else ""
+
+
+def generate_command_plan(prompt, client, model, os_info=None, session=None):
     """Generates a sequence of shell commands (a plan) from a natural language prompt."""
     if os_info is None:
         os_info = {"name": "a generic Linux system", "id": "linux"}
@@ -93,20 +120,18 @@ def generate_command_plan(prompt, client, model, os_info=None):
     Response: {{"commands": ["python3 -m venv venv", "source venv/bin/activate", "pip install --upgrade pip", "pip install black flake8 pytest", "echo 'venv/' >> .gitignore", "echo 'Development environment ready! Activate with: source venv/bin/activate'"]}}
     """
 
+    context = format_session_context(session or [])
+    user_message = f"{context}\n\nNew request: {prompt}" if context else prompt
+
     last_error = None
     for _ in range(MAX_RETRIES + 1):
-        raw_text = client.chat(model, system_prompt, prompt)
+        raw_text = client.chat(model, system_prompt, user_message)
         if not raw_text:
             raise ValueError("The AI model returned an empty response. Please try rephrasing your request.")
 
-        json_match = re.search(r'\{.*\}', raw_text, re.DOTALL)
-        if not json_match:
-            last_error = "The AI model did not return a valid JSON object."
-            continue
-        try:
-            parsed_json = json.loads(json_match.group(0))
-        except json.JSONDecodeError:
-            last_error = "Failed to decode the AI's response as JSON."
+        parsed_json = parse_plan(raw_text)
+        if parsed_json is None:
+            last_error = "The AI model did not return a usable plan."
             continue
 
         if "reason" in parsed_json and not parsed_json.get("commands"):
@@ -118,6 +143,13 @@ def generate_command_plan(prompt, client, model, os_info=None):
         return commands
 
     raise Exception(f"Error generating command plan: {last_error}")
+
+def explain_command(client, model, command):
+    """Plain-English explanation of a shell command."""
+    system = ("Explain what this shell command does, step by step, in plain language. "
+              "Point out anything destructive or surprising. Be brief. No markdown headings.")
+    return client.chat(model, system, command, max_tokens=800)
+
 
 def display_banner():
     """Display the Smart-Shell banner with improved styling."""
@@ -170,7 +202,7 @@ Type your requests in natural language to convert them into shell commands.
   [cyan]!clear[/cyan] - Clear screen          [cyan]!model <name>[/cyan] - Switch model   [cyan]!docs[/cyan] - Documentation
   [cyan]!last[/cyan] - Show last command      [cyan]!redo[/cyan] - Re-execute last       [cyan]!errors[/cyan] - Show error log
   [cyan]!forget-sudo[/cyan] - Clear sudo      [cyan]!creator[/cyan] - About creator       [cyan]!web[/cyan] - Toggle web search
-  [cyan]!update[/cyan] - Check for updates
+  [cyan]!explain <cmd>[/cyan] - Explain a command  [cyan]!update[/cyan] - Check for updates
 
 [bold green]Configuration Commands:[/bold green]
   [green]smart-shell setup[/green] - Configure provider   [green]smart-shell version[/green] - Show version

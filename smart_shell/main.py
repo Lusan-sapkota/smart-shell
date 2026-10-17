@@ -13,12 +13,12 @@ from rich.panel import Panel
 from rich.prompt import Prompt, Confirm
 from rich.markdown import Markdown
 
-from .shell_builder import generate_command_plan, display_banner
+from .shell_builder import generate_command_plan, explain_command, display_banner
 from .safety import check_command_safety
 from .setup_logic import setup_config
 from .config import load_config, ENV_API_KEY
 from .utils import execute_command, print_plan_preview, reset_sudo_password, ERROR_LOG_FILE, get_os_info, detect_shell
-from .ai_wrapper import get_client, resolve_model, is_configured, AIError
+from .ai_wrapper import PROVIDERS, get_client, resolve_model, is_configured, override_provider, AIError
 from .history import HISTORY_DIR, save_to_history, update_history_result, show_command_history, show_last_command, redo_last_command
 from .updater import handle_update_command, get_current_version
 
@@ -27,14 +27,16 @@ console = Console()
 @click.group(invoke_without_command=True)
 @click.pass_context
 @click.option("--list-models", is_flag=True, help="List all supported AI models")
-def cli(ctx, list_models):
+@click.option("--provider", type=click.Choice(list(PROVIDERS) + ["custom"]), help="Use this provider instead of the saved one")
+@click.option("--base-url", help="Use this OpenAI-compatible base URL instead of the saved one")
+def cli(ctx, list_models, provider, base_url):
     """Smart-Shell: Convert natural language to Bash or Zsh commands using AI."""
     if list_models:
         display_models()
         return
         
     if ctx.invoked_subcommand is None:
-        ctx.invoke(run, prompt=None, dry_run=False, model=None, interactive=True)
+        ctx.invoke(run, prompt=None, dry_run=False, model=None, interactive=True, provider=provider, base_url=base_url)
 
 def display_models():
     """List the models the configured provider offers."""
@@ -60,11 +62,16 @@ def display_models():
 @click.option("--model", "-m", help="Specify model to use for this command")
 @click.option("--interactive", "-i", is_flag=True, help="Run in interactive mode")
 @click.option("yes", "-y", is_flag=True, help="Automatically confirm all prompts")
-def run(prompt, dry_run, model, interactive, yes):
+@click.option("--provider", type=click.Choice(list(PROVIDERS) + ["custom"]), help="Use this provider instead of the saved one")
+@click.option("--base-url", help="Use this OpenAI-compatible base URL instead of the saved one")
+def run(prompt, dry_run, model, interactive, yes, provider, base_url):
     """Convert natural language to Bash or Zsh commands."""
-    
-    config = load_config()
-    
+    try:
+        config = override_provider(load_config(), provider, base_url)
+    except AIError as e:
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        return
+
     if not is_configured(config):
         console.print("[bold red]No AI provider configured. Run 'smart-shell setup' to configure.[/bold red]")
         console.print(f"Alternatively, set the {ENV_API_KEY} environment variable for Gemini.")
@@ -90,13 +97,17 @@ def run(prompt, dry_run, model, interactive, yes):
     user_prompt = " ".join(prompt)
     process_prompt(user_prompt, dry_run, model, client, config, yes)
 
-def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False):
+def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False, session=None):
     """Process a single user prompt."""
     console.print(f"\n[bold blue]Prompt:[/bold blue] {user_prompt}")
     
     try:
         console.print("[blue]Generating execution plan...[/blue]")
-        command_plan = generate_command_plan(user_prompt, client, resolve_model(client, model, config), os_info=get_os_info())
+        command_plan = generate_command_plan(user_prompt, client, resolve_model(client, model, config),
+                                             os_info=get_os_info(), session=session)
+        entry = {"prompt": user_prompt, "commands": command_plan, "result": "not run"}
+        if session is not None:
+            session.append(entry)
 
         if not command_plan:
             console.print("[yellow]The AI returned an empty plan. This could be due to a safety block or an impossible request. Please try again.[/yellow]")
@@ -161,6 +172,7 @@ def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False):
             
             # Run the whole plan in one shell so cd/source carry over; stop at the first failure.
             success = execute_command(" && ".join(command_plan))
+            entry.update(commands=command_plan, result="succeeded" if success else "failed")
             
             update_history_result(history_id, success)
             
@@ -201,6 +213,7 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
     except AIError as e:
         console.print(f"[bold red]Error:[/bold red] {e}")
         return
+    session = []
     try:
         while True:
             try:
@@ -246,17 +259,17 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
                 continue
                 
             if user_prompt.startswith("!"):
-                current_model = handle_special_command(user_prompt, current_model)
+                current_model = handle_special_command(user_prompt, current_model, client)
                 continue
                 
-            process_prompt(user_prompt, dry_run, current_model, client, config, auto_yes)
+            process_prompt(user_prompt, dry_run, current_model, client, config, auto_yes, session)
             
     except Exception as e:
         console.print(f"\n[bold red]Error in interactive mode:[/bold red] {str(e)}")
         console.print("[green]Exiting Smart-Shell.[/green]")
         return
 
-def handle_special_command(command, current_model):
+def handle_special_command(command, current_model, client):
     """Handle special commands in interactive mode."""
     cmd = command.lower().strip()
     
@@ -274,6 +287,14 @@ def handle_special_command(command, current_model):
         new_model = command.strip().split(" ", 1)[1].strip()
         console.print(f"[green]✓ Switched to model: {new_model}[/green]")
         return new_model
+    elif cmd.startswith("!explain "):
+        target = command.strip().split(" ", 1)[1].strip()
+        safety = check_command_safety(target)
+        console.print(f"[bold]Safety level:[/bold] {safety['status'].upper()} ({safety['notes']})")
+        try:
+            console.print(explain_command(client, current_model, target))
+        except AIError as e:
+            console.print(f"[bold red]Error:[/bold red] {e}")
     elif cmd == "!forget-sudo":
         reset_sudo_password()
         console.print("[green]Sudo credentials cleared.[/green]")
@@ -314,6 +335,7 @@ Examples:
 - `!help` - Show this help
 - `!model <model-name>` - Change the AI model
 - `!models` - List available models
+- `!explain <command>` - Explain what a command does
 - `!last` - Show the last generated command
 - `!redo` - Re-execute the last command
 - `!update` - Check for updates and install
