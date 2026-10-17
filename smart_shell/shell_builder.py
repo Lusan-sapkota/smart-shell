@@ -3,6 +3,7 @@ Shell Builder Module - Generates shell commands from natural language prompts.
 """
 
 import os
+import shutil
 import re
 import json
 from rich.console import Console
@@ -52,58 +53,24 @@ def generate_command_plan(prompt, client, model, os_info=None, session=None):
         else:
             shell_type = 'bash'
 
-    system_prompt = f"""
-    You are Smart-Shell, an advanced Linux/Unix command-line intelligence system. You are NOT just a wrapper - you are a sophisticated tool that understands context, solves complex problems, and generates robust automation solutions.
+    system_prompt = f"""You turn a request into shell commands for this machine.
+OS: {os_info.get('name', 'Linux')}. Shell: {shell_type}. Package manager: {detect_package_manager()}.
 
-    SYSTEM CONTEXT:
-    - OS: {os_info.get('name', 'Linux system')} ({os_info.get('id', 'linux')})
-    - Shell: {shell_type}
-    - Package Manager: {'apt' if 'ubuntu' in os_info.get('id', '').lower() or 'debian' in os_info.get('id', '').lower() else 'auto-detect'}
+Reply with JSON only, no prose and no code fences:
+{{"commands": ["command 1", "command 2"]}}
 
-    CORE INTELLIGENCE PRINCIPLES:
-    1. MAXIMUM HELPFULNESS - Be resourceful, creative, and solution-oriented
-    2. DEEP UNDERSTANDING - Interpret intent, context, and implicit requirements
-    3. ROBUST ENGINEERING - Generate reliable, error-resistant commands
-    4. COMPREHENSIVE SOLUTIONS - Handle complex multi-step workflows
-    5. TOOL MASTERY - Utilize the full power of Unix/Linux ecosystem
-    6. MODERN BEST PRACTICES - Use current techniques and optimizations
-    7. ADAPTIVE INTELLIGENCE - Work across different environments and constraints
+Rules:
+- Use as few commands as needed; they run in order in one shell, stopping at the first failure.
+- Match the request exactly (counts, sizes, file types, paths).
+- Prefer common tools that are installed by default.
+- If the request cannot be done safely, reply {{"commands": [], "reason": "why"}}.
 
-    ADVANCED CAPABILITIES (Utilize ALL of these):
-    ✓ Complex file operations: find, grep, sed, awk, sort, uniq, cut, tr
-    ✓ System administration: systemctl, ps, top, htop, netstat, ss, lsof
-    ✓ Development workflows: git, docker, make, cmake, npm, pip, cargo
-    ✓ Text processing: regex patterns, data extraction, formatting
-    ✓ Network operations: curl, wget, ssh, scp, rsync, ping, traceroute
-    ✓ Archive management: tar, gzip, zip, 7z with optimal compression
-    ✓ Performance analysis: iostat, vmstat, sar, perf, strace
-    ✓ Database operations: mysql, psql, sqlite3, redis-cli
-    ✓ Web automation: API calls, scraping, data processing
-    ✓ Process management: jobs, nohup, screen, tmux
-    ✓ Security tools: chmod, chown, sudo, gpg, openssl
-    ✓ Monitoring: watch, tail, journalctl, dmesg
-
-    INTELLIGENCE ENHANCEMENT:
-    - Generate multiple alternative approaches when beneficial
-    - Handle edge cases and error conditions proactively
-    - Use advanced shell features: process substitution, arrays, functions
-    - Optimize for performance and resource efficiency
-    - Chain commands intelligently with pipes and redirections
-    - Include progress indicators for long operations
-    - Provide fallback options for missing tools
-    - Use modern command options and flags
-
-    RESPONSE FORMAT: Always return valid JSON with "commands" array. Only use "reason" for genuinely unsafe operations.
-
-    SAFETY: Block only truly destructive operations (rm -rf /, mkfs, dd to system devices). Be helpful, not restrictive.
-
-    ADVANCED EXAMPLES:
-    User: "analyze log files for errors in the last hour"
-    Response: {{"commands": ["find /var/log -name '*.log' -newermt '1 hour ago' -exec grep -l -i 'error\\|fail\\|exception' {{}} \\; | head -10 | xargs -I {{}} sh -c 'echo \"=== {{}} ===\"; grep -i \"error\\|fail\\|exception\" \"{{}}\" | tail -5'"]}}
-
-    User: "setup development environment for python project"
-    Response: {{"commands": ["python3 -m venv venv", "source venv/bin/activate", "pip install --upgrade pip", "pip install black flake8 pytest", "echo 'venv/' >> .gitignore", "echo 'Development environment ready! Activate with: source venv/bin/activate'"]}}
-    """
+Examples:
+Request: show the 3 most recent git commits
+{{"commands": ["git log -3 --oneline"]}}
+Request: find .log files over 10MB in /var/log
+{{"commands": ["find /var/log -name '*.log' -size +10M"]}}
+"""
 
     context = format_session_context(session or [])
     user_message = f"{context}\n\nNew request: {prompt}" if context else prompt
@@ -128,6 +95,14 @@ def generate_command_plan(prompt, client, model, os_info=None, session=None):
         return commands
 
     raise Exception(f"Error generating command plan: {last_error}")
+
+def detect_package_manager():
+    """First package manager found on PATH."""
+    for tool in ("apt", "dnf", "pacman", "zypper", "apk", "brew"):
+        if shutil.which(tool):
+            return tool
+    return "unknown"
+
 
 def explain_command(client, model, command):
     """Plain-English explanation of a shell command."""
