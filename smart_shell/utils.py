@@ -8,9 +8,7 @@ import subprocess
 import re
 from typing import Dict, Any, Optional
 from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
-from rich.markdown import Markdown
 from datetime import datetime
 
 console = Console()
