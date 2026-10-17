@@ -13,9 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Spinner showing the provider and model while the AI is working.
 - `smart-shell "<prompt>"` works without the `run` subcommand.
 - New interactive prompt (prompt_toolkit): `/` command menu with descriptions, model-name completion after `/model`, status bar with provider, model, shell, folder and dry-run state, multi-line input, `Ctrl+R` history search. `Ctrl+C` clears the line or stops a running command instead of quitting.
-- `/dry` toggles dry run inside a session.
+- Modes, cycled with Shift+Tab or set with `/mode`: `ask` (every plan asks), `auto` (all-safe plans run without asking; anything risky still asks), `plan` (show plans, run nothing).
+- Notifications when Smart-Shell is waiting for an answer: terminal bell, plus a desktop notification after 5 seconds away from the keyboard (`notify-send` for Konsole and most Linux terminals, terminal escape codes for GNOME Terminal, Ghostty, WezTerm, iTerm2 and Windows Terminal, Notification Center on macOS). `/notify` turns it off.
+- `.coderabbit.yaml` turns off CodeRabbit reviews.
 
 ### Changed
+- Any `rm`, `rmdir`, `unlink`, `truncate`, emptying a file with `>`, `git reset --hard`, `git clean -f`, `git push --force`, `git branch -D` and `docker rm`/`prune` are rated **medium**, so they always ask. Plain `rm file` used to count as safe.
 - Interactive commands use `/` (`/help`, `/model`, ...). The `!` spelling still works.
 - Startup shows a two-line header instead of the ASCII banner and welcome panel.
 - Safe and info-leak plans now ask before running (default yes) instead of running immediately.

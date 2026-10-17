@@ -39,7 +39,10 @@ See [Safety](safety.md) for details.
 
 ## Interactive mode
 
-An interactive prompt in the style of Claude Code and Gemini CLI: a `/` command menu with descriptions and model-name completion, a status bar (provider, model, shell, folder, dry run), multi-line input (`Esc` `Enter`), and searchable history (`Ctrl+R`). Commands: `/help`, `/model <name>`, `/models`, `/explain <cmd>`, `/dry`, `/history`, `/last`, `/redo`, `/errors`, `/clear`, `/forget-sudo`, `/update`, `/docs`, `/exit`. Commands still run in your real terminal, so `sudo` prompts and live output work.
+An interactive prompt in the style of Claude Code and Gemini CLI: a `/` command menu with descriptions and model-name completion, a status bar (mode, provider, model, shell, folder), multi-line input (`Esc` `Enter`), and searchable history (`Ctrl+R`). Commands: `/help`, `/mode`, `/model <name>`, `/models`, `/explain <cmd>`, `/history`, `/last`, `/redo`, `/errors`, `/clear`, `/notify`, `/forget-sudo`, `/update`, `/docs`, `/exit`.
+
+- **Modes** (Shift+Tab): `ask` (every plan asks), `auto` (only all-safe plans run without asking; `sudo`, `rm` and anything risky still ask), `plan` (show plans, run nothing).
+- **Notifications**: a bell, plus a desktop notification in Konsole and other terminals when Smart-Shell is waiting for you after you've looked away. Commands still run in your real terminal, so `sudo` prompts and live output work.
 
 ## Other
 

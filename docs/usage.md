@@ -52,20 +52,44 @@ Type `/` at the `>` prompt to open the command menu: it shows each command with 
 | `/forget-sudo`   | Run `sudo -k` to drop cached sudo credentials |
 | `/update`        | Check for a new version and upgrade with uv, pipx or pip |
 | `/docs`          | Show the documentation link               |
-| `/dry`           | Toggle dry run for this session           |
+| `/mode <name>`   | Switch mode: `ask`, `auto` or `plan` (also Shift+Tab) |
+| `/notify`        | Turn waiting-for-you notifications on or off |
 | `/exit`          | Quit                                      |
 
 ### Keys
 
 | Key                 | Action                                  |
 |---------------------|-----------------------------------------|
+| `Shift+Tab`         | Cycle mode: ask, auto, plan             |
 | `Tab`, arrow keys   | Pick from the `/` menu                  |
 | `Esc`, then `Enter` | New line inside a request               |
 | `Up`, `Ctrl+R`      | Previous requests, search them          |
 | `Ctrl+C`            | Clear the line (or stop a running command) |
 | `Ctrl+D`            | Quit (as do `/exit`, `exit`, `quit`, `q`) |
 
-The status bar at the bottom shows the provider, model, shell, current folder and whether dry run is on.
+The status bar at the bottom shows the mode, provider, model, shell and current folder.
+
+### Modes
+
+| Mode   | What happens |
+|--------|--------------|
+| `ask`  | Default. Every plan asks yes / no / edit. |
+| `auto` | Plans where every step is **safe** run without asking. Anything else still asks: `sudo`, `rm` and other deletions, package installs, git resets, info leaks. Blocked plans never run. |
+| `plan` | Shows plans only and runs nothing, like `--dry-run`. |
+
+`smart-shell --dry-run` starts in plan mode.
+
+### Notifications
+
+When Smart-Shell waits for your answer (yes / no / edit, or "fix it?"), it rings the terminal bell. If you have been away from the keyboard for 5 seconds or more, it also sends a desktop notification:
+
+- **Konsole, kitty, Alacritty, xterm, foot** and other terminals on Linux: through `notify-send` (KDE, GNOME and other desktops show it like any notification).
+- **GNOME Terminal, Ptyxis, Ghostty, WezTerm**: through the terminal's own notification support.
+- **iTerm2, Windows Terminal**: through the terminal's own notification support.
+- **macOS Terminal.app**: through Notification Center.
+- **Over SSH**: bell only.
+
+Turn it off with `/notify`, or `"notify": false` in the config file.
 
 ## How a prompt runs
 
