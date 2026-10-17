@@ -5,6 +5,20 @@ All notable changes to Smart-Shell will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-10-17
+
+### Added
+- Every plan asks **yes / no / edit** before running, so you can change a command first. Edits are checked again.
+- Fix on failure: after a failed command, Smart-Shell offers to send the command and its error output to the model and shows a corrected plan.
+- Spinner showing the provider and model while the AI is working.
+- `smart-shell "<prompt>"` works without the `run` subcommand.
+
+### Changed
+- Startup shows a two-line header instead of the ASCII banner and welcome panel.
+- Safe and info-leak plans now ask before running (default yes) instead of running immediately.
+- Local providers (Ollama, LM Studio) are listed first, and a fresh setup defaults to Ollama.
+- Install docs lead with `pipx install smart-shell-cli` / `uv tool install smart-shell-cli`; the install script is the alternative. The script installs from PyPI.
+
 ## [1.1.0] - 2026-10-17
 
 ### Added
