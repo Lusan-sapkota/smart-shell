@@ -6,7 +6,7 @@ An overview of the modules in `smart_shell/`. See the source for details.
 
 | Module | Purpose |
 |--------|---------|
-| `main` | Click CLI (`run`, `setup`, `models`, `history`, `version`, `help`), the interactive REPL and `!` commands |
+| `main` | Click CLI (`run`, `setup`, `models`, `history`, `version`), the interactive REPL and `!` commands |
 | `ai_wrapper` | `AIClient` for OpenAI-compatible APIs and the provider presets |
 | `setup_logic` | The `smart-shell setup` wizard |
 | `shell_builder` | System prompt, plan parsing, banner and welcome message |

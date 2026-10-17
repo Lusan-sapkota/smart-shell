@@ -39,7 +39,7 @@ See [Safety](safety.md) for details.
 
 ## Interactive mode
 
-A REPL with readline history, a prompt that shows the current model, and `!` commands: `!help`, `!history`, `!clear`, `!models`, `!model <name>`, `!explain <cmd>`, `!last`, `!redo`, `!errors`, `!forget-sudo`, `!update`, `!creator`, `!docs`. If you type a `smart-shell ...` CLI command inside the REPL, it tells you to run it from your normal shell instead.
+A REPL with readline history, a prompt that shows the current model, and `!` commands: `!help`, `!history`, `!clear`, `!models`, `!model <name>`, `!explain <cmd>`, `!last`, `!redo`, `!errors`, `!forget-sudo`, `!update`, `!docs`.
 
 ## Other
 

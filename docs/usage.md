@@ -19,7 +19,7 @@ smart-shell "free up disk space" --dry-run
 | `smart-shell --list-models`       | Same as `models`                              |
 | `smart-shell history`             | Show command history                          |
 | `smart-shell version`             | Show version information                      |
-| `smart-shell --help`, `help`      | Show CLI help                                 |
+| `smart-shell --help`              | Show CLI help                                 |
 
 Options for `run`:
 
@@ -51,7 +51,6 @@ Type these at the `Smart-Shell (model):` prompt:
 | `!errors`        | Show the error log                        |
 | `!forget-sudo`   | Run `sudo -k` to drop cached sudo credentials |
 | `!update`        | Check for a new version and upgrade with uv, pipx or pip |
-| `!creator`       | Show creator information                  |
 | `!docs`          | Show the documentation link               |
 
 Exit with `exit`, `quit`, `bye`, `q`, Ctrl+C or Ctrl+D.
