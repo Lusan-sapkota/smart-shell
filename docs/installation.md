@@ -2,7 +2,18 @@
 
 Requires Python 3.9 or newer on Linux, macOS or WSL.
 
-## Quick install
+## Install
+
+```bash
+pipx install smart-shell-cli      # or: uv tool install smart-shell-cli
+smart-shell setup
+```
+
+Upgrade with `pipx upgrade smart-shell-cli` (or `uv tool upgrade smart-shell-cli`), or `!update` from inside Smart-Shell.
+
+## Install script
+
+Alternatively, the install script does it in one step:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
@@ -15,16 +26,7 @@ The script:
 3. Adds Bash/Zsh tab completion and a desktop entry.
 4. Runs `smart-shell setup`.
 
-## Install with uv
-
-If you already use [uv](https://docs.astral.sh/uv/), you can skip the script:
-
-```bash
-uv tool install smart-shell-cli   # or: pipx install smart-shell-cli
-smart-shell setup
-```
-
-Upgrade with `uv tool upgrade smart-shell-cli`, remove with `uv tool uninstall smart-shell-cli`. With pipx: `pipx install smart-shell-cli`, `pipx upgrade smart-shell-cli`. For the unreleased `development` branch: `uv tool install git+https://github.com/Lusan-sapkota/smart-shell@development`.
+To try the unreleased `development` branch: `pipx install git+https://github.com/Lusan-sapkota/smart-shell@development`.
 
 Dependencies are `rich`, `click` and `requests`. To install them yourself (for example behind a restrictive firewall):
 

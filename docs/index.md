@@ -11,8 +11,8 @@ Smart-Shell turns plain English into Bash or Zsh commands, checks each one for r
 ## Quick start
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
-smart-shell setup   # choose a provider and default model
+pipx install smart-shell-cli   # or: uv tool install smart-shell-cli
+smart-shell setup              # choose a provider and default model
 smart-shell         # start the interactive shell
 ```
 

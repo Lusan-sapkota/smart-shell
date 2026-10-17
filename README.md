@@ -17,8 +17,9 @@ Smart-Shell turns plain English into Bash or Zsh commands, checks them for risk,
 - **Natural language to commands** for Bash and Zsh, with the shell detected automatically.
 - **Local AI first.** Ollama or LM Studio: no API key, nothing leaves your machine.
 - **Or any OpenAI-compatible API.** Presets for gemini, openai, deepseek, openrouter and groq, plus `custom` for any base URL.
-- **Safety checks** on every command: blocked, high, medium, info_leak and safe. Blocked commands never run; high and medium need a y/n confirmation.
-- **Multi-step plans** run in one shell, joined with `&&`, stopping at the first failure.
+- **Safety checks** on every command: blocked, high, medium, info_leak and safe. Blocked commands never run; everything else asks yes / no / edit first.
+- **Fix on failure.** If a command fails, ask the AI to fix it using the error output.
+- **Multi-step plans** run in one shell, joined with `&&`, stopping at the first failure, with live output.
 - **Dry-run mode** (`--dry-run`) to preview without executing.
 - **Interactive REPL** with history and `!` commands (`!models`, `!model <name>`, `!redo`, `!errors`, ...).
 - **No stored sudo password.** `sudo` prompts in your terminal as usual.
@@ -27,15 +28,13 @@ Smart-Shell turns plain English into Bash or Zsh commands, checks them for risk,
 ## Install
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
+pipx install smart-shell-cli      # or: uv tool install smart-shell-cli
 ```
 
-The script installs Smart-Shell with uv (or pipx if you don't have uv), adds tab completion and a desktop entry, and runs the setup wizard.
-
-Already use [uv](https://docs.astral.sh/uv/)? Skip the script:
+Or use the install script, which picks uv or pipx for you and also adds tab completion and a desktop entry:
 
 ```bash
-uv tool install smart-shell-cli   # or: pipx install smart-shell-cli
+curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
 ```
 
 Then:
@@ -43,7 +42,7 @@ Then:
 ```bash
 smart-shell setup   # pick a provider, enter a key if needed, choose a default model
 smart-shell         # start the interactive shell
-smart-shell run "find files over 100MB in my home folder" --dry-run
+smart-shell "find files over 100MB in my home folder" --dry-run
 ```
 
 To run fully offline with a local model, see [Using local models (Ollama)](https://smart-shell.lusansapkota.com.np/installation/#using-local-models-ollama). For a manual or development install, see [Development](https://smart-shell.lusansapkota.com.np/development/).
@@ -51,8 +50,14 @@ To run fully offline with a local model, see [Using local models (Ollama)](https
 ## Uninstall
 
 ```bash
+pipx uninstall smart-shell-cli    # or: uv tool uninstall smart-shell-cli
+rm -rf ~/.config/smart-shell ~/.local/share/smart-shell   # optional: config and history
+```
+
+If you used the install script, remove its completion and desktop entry too:
+
+```bash
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash -s -- --uninstall
-rm -rf ~/.config/smart-shell ~/.local/share/smart-shell   # also delete config and history
 ```
 
 Details in [Uninstall](https://smart-shell.lusansapkota.com.np/uninstall/).
