@@ -8,20 +8,20 @@ Multi-step plans run in a single shell, joined with `&&`, so `cd` and environmen
 
 ## Providers
 
-One requests-based client talks to any OpenAI-compatible chat API. Presets:
+Local models come first: with Ollama or LM Studio everything runs on your machine, offline, with no API key. The same client also talks to any OpenAI-compatible chat API. Presets:
 
 | Provider     | Base URL                                                   | API key |
 |--------------|------------------------------------------------------------|---------|
+| `ollama`     | `http://localhost:11434/v1`                                | no      |
+| `lmstudio`   | `http://localhost:1234/v1`                                 | no      |
 | `gemini`     | `https://generativelanguage.googleapis.com/v1beta/openai`  | yes     |
 | `openai`     | `https://api.openai.com/v1`                                | yes     |
 | `deepseek`   | `https://api.deepseek.com/v1`                              | yes     |
 | `openrouter` | `https://openrouter.ai/api/v1`                             | yes     |
 | `groq`       | `https://api.groq.com/openai/v1`                           | yes     |
-| `ollama`     | `http://localhost:11434/v1`                                | no      |
-| `lmstudio`   | `http://localhost:1234/v1`                                 | no      |
 | `custom`     | any URL you enter                                          | optional |
 
-With Ollama or LM Studio, everything runs locally and offline. Models are listed live from the provider (`!models`, `smart-shell models`) and can be switched per run (`--model`) or per session (`!model <name>`).
+Models are listed live from the provider (`!models`, `smart-shell models`) and can be switched per run (`--model`) or per session (`!model <name>`).
 
 ## Safety
 

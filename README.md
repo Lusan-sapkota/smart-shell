@@ -4,19 +4,19 @@
 [![Tests](https://github.com/Lusan-sapkota/smart-shell/actions/workflows/test.yml/badge.svg)](https://github.com/Lusan-sapkota/smart-shell/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/Lusan-sapkota/smart-shell/blob/main/LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
-[![AI](https://img.shields.io/badge/AI-OpenAI--compatible-orange)](https://smart-shell.lusansapkota.com.np/installation/#providers)
+[![AI](https://img.shields.io/badge/AI-Local%20%2F%20OpenAI--compatible-orange)](https://smart-shell.lusansapkota.com.np/installation/#providers)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/docs/images/image.png" alt="Smart-Shell Demo" width="500"/>
 </p>
 
-Smart-Shell turns plain English into Bash or Zsh commands, checks them for risk, and runs them after you confirm. It works with any OpenAI-compatible chat API: Gemini, OpenAI, DeepSeek, OpenRouter, Groq, or a local model through Ollama or LM Studio (fully offline).
+Smart-Shell turns plain English into Bash or Zsh commands, checks them for risk, and runs them after you confirm. It runs on a local AI model through Ollama or LM Studio, fully offline with no API key, or on any OpenAI-compatible API: Gemini, OpenAI, DeepSeek, OpenRouter, Groq.
 
 ## Features
 
 - **Natural language to commands** for Bash and Zsh, with the shell detected automatically.
-- **Any OpenAI-compatible provider.** Built-in presets for gemini, openai, deepseek, openrouter, groq, ollama and lmstudio, plus `custom` for any base URL.
-- **Offline mode** with Ollama or LM Studio: no API key, nothing leaves your machine.
+- **Local AI first.** Ollama or LM Studio: no API key, nothing leaves your machine.
+- **Or any OpenAI-compatible API.** Presets for gemini, openai, deepseek, openrouter and groq, plus `custom` for any base URL.
 - **Safety checks** on every command: blocked, high, medium, info_leak and safe. Blocked commands never run; high and medium need a y/n confirmation.
 - **Multi-step plans** run in one shell, joined with `&&`, stopping at the first failure.
 - **Dry-run mode** (`--dry-run`) to preview without executing.

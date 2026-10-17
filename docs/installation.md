@@ -34,6 +34,18 @@ pip install --user rich click requests
 
 For a development install, see [Development](development.md).
 
+## Using local models (Ollama)
+
+Smart-Shell works fully offline with [Ollama](https://ollama.com/). No API key is needed.
+
+```bash
+ollama pull qwen2.5-coder   # any chat model works; coder models do well
+ollama serve                # skip if Ollama already runs as a service
+smart-shell setup           # choose "ollama", keep http://localhost:11434/v1
+```
+
+Pick the pulled model as your default and you're done. LM Studio works the same way: start its local server and choose `lmstudio` (`http://localhost:1234/v1`).
+
 ## Providers
 
 Run the setup wizard at any time:
@@ -44,7 +56,7 @@ smart-shell setup
 
 It asks you to:
 
-1. Choose a provider: `gemini`, `openai`, `deepseek`, `openrouter`, `groq`, `ollama`, `lmstudio`, or `custom` (any OpenAI-compatible base URL).
+1. Choose a provider: `ollama` or `lmstudio` (local, the default), `gemini`, `openai`, `deepseek`, `openrouter`, `groq`, or `custom` (any OpenAI-compatible base URL).
 2. Confirm the base URL.
 3. Enter an API key if the provider needs one. The connection is checked by listing models.
 4. Pick a default model from the live model list.
@@ -67,18 +79,6 @@ Cloud providers also store `api_key`. Environment variables override the saved v
 - `SMART_SHELL_BASE_URL`
 
 Configs from older versions that only contain `api_key` are treated as Gemini.
-
-## Using local models (Ollama)
-
-Smart-Shell works fully offline with [Ollama](https://ollama.com/). No API key is needed.
-
-```bash
-ollama pull qwen2.5-coder   # any chat model works; coder models do well
-ollama serve                # skip if Ollama already runs as a service
-smart-shell setup           # choose "ollama", keep http://localhost:11434/v1
-```
-
-Pick the pulled model as your default and you're done. LM Studio works the same way: start its local server and choose `lmstudio` (`http://localhost:1234/v1`).
 
 ## Troubleshooting
 
