@@ -74,7 +74,7 @@ The status bar at the bottom shows the mode, provider, model, shell and current 
 | Mode   | What happens |
 |--------|--------------|
 | `ask`  | Default. Every plan asks yes / no / edit. |
-| `auto` | Plans where every step is **safe** run without asking. Anything else still asks: `sudo`, `rm` and other deletions, package installs, git resets, info leaks. Blocked plans never run. |
+| `auto` | Read-only plans run without asking: every step must be a plain command from a list of read-only tools (`ls`, `cat`, `df`, `du`, `grep`, `find` without `-delete`/`-exec`, `git status`/`log`/`diff`, `ps`, ...). Anything else asks: `sudo`, `rm`, writing or overwriting files, package installs, loops, `bash -c`, `$(...)`, any command not on the list. Blocked plans never run. |
 | `plan` | Shows plans only and runs nothing, like `--dry-run`. |
 
 `smart-shell --dry-run` starts in plan mode.

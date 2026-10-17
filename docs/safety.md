@@ -12,7 +12,9 @@ Every generated command is checked by pattern rules in `smart_shell/safety.py` b
 | `info_leak` | Asks yes/no/edit (default yes)            | `env`, `printenv`, `echo $API_KEY` (any `TOKEN`/`KEY`/`PASS`/`SECRET` variable), `cat ~/.bash_history`, `cat .env` |
 | `safe`      | Asks yes/no/edit (default yes)            | `ls`, `pwd`, `df -h` |
 
-In **auto** mode (Shift+Tab), only plans where every step is `safe` run without asking. One `rm` or `sudo` step is enough to make the whole plan ask.
+In **auto** mode (Shift+Tab), a plan runs without asking only if every step is a plain pipeline of known read-only commands (an allowlist in `smart_shell/safety.py`: `ls`, `cat`, `df`, `grep`, `git status`, `find` without `-delete`/`-exec`, and so on). Shell constructs that can hide a command (`;` loops, `bash -c`, `$(...)`, backticks, `<(...)`, newlines) and any redirect that writes a file also make it ask. One `rm` or `sudo` step is enough to make the whole plan ask.
+
+The pattern rules below set the label and the default answer; the allowlist is what auto mode trusts, because pattern rules can always miss some spelling.
 
 If a plan contains several commands, the highest level among them sets the default answer. Every plan is shown before it runs, and you can edit it first.
 
