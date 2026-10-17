@@ -60,8 +60,10 @@ check_dependencies() {
         fi
     fi
     
-    # Check for pipx (recommended for PEP 668 systems)
-    if command -v pipx &> /dev/null; then
+    # uv installs isolated tools on its own; pipx is only needed without it
+    if command -v uv &> /dev/null; then
+        echo -e "${GREEN}✓ uv found (fastest install option)${NC}"
+    elif command -v pipx &> /dev/null; then
         echo -e "${GREEN}✓ pipx found (recommended for installation)${NC}"
     else
         echo -e "${YELLOW}⚠ pipx not found (recommended for better isolation)${NC}"
@@ -290,6 +292,15 @@ install_smart_shell() {
             echo -e "\nTo activate this environment, run:"
             echo -e "  source venv/bin/activate"
             ;;
+        4)
+            echo -e "\n${BLUE}Installing with uv...${NC}"
+            uv tool install --force . || {
+                echo -e "${RED}uv tool install failed.${NC}"
+                exit 1
+            }
+            uv tool update-shell &> /dev/null || true
+            install_path="$(uv tool dir --bin)/smart-shell"
+            ;;
         *)
             echo -e "${RED}Invalid installation option.${NC}"
             exit 1
@@ -444,24 +455,24 @@ if [[ -t 0 ]]; then
     NON_INTERACTIVE="false"
 else
     NON_INTERACTIVE="true"
-    echo -e "Running in non-interactive mode. Defaulting to user installation."
 fi
+
+# Prefer uv when it is installed, otherwise pipx
+if command -v uv &> /dev/null; then DEFAULT_OPTION=4; else DEFAULT_OPTION=2; fi
 
 # Prompt for installation method if in interactive mode
 if [[ "$NON_INTERACTIVE" == "false" ]]; then
     echo -e "\nPlease select installation method:"
     echo -e "1) System-wide installation (requires sudo)"
-    echo -e "2) User installation (recommended)"
+    echo -e "2) User installation with pipx"
     echo -e "3) Virtual environment (for development)"
+    echo -e "4) User installation with uv"
     
-    read -p "Enter your choice [2]: " INSTALL_OPTION
-    
-    # Default to user installation if no input
-    INSTALL_OPTION=${INSTALL_OPTION:-2}
+    read -p "Enter your choice [$DEFAULT_OPTION]: " INSTALL_OPTION
+    INSTALL_OPTION=${INSTALL_OPTION:-$DEFAULT_OPTION}
 else
-    # Default to user installation in non-interactive mode
-    INSTALL_OPTION=2
-    echo -e "Running in non-interactive mode. Defaulting to user installation."
+    INSTALL_OPTION=$DEFAULT_OPTION
+    echo -e "Running in non-interactive mode. Using option $DEFAULT_OPTION."
 fi
 
 # Install Smart-Shell
