@@ -39,14 +39,3 @@ def save_config(config):
             json.dump(config, f, indent=2)
     except IOError as e:
         console.print(f"[bold red]Error: Could not save config file: {e}[/bold red]")
-
-def get_current_model():
-    """Gets the current default model from the config file."""
-    config = load_config()
-    return config.get("default_model", "models/gemini-2.5-flash")
-
-def save_model(model_name):
-    """Saves the selected model to the config file."""
-    config = load_config()
-    config["default_model"] = model_name
-    save_config(config)

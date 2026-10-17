@@ -4,6 +4,8 @@ Smart-Shell - An intelligent terminal assistant that converts natural language i
 
 import sys
 import os
+import re
+import importlib.metadata
 import click
 import signal
 import readline
@@ -11,7 +13,6 @@ import atexit
 import json
 import subprocess
 import requests
-import toml
 from pathlib import Path
 from datetime import datetime
 from rich.console import Console
@@ -24,10 +25,9 @@ from rich.table import Table
 from .shell_builder import generate_command_plan, display_banner
 from .safety import check_command_safety
 from .setup_logic import setup_config
-from .config import load_config, ENV_API_KEY, get_current_model, save_model
+from .config import load_config, ENV_API_KEY
 from .utils import execute_command, print_plan_preview, reset_sudo_password, log_error, ERROR_LOG_FILE, get_os_info, detect_shell
-from .ai_wrapper import get_wrapper
-from .model_info import model_info
+from .ai_wrapper import get_client, resolve_model, is_configured, AIError
 
 console = Console()
 
@@ -49,34 +49,22 @@ def cli(ctx, list_models):
         ctx.invoke(run, prompt=None, dry_run=False, model=None, interactive=True)
 
 def display_models():
-    """Display a list of supported models by fetching them from the API."""
-    console.print("[blue]Checking for API key...[/blue]")
-    api_key = os.environ.get(ENV_API_KEY) or load_config().get("api_key")
-    if not api_key:
-        console.print("[bold red]No API key found. Cannot fetch models.[/bold red]")
-        console.print("Run 'smart-shell setup' to configure your key.")
+    """List the models the configured provider offers."""
+    if not is_configured():
+        console.print("[bold red]No provider configured. Run 'smart-shell setup'.[/bold red]")
         return
-
+    config = load_config()
     try:
-        wrapper = get_wrapper(api_key)
-        models = wrapper.list_available_models()
-        
-        display_banner()
-        
-        # Use the new model info system to display comprehensive model information
-        model_info.display_model_table(models)
-        
-        console.print("\n[bold green]Usage Examples:[/bold green]")
-        console.print("  smart-shell run --model gemini-2.5-flash \"list all files\"")
-        console.print("  smart-shell run --model gemini-2.5-pro \"complex analysis task\"")
-        
-        console.print("\n[bold yellow]💡 Tips:[/bold yellow]")
-        console.print("  • Use [cyan]gemini-2.5-flash[/cyan] for fast, everyday commands (free)")
-        console.print("  • Use [cyan]gemini-2.5-pro[/cyan] for complex analysis (premium)")
-        console.print("  • Switch models in interactive mode with [cyan]!model <name>[/cyan]")
-        
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {str(e)}")
+        models = get_client(config).list_models()
+    except AIError as e:
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        return
+    current = config.get("default_model", "")
+    console.print(f"\n[bold blue]Models from {config.get('provider', 'gemini')}:[/bold blue]")
+    for name in models:
+        marker = "[green]*[/green]" if name == current.removeprefix("models/") else " "
+        console.print(f" {marker} {name}")
+    console.print("\nSwitch for one run with [cyan]--model <name>[/cyan] or in interactive mode with [cyan]!model <name>[/cyan].")
 
 @cli.command()
 @click.argument("prompt", nargs=-1)
@@ -91,12 +79,11 @@ def run(prompt, dry_run, model, interactive, yes):
     # Load configuration
     config = load_config()
     
-    # Check for API key in environment or config
-    api_key = os.environ.get(ENV_API_KEY) or config.get("api_key")
-    if not api_key:
-        console.print("[bold red]No API key found. Run 'smart-shell setup' to configure.[/bold red]")
-        console.print(f"Alternatively, set the {ENV_API_KEY} environment variable.")
+    if not is_configured(config):
+        console.print("[bold red]No AI provider configured. Run 'smart-shell setup' to configure.[/bold red]")
+        console.print(f"Alternatively, set the {ENV_API_KEY} environment variable for Gemini.")
         return
+    client = get_client(config)
 
     # Detect shell type
     shell_type = detect_shell()
@@ -105,7 +92,7 @@ def run(prompt, dry_run, model, interactive, yes):
         console.print(f"[bold blue]Detected shell:[/bold blue] {shell_type}")
     
     if interactive:
-        run_interactive_mode(dry_run, model, api_key, config, yes, shell_type)
+        run_interactive_mode(dry_run, model, client, config, yes, shell_type)
         return
     
     if not prompt:
@@ -118,16 +105,16 @@ def run(prompt, dry_run, model, interactive, yes):
 
     # Generate command from natural language
     user_prompt = " ".join(prompt)
-    process_prompt(user_prompt, dry_run, model, api_key, config, yes)
+    process_prompt(user_prompt, dry_run, model, client, config, yes)
 
-def process_prompt(user_prompt, dry_run, model, api_key, config, auto_yes=False):
+def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False):
     """Process a single user prompt."""
     console.print(f"\n[bold blue]Prompt:[/bold blue] {user_prompt}")
     
     try:
         # Generate a command plan (list of commands)
         console.print("[blue]Generating execution plan...[/blue]")
-        command_plan = generate_command_plan(user_prompt, api_key, model, os_info=get_os_info())
+        command_plan = generate_command_plan(user_prompt, client, resolve_model(client, model, config), os_info=get_os_info())
 
         if not command_plan:
             console.print("[yellow]The AI returned an empty plan. This could be due to a safety block or an impossible request. Please try again.[/yellow]")
@@ -211,10 +198,10 @@ def process_prompt(user_prompt, dry_run, model, api_key, config, auto_yes=False)
         return False
     except Exception as e:
         console.print(f"[bold red]Error:[/bold red] {str(e)}")
-        console.print("[yellow]If this is an API error, check your API key and internet connection.[/yellow]")
+        console.print("[yellow]If this is an API error, check 'smart-shell setup' and that the provider is reachable.[/yellow]")
         return False
 
-def run_interactive_mode(dry_run, model, api_key, config, auto_yes=False, shell_type="bash"):
+def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_type="bash"):
     """Run Smart-Shell in interactive mode until user exits."""
     # Set up history directory
     os.makedirs(HISTORY_DIR, exist_ok=True)
@@ -242,13 +229,17 @@ def run_interactive_mode(dry_run, model, api_key, config, auto_yes=False, shell_
     signal.signal(signal.SIGINT, signal_handler)
     
     # Main interactive loop
-    current_model = model or get_current_model()
+    try:
+        current_model = resolve_model(client, model, config)
+    except AIError as e:
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        return
     try:
         while True:
             # Get user input with enhanced prompt showing current model
             try:
                 # Extract model name for display (remove 'models/' prefix if present)
-                display_model = current_model.replace('models/', '') if current_model else 'gemini-2.5-flash'
+                display_model = current_model.removeprefix('models/')
                 
                 # Create a truly protected prompt using a custom approach
                 def get_protected_input():
@@ -303,7 +294,7 @@ def run_interactive_mode(dry_run, model, api_key, config, auto_yes=False, shell_
                 continue
                 
             # Process the prompt
-            process_prompt(user_prompt, dry_run, current_model, api_key, config, auto_yes)
+            process_prompt(user_prompt, dry_run, current_model, client, config, auto_yes)
             
     except Exception as e:
         console.print(f"\n[bold red]Error in interactive mode:[/bold red] {str(e)}")
@@ -323,53 +314,11 @@ def handle_special_command(command, current_model):
         show_help()
     elif cmd == "!models":
         display_models()
-    elif cmd == "!models refresh":
-        # Refresh model information from web
-        console.print("[blue]Refreshing model information from web sources...[/blue]")
-        model_info.refresh_model_info()
-        display_models()
-    elif cmd.startswith("!models "):
-        # Handle filtered model display
-        parts = cmd.split(" ", 1)
-        if len(parts) > 1:
-            filter_type = parts[1].strip().lower()
-            
-            if filter_type == "refresh":
-                model_info.refresh_model_info()
-                display_models()
-                return current_model
-            
-            try:
-                wrapper = get_wrapper(os.environ.get(ENV_API_KEY) or load_config().get("api_key"))
-                models = wrapper.list_available_models()
-                
-                if filter_type in ["free", "premium", "legacy"]:
-                    console.print(f"\n[bold blue]{filter_type.title()} Models:[/bold blue]")
-                    model_info.display_model_table(models, filter_type)
-                else:
-                    console.print("[yellow]Unknown filter. Use: !models free, !models premium, !models legacy, or !models refresh[/yellow]")
-            except Exception as e:
-                console.print(f"[red]Error fetching models: {e}[/red]")
-        else:
-            display_models()
     elif cmd.startswith("!model "):
-        parts = cmd.split(" ", 1)
-        if len(parts) > 1:
-            new_model = parts[1].strip()
-            
-            # Check if switching to a premium model and show detailed warning
-            if model_info.is_premium_model(new_model):
-                if not model_info.show_premium_warning(new_model):
-                    console.print("[yellow]Model switch cancelled.[/yellow]")
-                    return current_model
-            
-            # Show model information
-            model_info.show_model_info(new_model)
-            console.print(f"\n[green]✓ Switched to model: {new_model}[/green]")
-            return new_model
-        else:
-            console.print("[yellow]Please specify a model name. Example: !model gemini-2.5-flash[/yellow]")
-            console.print("[yellow]Use !models to see available models.[/yellow]")
+        # Keep the original case: model ids like Qwen/Qwen2.5 are case-sensitive.
+        new_model = command.strip().split(" ", 1)[1].strip()
+        console.print(f"[green]✓ Switched to model: {new_model}[/green]")
+        return new_model
     elif cmd == "!forget-sudo":
         reset_sudo_password()
         console.print("[green]Sudo credentials cleared.[/green]")
@@ -385,8 +334,6 @@ def handle_special_command(command, current_model):
         redo_last_command()
     elif cmd == "!errors":
         show_error_log()
-    elif cmd == "!web":
-        toggle_web_search()
     else:
         console.print(f"[yellow]Unknown special command: {command}[/yellow]")
     
@@ -414,7 +361,6 @@ Examples:
 - `!models` - List available models
 - `!last` - Show the last generated command
 - `!redo` - Re-execute the last command
-- `!web` - Toggle web search for commands
 - `!update` - Check for updates and install
 - `!errors` - Show the error log
 - `!forget-sudo` - Clear cached sudo credentials
@@ -435,7 +381,7 @@ Commands are checked for safety before execution:
 - `smart-shell --version` — Show version information
 - `smart-shell run <prompt>` — Run a one-off natural language command
 - `smart-shell --interactive` — Start interactive mode
-- `smart-shell setup` — Configure API key and settings
+- `smart-shell setup` — Configure provider, API key and model
 - `smart-shell models` — List available models
 - `smart-shell history` — Show command history
 
@@ -557,25 +503,16 @@ def setup():
 def version():
     """Show version information."""
     display_banner()
-    console.print("[bold]Smart-Shell v1.0.0[/bold]")
+    console.print(f"[bold]Smart-Shell v{get_current_version()}[/bold]")
     console.print("An intelligent terminal assistant for Bash or Zsh commands")
-    console.print("Powered by Google Gemini")
+    console.print("Works with Gemini, OpenAI, DeepSeek, Ollama and any OpenAI-compatible API")
 
 @click.command('help', context_settings=dict(ignore_unknown_options=True, allow_extra_args=True))
 def cli_help():
     """Show CLI help information."""
     click.echo(cli.get_help(click.Context(cli)))
 
-@click.command('version')
-def cli_version():
-    """Show version information."""
-    display_banner()
-    console.print("[bold]Smart-Shell v1.0.0[/bold]")
-    console.print("An intelligent terminal assistant for Bash or Zsh commands")
-    console.print("Powered by Google Gemini")
-
 cli.add_command(cli_help)
-cli.add_command(cli_version)
 
 @cli.command()
 def history():
@@ -658,27 +595,10 @@ def handle_update_command():
         log_error(f"Update error: {e}")
 
 def get_current_version():
-    """Get the current version from pyproject.toml or package metadata."""
+    """Get the installed package version."""
     try:
-        # Try to find pyproject.toml in project root
-        project_root = find_project_root()
-        if project_root:
-            pyproject_file = project_root / "pyproject.toml"
-            if pyproject_file.exists():
-                with open(pyproject_file, 'r') as f:
-                    pyproject_data = toml.load(f)
-                    return pyproject_data.get('project', {}).get('version', 'unknown')
-        
-        # Fallback: try to get from installed package
-        import subprocess
-        result = subprocess.run(["pip", "show", "smart-shell"], capture_output=True, text=True)
-        if result.returncode == 0:
-            for line in result.stdout.split('\n'):
-                if line.startswith('Version:'):
-                    return line.split(':')[1].strip()
-        
-        return "unknown"
-    except Exception:
+        return importlib.metadata.version("smart-shell")
+    except importlib.metadata.PackageNotFoundError:
         return "unknown"
 
 def get_latest_github_version():
@@ -696,8 +616,8 @@ def get_latest_github_version():
         url = "https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/pyproject.toml"
         response = requests.get(url, timeout=10)
         if response.status_code == 200:
-            pyproject_data = toml.loads(response.text)
-            return pyproject_data.get('project', {}).get('version', None)
+            match = re.search(r'^version\s*=\s*"([^"]+)"', response.text, re.M)
+            return match.group(1) if match else None
         
         return None
     except Exception as e:
@@ -917,28 +837,3 @@ def show_error_log():
             
     except Exception as e:
         console.print(f"[red]Error reading error log: {e}[/red]")
-
-def toggle_web_search():
-    """Toggle web search functionality - Advanced feature for enhanced command intelligence."""
-    console.print("[bold cyan]🌐 Web-Enhanced Command Intelligence[/bold cyan]")
-    console.print("[blue]Smart-Shell's AI already leverages web knowledge for command generation![/blue]")
-    console.print("[green]✓ Current capabilities:[/green]")
-    console.print("  • Knowledge of modern command-line tools and techniques")
-    console.print("  • Best practices from documentation and community")
-    console.print("  • Cross-platform compatibility awareness")
-    console.print("  • Package installation methods for various distributions")
-    console.print("[yellow]🚧 Future enhancements:[/yellow]")
-    console.print("  • Real-time documentation lookup")
-    console.print("  • Live package version checking")  
-    console.print("  • Community command examples integration")
-    console.print("[dim]Smart-Shell is already a powerful, web-informed tool![/dim]")
-
-def is_premium_model(model_name):
-    """Check if a model is a premium model that may incur costs."""
-    premium_models = [
-        "gemini-2.5-pro", 
-        "models/gemini-2.5-pro",
-        "gemini-pro",  # Add other premium models as needed
-        "models/gemini-pro"
-    ]
-    return any(premium.lower() in model_name.lower() for premium in premium_models)

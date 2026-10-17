@@ -2,130 +2,104 @@
 Setup Logic Module - Handles all interactive setup for Smart-Shell.
 """
 
-import os
 from rich.console import Console
 from rich.prompt import Prompt, Confirm
 from rich.panel import Panel
 
-# Import necessary functions from other modules
-from .ai_wrapper import validate_api_key, get_wrapper
-from .utils import log_error
-from .config import load_config, save_config
-from .model_info import model_info
+from .ai_wrapper import PROVIDERS, ENV_BASE_URL, AIClient, AIError
+from .config import load_config, save_config, ENV_API_KEY
 
 console = Console()
-ENV_API_KEY = "SMART_SHELL_API_KEY"
 
 def setup_config():
-    """Interactive configuration setup for API key and default model."""
+    """Interactive configuration setup for provider, API key and default model."""
     console.print(Panel.fit(
         "Welcome to Smart-Shell setup!\n"
-        "This will guide you through setting up your API key and default model.",
+        "Pick an AI provider (cloud or local), then a default model.",
         title="Smart-Shell Setup",
         border_style="blue"
     ))
-    
-    config = load_config()
-    
-    if not setup_api_key(config):
-        console.print("[red]API key setup is required. Exiting setup.[/red]")
-        return
-        
-    api_key = os.environ.get(ENV_API_KEY) or config.get("api_key")
-    if api_key:
-        set_default_model(api_key, config)
 
+    config = load_config()
+    client = setup_provider(config)
+    if not client:
+        console.print("[red]Provider setup did not complete. Nothing saved.[/red]")
+        return
+
+    set_default_model(client, config)
     save_config(config)
-    console.print(f"\n[bold]Reminder:[/bold] You can also set your API key via the {ENV_API_KEY} environment variable.")
+    console.print(f"\n[bold]Reminder:[/bold] {ENV_API_KEY} and {ENV_BASE_URL} override the saved key and URL.")
     console.print("\n[green]Setup complete![/green]")
 
-def setup_api_key(config):
-    """Handles the API key part of the setup."""
-    env_key = os.environ.get(ENV_API_KEY)
-    if env_key:
-        console.print(f"[green]API key found in {ENV_API_KEY} environment variable.[/green]")
-    
-    current_key = config.get("api_key", "")
-    console.print("\n[bold]API Key Configuration[/bold]")
-    
-    if current_key:
-        masked_key = f"****{current_key[-4:]}"
-        console.print(f"An API key is already configured ({masked_key}).")
-        if not Confirm.ask("Do you want to change it?", choices=["y", "n"], default="n"):
-            return True
-    
-    while True:
-        api_key = Prompt.ask("Enter your Gemini API key", password=True)
-        if not api_key:
-            continue
-        
-        # Ask if user wants to see the API key for verification
-        if Confirm.ask("Do you want to see the API key you entered for verification?", choices=["y", "n"], default="n"):
-            console.print(f"[dim]API key entered: {api_key}[/dim]")
-        
-        # Basic format check before validation
-        if not api_key.startswith('AIza') or len(api_key) < 35:
-            console.print("[yellow]⚠️  Warning: This doesn't look like a typical Gemini API key format.[/yellow]")
-            console.print("   Gemini API keys usually start with 'AIza' and are ~39 characters long.")
-            if not Confirm.ask("Do you want to continue with validation anyway?", choices=["y", "n"], default="y"):
-                continue
-        
-        console.print("[blue]Validating API key...[/blue]")
-        is_valid, message = validate_api_key(api_key)
-        
-        if is_valid:
-            console.print(f"[green]✓ {message}[/green]")
-            config["api_key"] = api_key
-            return True
-        else:
-            console.print(f"[bold red]✗ Validation failed: {message}[/bold red]")
-            
-            # Provide helpful guidance for common API key issues
-            if "API key not valid" in message or "INVALID_ARGUMENT" in message:
-                console.print("[yellow]💡 API Key Help:[/yellow]")
-                console.print("   • Make sure you're using a [bold]Gemini API key[/bold] (not other Google APIs)")
-                console.print("   • Get your key from: [blue]https://makersuite.google.com/app/apikey[/blue]")
-                console.print("   • Ensure the key starts with 'AIza' and is about 40 characters long")
-                console.print("   • Check that Generative AI API is enabled in your Google Cloud project")
-            
-            if not Confirm.ask("Do you want to try again?", choices=["y", "n"], default="y"):
-                return False
+def setup_provider(config):
+    """Ask for provider, base URL and API key; return a working client or None."""
+    names = list(PROVIDERS) + ["custom"]
+    console.print("\n[bold]Providers:[/bold]")
+    for i, name in enumerate(names, 1):
+        where = "local" if name in ("ollama", "lmstudio") else "any OpenAI-compatible URL" if name == "custom" else "cloud"
+        console.print(f"  [cyan]{i}[/cyan]: {name} [dim]({where})[/dim]")
+    # Configs from before multi-provider support are Gemini.
+    current = config.get("provider", "gemini" if config.get("api_key") else None)
+    default = str(names.index(current) + 1) if current in names else "1"
+    provider = names[int(Prompt.ask("Choose a provider", choices=[str(i) for i in range(1, len(names) + 1)],
+                                    default=default, show_choices=False)) - 1]
 
-def set_default_model(api_key, config):
+    if provider == "custom":
+        base_url = Prompt.ask("Base URL (e.g. http://localhost:8080/v1)", default=config.get("base_url") or None)
+        needs_key = Confirm.ask("Does it need an API key?", default=False)
+    else:
+        base_url, _, needs_key = PROVIDERS[provider]
+        base_url = Prompt.ask("Base URL", default=base_url)
+
+    # Only offer to keep the saved key if it belongs to this provider.
+    kept = config.get("api_key") if current == provider else None
+    while True:
+        api_key = None
+        if needs_key:
+            hint = f" (enter to keep ****{kept[-4:]})" if kept else ""
+            api_key = Prompt.ask(f"API key for {provider}{hint}", password=True, default=kept or "", show_default=False)
+            if not api_key:
+                continue
+
+        client = AIClient(base_url, api_key)
+        console.print("[blue]Checking connection...[/blue]")
+        try:
+            client.list_models()
+        except AIError as e:
+            console.print(f"[bold red]✗ {e}[/bold red]")
+            if provider == "ollama":
+                console.print("[yellow]Is Ollama running? Start it with: ollama serve[/yellow]")
+            if not Confirm.ask("Try again?", default=True):
+                return None
+            continue
+
+        console.print("[green]✓ Connected.[/green]")
+        config["provider"] = provider
+        config["base_url"] = base_url
+        if api_key:
+            config["api_key"] = api_key
+        else:
+            config.pop("api_key", None)
+        return client
+
+def set_default_model(client, config):
     """Asks the user to select a default model and saves it to the config."""
-    if not Confirm.ask("\nWould you like to set a default model now?", choices=["y", "n"], default="y"):
+    config.pop("default_model", None)
+    try:
+        models = client.list_models()
+    except AIError as e:
+        console.print(f"[bold red]Could not list models: {e}[/bold red]")
+        return
+    if not models:
+        console.print("[yellow]No models available. For Ollama, pull one: ollama pull qwen2.5-coder[/yellow]")
         return
 
-    try:
-        wrapper = get_wrapper(api_key)
-        models = wrapper.list_available_models()
-        if not models:
-            console.print("[red]Could not retrieve any models from the API.[/red]")
-            return
-
-        # Display models with detailed information
-        console.print("\n[bold blue]Available Models:[/bold blue]")
-        model_info.display_model_table(models)
-
-        model_choices = [name.replace('models/', '') for name in models]
-        console.print("\nPlease select a default model from the list above:")
-        for i, model_name in enumerate(model_choices, 1):
-            details = model_info.get_model_details(model_name)
-            model_type = details.get('type', 'unknown')
-            type_emoji = '🆓' if model_type == 'free' else '💎' if model_type == 'premium' else '📦'
-            console.print(f"  [cyan]{i}[/cyan]: {model_name} {type_emoji}")
-
-        choice = Prompt.ask("Enter the number of your choice", choices=[str(i) for i in range(1, len(model_choices) + 1)], show_choices=False)
-        selected_model_name = models[int(choice) - 1]
-        
-        # Check if it's a premium model and warn user
-        if model_info.is_premium_model(selected_model_name):
-            if not model_info.show_premium_warning(selected_model_name):
-                console.print("[yellow]Keeping current default model.[/yellow]")
-                return
-        
-        config["default_model"] = selected_model_name
-        console.print(f"[green]✓ '{selected_model_name}' has been set as your default model.[/green]")
-    except Exception as e:
-        console.print(f"[bold red]Could not set default model: {e}[/bold red]")
-        log_error(f"Failed during default model setup: {e}") 
+    console.print("\n[bold blue]Available Models:[/bold blue]")
+    for i, name in enumerate(models, 1):
+        console.print(f"  [cyan]{i}[/cyan]: {name}")
+    preferred = PROVIDERS.get(config["provider"], (None, None, None))[1]
+    default = str(models.index(preferred) + 1) if preferred in models else "1"
+    choice = Prompt.ask("Default model", choices=[str(i) for i in range(1, len(models) + 1)],
+                        default=default, show_choices=False)
+    config["default_model"] = models[int(choice) - 1]
+    console.print(f"[green]✓ '{config['default_model']}' is now your default model.[/green]")

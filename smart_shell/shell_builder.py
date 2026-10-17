@@ -3,8 +3,6 @@ Shell Builder Module - Generates shell commands from natural language prompts.
 """
 
 import os
-import sys
-import time
 import re
 import json
 from rich.console import Console
@@ -16,9 +14,6 @@ from rich.prompt import Confirm
 from rich.table import Table
 from rich.box import ROUNDED, DOUBLE, HEAVY
 from rich.columns import Columns
-
-# Import our AI wrapper
-from .ai_wrapper import get_wrapper
 
 console = Console()
 
@@ -34,22 +29,18 @@ BANNER = r"""
   Natural Language → Bash/Zsh Commands
 """
 
-# Maximum number of retries for command generation
-MAX_RETRIES = 3
-# Delay between retries (in seconds)
-RETRY_DELAY = 2
+# Retries when the model's reply is not valid JSON (network retries live in the client)
+MAX_RETRIES = 2
 
-def generate_command_plan(prompt, api_key, model=None, os_info=None, shell_type=None, max_retries=MAX_RETRIES):
+def generate_command_plan(prompt, client, model, os_info=None):
     """
     Generates a sequence of shell commands (a plan) from a natural language prompt.
 
     Args:
         prompt (str): Natural language prompt.
-        api_key (str): API key for Gemini.
-        model (str, optional): Model to use. Defaults to None.
+        client (AIClient): Client for the configured provider.
+        model (str): Model to use.
         os_info (dict, optional): Information about the user's OS.
-        shell_type (str, optional): The user's shell ("bash" or "zsh").
-        max_retries (int, optional): Maximum number of retries. Defaults to MAX_RETRIES.
 
     Returns:
         list[str]: A list of shell commands.
@@ -120,66 +111,29 @@ def generate_command_plan(prompt, api_key, model=None, os_info=None, shell_type=
     Response: {{"commands": ["python3 -m venv venv", "source venv/bin/activate", "pip install --upgrade pip", "pip install black flake8 pytest", "echo 'venv/' >> .gitignore", "echo 'Development environment ready! Activate with: source venv/bin/activate'"]}}
     """
 
-    retries = 0
-    last_error = "Unknown error occurred"
+    last_error = None
+    for _ in range(MAX_RETRIES + 1):
+        raw_text = client.chat(model, system_prompt, prompt)
+        if not raw_text:
+            raise ValueError("The AI model returned an empty response. Please try rephrasing your request.")
 
-    while retries <= max_retries:
+        json_match = re.search(r'\{.*\}', raw_text, re.DOTALL)
+        if not json_match:
+            last_error = "The AI model did not return a valid JSON object."
+            continue
         try:
-            wrapper = get_wrapper(api_key)
-            model_to_use = model if model else "models/gemini-2.5-flash"
-            model_obj = wrapper.get_model(model_to_use)
-
-            response = wrapper.generate_content(
-                model_obj,
-                [system_prompt, prompt],
-                retry=True,
-                temperature=0.3,  # Optimal balance of creativity and precision
-                top_p=0.95,       # High diversity for comprehensive solutions
-                top_k=60,         # More options for advanced command generation
-                max_output_tokens=3000,  # Generous limit for complex multi-step operations
-            )
-
-            raw_text = None
-            if response and hasattr(response, 'text') and response.text:
-                raw_text = response.text.strip()
-            
-            if not raw_text:
-                from .utils import log_error
-                log_error(f"AI model returned an empty response. Full response object: {response}")
-                raise ValueError("The AI model returned an empty response. This may be due to a safety filter or an unclear prompt. Please try rephrasing your request.")
-            
-            # Find the JSON part of the response
-            json_match = re.search(r'\{.*\}', raw_text, re.DOTALL)
-            if not json_match:
-                raise ValueError("The AI model did not return a valid JSON object.")
-            
             parsed_json = json.loads(json_match.group(0))
-
-            if "reason" in parsed_json and not parsed_json.get("commands"):
-                raise Exception(f"Request blocked by AI for safety: {parsed_json['reason']}")
-
-            commands = parsed_json.get("commands", [])
-            if not isinstance(commands, list) or not all(isinstance(cmd, str) for cmd in commands):
-                raise ValueError("The AI model returned an invalid command structure.")
-            
-            return commands
-
         except json.JSONDecodeError:
-            last_error = "Failed to decode the AI's response as JSON. Retrying..."
-            retries += 1
-            time.sleep(RETRY_DELAY)
-        except Exception as e:
-            last_error = str(e)
-            error_msg = last_error.lower()
-            if "quota" in error_msg or "rate limit" in error_msg or "network" in error_msg or "connection" in error_msg or "timeout" in error_msg or "internet" in error_msg:
-                if retries >= max_retries:
-                    break
-                console.print(f"[yellow]Error: {last_error}[/yellow]")
-                console.print(f"[yellow]Retrying ({retries+1}/{max_retries})...[/yellow]")
-                time.sleep(RETRY_DELAY)
-                retries += 1
-            else:
-                break
+            last_error = "Failed to decode the AI's response as JSON."
+            continue
+
+        if "reason" in parsed_json and not parsed_json.get("commands"):
+            raise Exception(f"Request blocked by AI for safety: {parsed_json['reason']}")
+
+        commands = parsed_json.get("commands", [])
+        if not isinstance(commands, list) or not all(isinstance(cmd, str) for cmd in commands):
+            raise ValueError("The AI model returned an invalid command structure.")
+        return commands
 
     raise Exception(f"Error generating command plan: {last_error}")
 
@@ -204,7 +158,7 @@ def display_banner():
         padding=(1, 2),
         title="[bold white]Smart-Shell[/bold white]",
         title_align="center",
-        subtitle="[bold white]Powered by Google Gemini[/bold white]",
+        subtitle="[bold white]Any OpenAI-compatible model, local or cloud[/bold white]",
         subtitle_align="center"
     )
     
@@ -241,12 +195,12 @@ Type your requests in natural language to convert them into shell commands.
   [cyan]!update[/cyan] - Check for updates
 
 [bold green]Configuration Commands:[/bold green]
-  [green]smart-shell setup[/green] - Configure API key    [green]smart-shell version[/green] - Show version
+  [green]smart-shell setup[/green] - Configure provider   [green]smart-shell version[/green] - Show version
   [green]smart-shell --help[/green] - Show CLI help      [green]smart-shell models[/green] - List models
 
 [bold yellow]Exit Commands:[/bold yellow] [cyan]exit[/cyan], [cyan]quit[/cyan], [cyan]bye[/cyan], [cyan]q[/cyan], or [cyan]Ctrl+C[/cyan]
 
-[italic]Note: Commands are safety-checked before execution. Premium models may incur costs.
+[italic]Note: Commands are safety-checked before execution. Cloud providers may bill per request.
 Configuration commands should be run outside Smart-Shell (exit first).[/italic]"""
     
     # Main welcome panel with all information in one block
