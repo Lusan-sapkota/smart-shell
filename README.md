@@ -66,7 +66,7 @@ Details in [docs/uninstall.md](docs/uninstall.md).
 - [Contributing](docs/contributing.md)
 - [Author](docs/author.md)
 
-Full documentation: [lusan-sapkota.github.io/smart-shell](https://smart-shell.lusansapkota.com.np/).
+Full documentation: [smart-shell.lusansapkota.com.np](https://smart-shell.lusansapkota.com.np/).
 
 ## License
 
