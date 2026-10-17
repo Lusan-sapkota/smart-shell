@@ -5,9 +5,7 @@ Smart-Shell - An intelligent terminal assistant that converts natural language i
 import sys
 import os
 import click
-import signal
-import readline
-import atexit
+from html import escape
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt, Confirm
@@ -21,6 +19,7 @@ from .utils import execute_command, print_plan_preview, reset_sudo_password, ERR
 from .ai_wrapper import PROVIDERS, get_client, resolve_model, is_configured, override_provider, AIError
 from .history import HISTORY_DIR, save_to_history, update_history_result, show_command_history, show_last_command, redo_last_command
 from .updater import handle_update_command, get_current_version
+from .ui import COMMANDS, make_reader
 
 console = Console()
 
@@ -69,7 +68,7 @@ def display_models():
     for name in models:
         marker = "[green]*[/green]" if name == current.removeprefix("models/") else " "
         console.print(f" {marker} {name}")
-    console.print("\nSwitch for one run with [cyan]--model <name>[/cyan] or in interactive mode with [cyan]!model <name>[/cyan].")
+    console.print("\nSwitch for one run with [cyan]--model <name>[/cyan] or in interactive mode with [cyan]/model <name>[/cyan].")
 
 @cli.command()
 @click.argument("prompt", nargs=-1)
@@ -198,125 +197,97 @@ def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry):
 
 
 def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_type="bash"):
-    """Run Smart-Shell in interactive mode until user exits."""
+    """Run Smart-Shell in interactive mode until the user exits."""
     os.makedirs(HISTORY_DIR, exist_ok=True)
-    
-    readline_history_file = os.path.join(HISTORY_DIR, "readline_history")
-    # A file from another readline build (GNU vs libedit) can be unreadable; keep it aside, don't fail or overwrite it.
-    try:
-        readline.read_history_file(readline_history_file)
-    except FileNotFoundError:
-        pass
-    except OSError:
-        os.replace(readline_history_file, readline_history_file + ".old")
-    readline.set_history_length(1000)
-
-    def save_input_history():
-        try:
-            readline.write_history_file(readline_history_file)
-        except OSError:
-            pass
-    atexit.register(save_input_history)
-    
-    
-    def signal_handler(sig, frame):
-        console.print("\n[green]Exiting Smart-Shell. Goodbye![/green]")
-        sys.exit(0)
-    
-    signal.signal(signal.SIGINT, signal_handler)
-    
     try:
         current_model = resolve_model(client, model, config)
     except AIError as e:
         console.print(f"[bold red]Error:[/bold red] {e}")
         return
-    console.print(f"[bold cyan]Smart-Shell[/bold cyan] v{get_current_version()}  "
-                  f"[dim]{config.get('provider', 'gemini')}:{current_model}  {shell_type}[/dim]")
-    console.print("[dim]Describe what you want to do. !help for commands, exit to quit.[/dim]")
-    session = []
-    try:
-        while True:
-            try:
-                display_model = current_model.removeprefix('models/')
-                
-                def get_protected_input():
-                    try:
-                        prompt_text = f"\nSmart-Shell ({display_model}): "
-                        line = input(prompt_text)
-                        return line.rstrip()
-                    except KeyboardInterrupt:
-                        raise
-                    except EOFError:
-                        raise
-                
-                user_prompt = get_protected_input()
-                
-                if user_prompt:  # Only add non-empty prompts to history
-                    readline.add_history(user_prompt)
-            except EOFError:
-                console.print("\n[green]Exiting Smart-Shell. Goodbye![/green]")
-                break
-            
-            if user_prompt.lower() in ["exit", "quit", "bye", "q"]:
-                console.print("[green]Exiting Smart-Shell. Goodbye![/green]")
-                break
-            
-            if not user_prompt or not user_prompt.strip():
-                continue
-            
-            if user_prompt.startswith("!"):
-                current_model = handle_special_command(user_prompt, current_model, client)
-                continue
-                
-            process_prompt(user_prompt, dry_run, current_model, client, config, auto_yes, session)
-            
-    except Exception as e:
-        console.print(f"\n[bold red]Error in interactive mode:[/bold red] {str(e)}")
-        console.print("[green]Exiting Smart-Shell.[/green]")
-        return
 
-def handle_special_command(command, current_model, client):
-    """Handle special commands in interactive mode."""
-    cmd = command.lower().strip()
-    
-    if cmd == "!history":
+    state = {"model": current_model, "dry_run": dry_run}
+    provider = config.get("provider", "gemini")
+
+    def status():
+        cwd = os.getcwd().replace(os.path.expanduser("~"), "~", 1)
+        dry = " · <b>dry run</b>" if state["dry_run"] else ""
+        return (f" {escape(provider)}:{escape(state['model'])} · {shell_type} · {escape(cwd)}{dry}"
+                f"   <key>/</key> commands · <key>Esc Enter</key> new line · <key>Ctrl+D</key> quit")
+
+    read = make_reader(os.path.join(HISTORY_DIR, "input_history"), client.list_models, status)
+    console.print(f"[bold cyan]Smart-Shell[/bold cyan] v{get_current_version()}  "
+                  f"[dim]{provider}:{current_model}  {shell_type}[/dim]", highlight=False)
+    console.print("[dim]Describe what you want to do. Type / for commands.[/dim]", highlight=False)
+
+    session = []
+    while True:
+        try:
+            user_prompt = read().strip()
+        except EOFError:
+            break
+        if not user_prompt:
+            continue
+        if user_prompt.lower() in ("exit", "quit", "bye", "q", "/exit", "/quit"):
+            break
+        if user_prompt[0] in "/!":
+            handle_special_command(user_prompt, state, client)
+            continue
+        try:
+            process_prompt(user_prompt, state["dry_run"], state["model"], client, config, auto_yes, session)
+        except KeyboardInterrupt:
+            console.print("\n[yellow]Interrupted.[/yellow]")
+    console.print("[green]Goodbye![/green]")
+
+
+def handle_special_command(command, state, client):
+    """Handle a /command (the older !command spelling still works)."""
+    name, _, arg = command.strip().partition(" ")
+    name = "/" + name[1:].lower()
+    arg = arg.strip()
+
+    if name == "/history":
         show_command_history()
-    elif cmd == "!clear":
-        os.system("clear" if os.name == "posix" else "cls")
-    elif cmd == "!help":
+    elif name == "/clear":
+        os.system("clear")
+    elif name == "/help":
         show_help()
-    elif cmd == "!models":
+    elif name == "/models":
         display_models()
-    elif cmd.startswith("!model "):
+    elif name == "/model":
+        if not arg:
+            console.print(f"Current model: {state['model']}. Use /model <name>; /models lists them.")
+            return
         # Keep the original case: model ids like Qwen/Qwen2.5 are case-sensitive.
-        new_model = command.strip().split(" ", 1)[1].strip()
-        console.print(f"[green]✓ Switched to model: {new_model}[/green]")
-        return new_model
-    elif cmd.startswith("!explain "):
-        target = command.strip().split(" ", 1)[1].strip()
-        safety = check_command_safety(target)
+        state["model"] = arg
+        console.print(f"[green]✓ Switched to model: {arg}[/green]")
+    elif name == "/dry":
+        state["dry_run"] = not state["dry_run"]
+        console.print(f"Dry run is {'on: plans are shown, nothing runs' if state['dry_run'] else 'off'}.")
+    elif name == "/explain" and arg:
+        safety = check_command_safety(arg)
         console.print(f"[bold]Safety level:[/bold] {safety['status'].upper()} ({safety['notes']})")
         try:
-            console.print(explain_command(client, current_model, target))
+            with console.status("Explaining..."):
+                text = explain_command(client, state["model"], arg)
+            console.print(text)
         except AIError as e:
             console.print(f"[bold red]Error:[/bold red] {e}")
-    elif cmd == "!forget-sudo":
+    elif name == "/forget-sudo":
         reset_sudo_password()
         console.print("[green]Sudo credentials cleared.[/green]")
-    elif cmd == "!docs":
+    elif name == "/docs":
         console.print("[bold blue]Documentation:[/bold blue] https://smart-shell.lusansapkota.com.np/")
-    elif cmd == "!update":
+    elif name == "/update":
         handle_update_command()
-    elif cmd == "!last":
+    elif name == "/last":
         show_last_command()
-    elif cmd == "!redo":
+    elif name == "/redo":
         redo_last_command()
-    elif cmd == "!errors":
+    elif name == "/errors":
         show_error_log()
     else:
-        console.print(f"[yellow]Unknown special command: {command}[/yellow]")
-    
-    return current_model
+        console.print(f"[yellow]Unknown command: {command}. Type / to see commands.[/yellow]")
+
 
 def show_help():
     """Show help information in interactive mode."""
@@ -332,22 +303,14 @@ Examples:
 - "Find large files over 100MB"
 - "Create a backup of my project folder"
 
-## Special Commands (Interactive Mode)
-- `!history` - Show command history
-- `!clear` - Clear the screen
-- `!help` - Show this help
-- `!model <model-name>` - Change the AI model
-- `!models` - List available models
-- `!explain <command>` - Explain what a command does
-- `!last` - Show the last generated command
-- `!redo` - Re-execute the last command
-- `!update` - Check for updates and install
-- `!errors` - Show the error log
-- `!forget-sudo` - Clear cached sudo credentials
-- `!docs` - Show link to documentation
+## Commands
+{{commands}}
 
-## Exiting
-Type `exit`, `quit`, `bye`, `q` or press Ctrl+C to exit.
+## Keys
+- `Tab` or arrow keys - pick from the / command menu
+- `Esc` then `Enter` - new line in your request
+- `Up` / `Ctrl+R` - previous requests / search them
+- `Ctrl+C` - clear the line; `Ctrl+D` or `/exit` - quit
 
 ## Safety
 Every step is checked before execution:
@@ -369,7 +332,7 @@ Every plan asks yes / no / edit before running. If it fails, you can ask the AI 
 
 For more, see the documentation or run `smart-shell --help`.
 """
-    md = Markdown(help_text)
+    md = Markdown(help_text.replace("{commands}", "\n".join(f"- `{c}` - {d}" for c, d in COMMANDS.items())))
     console.print(Panel(md, title="Smart-Shell Help", border_style="blue"))
 
 @cli.command()

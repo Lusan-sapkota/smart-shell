@@ -21,6 +21,7 @@ dependencies = [
     "rich",
     "click",
     "requests",
+    "prompt_toolkit>=3.0",
 ]
 
 [project.urls]

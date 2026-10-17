@@ -67,11 +67,18 @@ def execute_command(command: str) -> Tuple[bool, str]:
         # stderr is echoed live too, keeping the tail for the error hints below.
         process = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, executable=shell_executable)
         tail = b""
-        for chunk in iter(lambda: os.read(process.stderr.fileno(), 4096), b""):
-            sys.stderr.buffer.write(chunk)
-            sys.stderr.flush()
-            tail = (tail + chunk)[-4096:]
-        process.wait()
+        try:
+            for chunk in iter(lambda: os.read(process.stderr.fileno(), 4096), b""):
+                sys.stderr.buffer.write(chunk)
+                sys.stderr.flush()
+                tail = (tail + chunk)[-4096:]
+            process.wait()
+        except KeyboardInterrupt:
+            # Ctrl+C already reached the command (same process group); stop it, keep Smart-Shell running.
+            process.kill()
+            process.wait()
+            console.print("\n[yellow]Interrupted.[/yellow]")
+            return False, "interrupted by user"
         stderr_text = tail.decode(errors="replace")
 
         console.print("─" * console.width)
