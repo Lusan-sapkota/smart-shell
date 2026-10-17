@@ -234,7 +234,7 @@ install_smart_shell() {
             echo -e "Or use the quick install script (recommended):"
             echo -e "  curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash"
             echo -e "Then run: pipx install smart-shell again if prompted."
-            echo -e "See the FAQ: https://lusan-sapkota.github.io/smart-shell/faq/#pipx-or-pep668"
+            echo -e "See the FAQ: https://smart-shell.lusansapkota.com.np/faq/#pipx-or-pep668"
             exit 1
         fi
         echo -e "\n${BLUE}Installing with pipx (recommended)...${NC}"

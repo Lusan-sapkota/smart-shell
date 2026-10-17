@@ -312,7 +312,7 @@ def handle_special_command(command, current_model):
         reset_sudo_password()
         console.print("[green]Sudo credentials cleared.[/green]")
     elif cmd == "!docs":
-        console.print("[bold blue]Documentation:[/bold blue] https://lusan-sapkota.github.io/smart-shell/")
+        console.print("[bold blue]Documentation:[/bold blue] https://smart-shell.lusansapkota.com.np/")
     elif cmd == "!update":
         handle_update_command()
     elif cmd == "!creator":
