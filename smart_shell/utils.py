@@ -6,7 +6,7 @@ import os
 import sys
 import subprocess
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 from rich.console import Console
 from rich.table import Table
 from datetime import datetime
@@ -54,8 +54,8 @@ def detect_shell() -> str:
     else:
         return "bash"  # Default fallback
 
-def execute_command(command: str) -> bool:
-    """Execute a shell command, handling sudo and displaying output."""
+def execute_command(command: str) -> Tuple[bool, str]:
+    """Run a shell command with live output. Returns (success, tail of stderr)."""
     console.print(f"[bold green]Executing:[/bold green] {command}")
     console.print("─" * console.width)
 
@@ -89,15 +89,15 @@ def execute_command(command: str) -> bool:
                     console.print(f"[bold yellow]✗ Command '{missing_command}' not found. You may need to install it.[/bold yellow]")
             else:
                 console.print(f"[bold red]✗ Command failed with exit code {process.returncode}[/bold red]")
-            return False
+            return False, stderr_text
         else:
             console.print("[bold green]✓ Command executed successfully[/bold green]")
-            return True
+            return True, stderr_text
 
     except Exception as e:
         log_error(f"Failed to execute command '{command}': {e}")
         console.print(f"[bold red]Error during command execution: {e}[/bold red]")
-        return False
+        return False, str(e)
 
 def extract_missing_command(error_text: str) -> Optional[str]:
     """Extract the missing command from an error message."""

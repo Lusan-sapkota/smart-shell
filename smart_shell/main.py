@@ -13,7 +13,7 @@ from rich.panel import Panel
 from rich.prompt import Prompt, Confirm
 from rich.markdown import Markdown
 
-from .shell_builder import generate_command_plan, explain_command, display_banner
+from .shell_builder import generate_command_plan, explain_command
 from .safety import check_command_safety
 from .setup_logic import setup_config
 from .config import load_config, ENV_API_KEY
@@ -24,7 +24,22 @@ from .updater import handle_update_command, get_current_version
 
 console = Console()
 
-@click.group(invoke_without_command=True)
+class DefaultRunGroup(click.Group):
+    """Treat `smart-shell "do something"` as `smart-shell run "do something"`."""
+
+    GROUP_OPTIONS = {"--provider": 2, "--base-url": 2}
+
+    def parse_args(self, ctx, args):
+        i = 0
+        while i < len(args) and args[i].split("=")[0] in self.GROUP_OPTIONS:
+            i += 1 if "=" in args[i] else self.GROUP_OPTIONS[args[i]]
+        rest = args[i:]
+        if rest and rest[0] not in self.commands and rest[0] not in ("--help", "--list-models"):
+            args = ["run"] + args
+        return super().parse_args(ctx, args)
+
+
+@click.group(cls=DefaultRunGroup, invoke_without_command=True)
 @click.pass_context
 @click.option("--list-models", is_flag=True, help="List all supported AI models")
 @click.option("--provider", type=click.Choice(list(PROVIDERS) + ["custom"]), help="Use this provider instead of the saved one")
@@ -97,94 +112,90 @@ def run(prompt, dry_run, model, interactive, yes, provider, base_url):
     user_prompt = " ".join(prompt)
     process_prompt(user_prompt, dry_run, model, client, config, yes)
 
+RISK_ORDER = ["safe", "info_leak", "medium", "high", "blocked"]
+
+
 def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False, session=None):
-    """Process a single user prompt."""
+    """Generate a plan for the prompt, then review and run it."""
     console.print(f"\n[bold blue]Prompt:[/bold blue] {user_prompt}")
-    
     try:
-        console.print("[blue]Generating execution plan...[/blue]")
-        command_plan = generate_command_plan(user_prompt, client, resolve_model(client, model, config),
-                                             os_info=get_os_info(), session=session)
-        entry = {"prompt": user_prompt, "commands": command_plan, "result": "not run"}
-        if session is not None:
-            session.append(entry)
-
-        if not command_plan:
-            console.print("[yellow]The AI returned an empty plan. This could be due to a safety block or an impossible request. Please try again.[/yellow]")
-            return
-
-        safety_results = [check_command_safety(cmd) for cmd in command_plan]
-        
-        print_plan_preview(command_plan, safety_results)
-        
-        blocked_commands = [cmd for cmd, safety in zip(command_plan, safety_results) if safety["status"] == "blocked"]
-        if blocked_commands:
-            console.print("[bold red]BLOCKED:[/bold red]")
-            for cmd in blocked_commands:
-                console.print(f"   {cmd}")
-            
-            if Prompt.ask("Would you like to edit the command?", choices=["y", "n"], default="y") == "y":
-                edited_command = Prompt.ask("Enter modified command", default=blocked_commands[0])
-                if edited_command != blocked_commands[0]:
-                    safety_result = check_command_safety(edited_command)
-                    if safety_result["status"] == "blocked":
-                        console.print(f"[bold red]Edited command is still blocked:[/bold red]")
-                        console.print(f"[red]Reason: {safety_result['reason']}[/red]")
-                        return False
-                    command_plan = [edited_command]
-                    console.print("[green]Using edited command.[/green]")
-                else:
-                    return False
-            else:
-                return False
-            
-        if dry_run:
-            console.print("[yellow]Dry run mode - command not executed[/yellow]")
-            save_to_history(user_prompt, command_plan, executed=False)
-            return True
-        else:
-            high_risk_commands = [cmd for cmd, safety in zip(command_plan, safety_results) if safety["status"] == "high"]
-            medium_risk_commands = [cmd for cmd, safety in zip(command_plan, safety_results) if safety["status"] == "medium"]
-            
-            if high_risk_commands and not auto_yes:
-                console.print(f"[bold red]HIGH RISK COMMAND DETECTED![/bold red]")
-                for cmd, safety in zip(command_plan, safety_results):
-                    if safety["status"] == "high":
-                        console.print(f"[red]Command:[/red] {cmd}")
-                        console.print(f"[red]Risk:[/red] {safety['notes']}")
-                
-                if not Confirm.ask("This command has HIGH RISK. Do you want to proceed?", choices=["y", "n"], default="n"):
-                    console.print("[yellow]Command execution cancelled for safety.[/yellow]")
-                    return False
-            
-            elif medium_risk_commands and not auto_yes:
-                console.print(f"[bold yellow]MEDIUM RISK COMMAND DETECTED![/bold yellow]")
-                for cmd, safety in zip(command_plan, safety_results):
-                    if safety["status"] == "medium":
-                        console.print(f"[yellow]Command:[/yellow] {cmd}")
-                        console.print(f"[yellow]Risk:[/yellow] {safety['notes']}")
-                
-                if not Confirm.ask("This command has MEDIUM RISK. Do you want to proceed?", choices=["y", "n"], default="n"):
-                    console.print("[yellow]Command execution cancelled for safety.[/yellow]")
-                    return False
-            
-            history_id = save_to_history(user_prompt, command_plan, executed=True)
-            
-            # Run the whole plan in one shell so cd/source carry over; stop at the first failure.
-            success = execute_command(" && ".join(command_plan))
-            entry.update(commands=command_plan, result="succeeded" if success else "failed")
-            
-            update_history_result(history_id, success)
-            
-            return success
-            
+        model = resolve_model(client, model, config)
+        with console.status(f"Thinking ({config.get('provider', 'gemini')}:{model})..."):
+            plan = generate_command_plan(user_prompt, client, model, os_info=get_os_info(), session=session)
     except KeyboardInterrupt:
         console.print("\n[yellow]Command generation interrupted.[/yellow]")
         return False
     except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {str(e)}")
+        console.print(f"[bold red]Error:[/bold red] {e}")
         console.print("[yellow]If this is an API error, check 'smart-shell setup' and that the provider is reachable.[/yellow]")
         return False
+
+    if not plan:
+        console.print("[yellow]The AI returned an empty plan. Try rephrasing the request.[/yellow]")
+        return False
+    entry = {"prompt": user_prompt, "commands": plan, "result": "not run"}
+    if session is not None:
+        session.append(entry)
+    return review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry)
+
+
+def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry):
+    """Preview, confirm (yes / no / edit), run, and offer an AI fix if it fails."""
+    while True:
+        results = [check_command_safety(cmd) for cmd in plan]
+        print_plan_preview(plan, results)
+        worst = max((r["status"] for r in results), key=RISK_ORDER.index)
+
+        if dry_run:
+            console.print("[yellow]Dry run: nothing was executed.[/yellow]")
+            save_to_history(user_prompt, plan, executed=False)
+            return True
+
+        if worst == "blocked":
+            console.print("[bold red]Blocked: this plan will not run.[/bold red] You can edit it or cancel.")
+            choice = "n" if auto_yes else Prompt.ask(r"\[e]dit or \[n]o", choices=["e", "n"], default="n")
+        elif auto_yes:
+            choice = "y"
+        else:
+            if worst in ("high", "medium"):
+                color = "red" if worst == "high" else "yellow"
+                for cmd, r in zip(plan, results):
+                    if r["status"] == worst:
+                        console.print(f"[{color}]{worst.upper()} risk:[/{color}] {cmd}  [dim]({r['notes']})[/dim]")
+            default = "n" if worst in ("high", "medium") else "y"
+            choice = Prompt.ask(r"Run it? \[y]es / \[n]o / \[e]dit", choices=["y", "n", "e"], default=default, show_choices=False)
+
+        if choice == "n":
+            console.print("[yellow]Cancelled.[/yellow]")
+            return False
+        if choice == "e":
+            edited = Prompt.ask("Command", default=" && ".join(plan)).strip()
+            if edited:
+                plan = [edited]
+            continue
+
+        history_id = save_to_history(user_prompt, plan, executed=True)
+        # Run the whole plan in one shell so cd/source carry over; stop at the first failure.
+        command = " && ".join(plan)
+        success, error_tail = execute_command(command)
+        update_history_result(history_id, success)
+        entry.update(commands=plan, result="succeeded" if success else "failed")
+        if success or auto_yes or not Confirm.ask("Ask the AI to fix it?", default=True):
+            return success
+
+        fix_request = (f"This command failed:\n{command}\n\nLast lines of its error output:\n"
+                       f"{error_tail.strip()[-1500:] or '(none)'}\n\nOriginal request: {user_prompt}\n"
+                       "Return a corrected plan.")
+        try:
+            with console.status(f"Working on a fix ({model})..."):
+                plan = generate_command_plan(fix_request, client, model, os_info=get_os_info())
+        except Exception as e:
+            console.print(f"[bold red]Error:[/bold red] {e}")
+            return False
+        if not plan:
+            console.print("[yellow]The AI did not suggest a fix.[/yellow]")
+            return False
+
 
 def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_type="bash"):
     """Run Smart-Shell in interactive mode until user exits."""
@@ -198,9 +209,6 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
     
     atexit.register(readline.write_history_file, readline_history_file)
     
-    from .shell_builder import display_banner, display_welcome_message
-    display_banner()
-    display_welcome_message(shell_type)
     
     def signal_handler(sig, frame):
         console.print("\n[green]Exiting Smart-Shell. Goodbye![/green]")
@@ -213,6 +221,9 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
     except AIError as e:
         console.print(f"[bold red]Error:[/bold red] {e}")
         return
+    console.print(f"[bold cyan]Smart-Shell[/bold cyan] v{get_current_version()}  "
+                  f"[dim]{config.get('provider', 'gemini')}:{current_model}  {shell_type}[/dim]")
+    console.print("[dim]Describe what you want to do. !help for commands, exit to quit.[/dim]")
     session = []
     try:
         while True:
@@ -277,7 +288,6 @@ def handle_special_command(command, current_model, client):
         show_command_history()
     elif cmd == "!clear":
         os.system("clear" if os.name == "posix" else "cls")
-        display_banner()
     elif cmd == "!help":
         show_help()
     elif cmd == "!models":
@@ -371,16 +381,12 @@ For more, see the documentation or run `smart-shell --help`.
 @cli.command()
 def setup():
     """Setup API key and configuration."""
-    display_banner()
     setup_config()
 
 @cli.command()
 def version():
     """Show version information."""
-    display_banner()
-    console.print(f"[bold]Smart-Shell v{get_current_version()}[/bold]")
-    console.print("An intelligent terminal assistant for Bash or Zsh commands")
-    console.print("Works with local models (Ollama, LM Studio) and any OpenAI-compatible API")
+    console.print(f"Smart-Shell v{get_current_version()}")
 
 @click.command('help', context_settings=dict(ignore_unknown_options=True, allow_extra_args=True))
 def cli_help():
@@ -392,7 +398,6 @@ cli.add_command(cli_help)
 @cli.command()
 def history():
     """Show command history."""
-    display_banner()
     show_command_history()
 
 @cli.command()

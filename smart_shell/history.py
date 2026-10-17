@@ -157,7 +157,7 @@ def redo_last_command():
         console.print(f"[blue]Re-executing:[/blue] {command_to_execute}")
         
         if Confirm.ask("Do you want to execute this command?", choices=["y", "n"], default="y"):
-            success = execute_command(command_to_execute)
+            success, _ = execute_command(command_to_execute)
             if success:
                 console.print("[green]✓ Command executed successfully.[/green]")
             else:

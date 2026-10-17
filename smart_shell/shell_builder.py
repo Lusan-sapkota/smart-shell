@@ -6,23 +6,8 @@ import os
 import re
 import json
 from rich.console import Console
-from rich.panel import Panel
-from rich.text import Text
-from rich.align import Align
-from rich.box import ROUNDED, DOUBLE, HEAVY
 
 console = Console()
-
-BANNER = r"""
-    _____                      _      _____ _          _ _                  
-   / ____|                    | |    / ____| |        | | |                 
-  | (___  _ __ ___   __ _ _ __| |_  | (___ | |__   ___| | |                 
-   \___ \| '_ ` _ \ / _` | '__| __|  \___ \| '_ \ / _ \ | |                 
-   ____) | | | | | | (_| | |  | |_   ____) | | | |  __/ | |                 
-  |_____/|_| |_| |_|\__,_|_|   \__| |_____/|_| |_|\___|_|_|                 
-
-  Natural Language → Bash/Zsh Commands
-"""
 
 # Retries when the model's reply is not valid JSON (network retries live in the client)
 MAX_RETRIES = 2
@@ -149,83 +134,3 @@ def explain_command(client, model, command):
     system = ("Explain what this shell command does, step by step, in plain language. "
               "Point out anything destructive or surprising. Be brief. No markdown headings.")
     return client.chat(model, system, command, max_tokens=800)
-
-
-def display_banner():
-    """Display the Smart-Shell banner with improved styling."""
-    styled_banner = Text()
-    lines = BANNER.strip().split('\n')
-    
-    for i, line in enumerate(lines):
-        if i < 6:  # The ASCII art part
-            styled_banner.append(line + "\n", style=f"bold bright_blue")
-        else:  # The tagline
-            styled_banner.append(line, style="bold cyan")
-    
-    panel = Panel(
-        Align.center(styled_banner),
-        box=DOUBLE,
-        border_style="bright_blue",
-        padding=(1, 2),
-        title="[bold white]Smart-Shell[/bold white]",
-        title_align="center",
-        subtitle="[bold white]Local AI or any OpenAI-compatible API[/bold white]",
-        subtitle_align="center"
-    )
-    
-    console.print(panel)
-
-def create_command_section(title, commands):
-    """Create a section of commands for the welcome message."""
-    content = ""
-    for cmd, desc in commands:
-        content += f"  [bold cyan]{cmd}[/bold cyan] - {desc}\n"
-    
-    return Panel(
-        content,
-        title=f"[bold white]{title}[/bold white]",
-        border_style="blue",
-        box=ROUNDED,
-        padding=(0, 1),
-        expand=False
-    )
-
-def display_welcome_message(shell_type="bash"):
-    """Display a welcome message with helpful information."""
-    welcome_content = f"""[bold blue]Detected shell:[/bold blue] [green]{shell_type}[/green]
-
-[bold white]Welcome to Smart-Shell![/bold white]
-Type your requests in natural language to convert them into shell commands.
-
-[bold cyan]Special Commands:[/bold cyan]
-  [cyan]!help[/cyan] - Show detailed help      [cyan]!history[/cyan] - Command history     [cyan]!models[/cyan] - List AI models
-  [cyan]!clear[/cyan] - Clear screen          [cyan]!model <name>[/cyan] - Switch model   [cyan]!docs[/cyan] - Documentation
-  [cyan]!last[/cyan] - Show last command      [cyan]!redo[/cyan] - Re-execute last       [cyan]!errors[/cyan] - Show error log
-  [cyan]!forget-sudo[/cyan] - Clear sudo      [cyan]!creator[/cyan] - About creator       [cyan]!web[/cyan] - Toggle web search
-  [cyan]!explain <cmd>[/cyan] - Explain a command  [cyan]!update[/cyan] - Check for updates
-
-[bold green]Configuration Commands:[/bold green]
-  [green]smart-shell setup[/green] - Configure provider   [green]smart-shell version[/green] - Show version
-  [green]smart-shell --help[/green] - Show CLI help      [green]smart-shell models[/green] - List models
-
-[bold yellow]Exit Commands:[/bold yellow] [cyan]exit[/cyan], [cyan]quit[/cyan], [cyan]bye[/cyan], [cyan]q[/cyan], or [cyan]Ctrl+C[/cyan]
-
-[italic]Note: Commands are safety-checked before execution. Cloud providers may bill per request.
-Configuration commands should be run outside Smart-Shell (exit first).[/italic]"""
-    
-    welcome_panel = Panel(
-        welcome_content,
-        title="[bold white]Smart Terminal Assistant[/bold white]",
-        border_style="green",
-        box=HEAVY,
-        padding=(1, 2),
-        expand=True
-    )
-    
-    console.print(welcome_panel)
-
-if __name__ == "__main__":
-    display_banner()
-    display_welcome_message()
-    console.print("[yellow]Shell Builder module - For testing only[/yellow]")
-    console.print("Use 'smart-shell' command or main.py to run the application.")
