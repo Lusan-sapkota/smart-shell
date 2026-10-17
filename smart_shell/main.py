@@ -359,15 +359,17 @@ Type `exit`, `quit`, `bye`, `q` or press Ctrl+C to exit.
 
 ## Safety
 Every step is checked before execution:
-- **Blocked**: never runs (e.g. `rm -rf /`, fork bombs, formatting disks); you can only edit it
-- **High**: destructive, asks y/n (e.g. `rm -rf dir`, piping into a shell)
-- **Medium**: changes the system, asks y/n (e.g. `sudo`, package installs, `kill`)
-- **Info leak**: may print secrets, flagged in the preview
-- **Safe**: runs directly
+- **Blocked**: never runs (e.g. `rm -rf /`, fork bombs, formatting disks); edit or cancel
+- **High**: destructive, defaults to no (e.g. `rm -rf dir`, piping into a shell)
+- **Medium**: changes the system, defaults to no (e.g. `sudo`, package installs, `kill`)
+- **Info leak**: may print secrets, defaults to yes
+- **Safe**: defaults to yes
+
+Every plan asks yes / no / edit before running. If it fails, you can ask the AI to fix it.
 
 ## CLI Usage
 - `smart-shell` - Start interactive mode
-- `smart-shell run <prompt>` - Run a one-off command (`-d` dry run, `-m <model>`, `-y` skip prompts)
+- `smart-shell "<prompt>"` - Run a one-off request (`-d` dry run, `-m <model>`, `-y` skip prompts)
 - `smart-shell setup` - Configure provider, API key and model
 - `smart-shell models` - List available models
 - `smart-shell history` - Show command history
