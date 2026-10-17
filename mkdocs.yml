@@ -14,7 +14,7 @@ nav:
     - API Reference: api.md
     - FAQ: faq.md
   - Development:
-    - Development Guide: DEVELOPMENT.md
+    - Development Guide: development.md
     - Contributing: contributing.md
   - Project Info:
     - Changelog: CHANGELOG.md

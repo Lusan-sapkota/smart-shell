@@ -62,7 +62,7 @@ The installation script automatically:
 
 - 📖 **New to Smart-Shell?** Start with our [Usage Guide](usage.md)
 - 🔧 **Having issues?** Check the [FAQ](faq.md)
-- 🛠️ **Want to contribute?** See [Development Guide](DEVELOPMENT.md)
+- 🛠️ **Want to contribute?** See [Development Guide](development.md)
 
 ## 📚 Documentation Sections
 
@@ -81,7 +81,7 @@ The installation script automatically:
 ### 🔧 Advanced & Development
 
 - **[API Reference](api.md)** - Technical API documentation
-- **[Development Guide](DEVELOPMENT.md)** - Contributing and development setup
+- **[Development Guide](development.md)** - Contributing and development setup
 - **[Contributing](contributing.md)** - How to contribute to the project
 
 ### 📋 Project Information

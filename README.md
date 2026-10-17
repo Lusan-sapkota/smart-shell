@@ -95,7 +95,7 @@ The first time you run Smart-Shell, it will guide you through setting up your Go
 smart-shell setup
 ```
 
-For manual installation and development instructions, see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+For manual installation and development instructions, see [docs/development.md](docs/development.md).
 
 ## �️ Uninstall
 
