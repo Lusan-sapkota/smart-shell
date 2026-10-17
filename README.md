@@ -1,5 +1,6 @@
 # Smart-Shell
 
+[![Release](https://img.shields.io/github/v/release/Lusan-sapkota/smart-shell)](https://github.com/Lusan-sapkota/smart-shell/releases/latest)
 [![Tests](https://github.com/Lusan-sapkota/smart-shell/actions/workflows/test.yml/badge.svg)](https://github.com/Lusan-sapkota/smart-shell/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
