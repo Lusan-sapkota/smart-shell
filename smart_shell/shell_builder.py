@@ -169,7 +169,7 @@ def display_banner():
         padding=(1, 2),
         title="[bold white]Smart-Shell[/bold white]",
         title_align="center",
-        subtitle="[bold white]Any OpenAI-compatible model, local or cloud[/bold white]",
+        subtitle="[bold white]Local AI or any OpenAI-compatible API[/bold white]",
         subtitle_align="center"
     )
     

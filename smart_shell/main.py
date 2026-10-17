@@ -380,7 +380,7 @@ def version():
     display_banner()
     console.print(f"[bold]Smart-Shell v{get_current_version()}[/bold]")
     console.print("An intelligent terminal assistant for Bash or Zsh commands")
-    console.print("Works with Gemini, OpenAI, DeepSeek, Ollama and any OpenAI-compatible API")
+    console.print("Works with local models (Ollama, LM Studio) and any OpenAI-compatible API")
 
 @click.command('help', context_settings=dict(ignore_unknown_options=True, allow_extra_args=True))
 def cli_help():

@@ -8,7 +8,7 @@ version = "1.1.0"
 authors = [
   { name="Lusan Sapkota", email="sapkotalusan@gmail.com" },
 ]
-description = "An intelligent terminal assistant that converts natural language into executable Bash or Zsh commands."
+description = "Natural language to Bash/Zsh commands with a local AI (Ollama, LM Studio) or any OpenAI-compatible API, with safety checks."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "Apache-2.0" }

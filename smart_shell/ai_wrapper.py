@@ -15,14 +15,15 @@ from .config import load_config, ENV_API_KEY
 ENV_BASE_URL = "SMART_SHELL_BASE_URL"
 
 # name -> (base_url, default model or None to pick from the model list, needs api key)
+# Order is the setup wizard's order: local first, so a fresh setup defaults to Ollama.
 PROVIDERS = {
+    "ollama": ("http://localhost:11434/v1", None, False),
+    "lmstudio": ("http://localhost:1234/v1", None, False),
     "gemini": ("https://generativelanguage.googleapis.com/v1beta/openai", "gemini-flash-latest", True),
     "openai": ("https://api.openai.com/v1", None, True),
     "deepseek": ("https://api.deepseek.com/v1", "deepseek-chat", True),
     "openrouter": ("https://openrouter.ai/api/v1", None, True),
     "groq": ("https://api.groq.com/openai/v1", None, True),
-    "ollama": ("http://localhost:11434/v1", None, False),
-    "lmstudio": ("http://localhost:1234/v1", None, False),
 }
 
 MAX_RETRIES = 3
