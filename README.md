@@ -35,7 +35,7 @@ The script installs Smart-Shell with uv (or pipx if you don't have uv), adds tab
 Already use [uv](https://docs.astral.sh/uv/)? Skip the script:
 
 ```bash
-uv tool install git+https://github.com/Lusan-sapkota/smart-shell
+uv tool install smart-shell-cli   # or: pipx install smart-shell-cli
 ```
 
 Then:

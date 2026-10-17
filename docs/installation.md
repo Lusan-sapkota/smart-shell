@@ -20,11 +20,11 @@ The script:
 If you already use [uv](https://docs.astral.sh/uv/), you can skip the script:
 
 ```bash
-uv tool install git+https://github.com/Lusan-sapkota/smart-shell
+uv tool install smart-shell-cli   # or: pipx install smart-shell-cli
 smart-shell setup
 ```
 
-Upgrade with `uv tool upgrade smart-shell-cli`, remove with `uv tool uninstall smart-shell-cli`. With pipx, use `pipx install git+https://github.com/Lusan-sapkota/smart-shell` the same way.
+Upgrade with `uv tool upgrade smart-shell-cli`, remove with `uv tool uninstall smart-shell-cli`. With pipx: `pipx install smart-shell-cli`, `pipx upgrade smart-shell-cli`. For the unreleased `development` branch: `uv tool install git+https://github.com/Lusan-sapkota/smart-shell@development`.
 
 Dependencies are `rich`, `click` and `requests`. To install them yourself (for example behind a restrictive firewall):
 
