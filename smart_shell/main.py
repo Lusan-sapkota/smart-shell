@@ -202,13 +202,21 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
     os.makedirs(HISTORY_DIR, exist_ok=True)
     
     readline_history_file = os.path.join(HISTORY_DIR, "readline_history")
+    # A file from another readline build (GNU vs libedit) can be unreadable; keep it aside, don't fail or overwrite it.
     try:
         readline.read_history_file(readline_history_file)
     except FileNotFoundError:
         pass
-    
+    except OSError:
+        os.replace(readline_history_file, readline_history_file + ".old")
     readline.set_history_length(1000)
-    atexit.register(readline.write_history_file, readline_history_file)
+
+    def save_input_history():
+        try:
+            readline.write_history_file(readline_history_file)
+        except OSError:
+            pass
+    atexit.register(save_input_history)
     
     
     def signal_handler(sig, frame):
