@@ -18,7 +18,7 @@ from .setup_logic import setup_config
 from .config import load_config, save_config, ENV_API_KEY
 from .utils import execute_command, log_error, mark_input, notify, print_plan_preview, reset_sudo_password, ERROR_LOG_FILE, get_os_info, detect_shell
 from .ai_wrapper import PROVIDERS, get_client, resolve_model, is_configured, override_provider, AIError
-from .history import HISTORY_DIR, save_to_history, update_history_result, show_command_history, show_last_command, redo_last_command
+from .history import HISTORY_DIR, save_to_history, update_history_result, show_command_history, show_last_command, load_history
 from .updater import handle_update_command, get_current_version
 from .ui import COMMANDS, MODES, make_reader
 
@@ -188,9 +188,10 @@ def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry, a
         success, error_tail = execute_command(command)
         update_history_result(history_id, success)
         entry.update(commands=plan, result="succeeded" if success else "failed")
-        if not success and not auto_yes:
+        interrupted = error_tail == "interrupted by user"
+        if not success and not auto_yes and not interrupted:
             notify("A command failed: ask the AI to fix it?")
-        if success or auto_yes or not Confirm.ask("Ask the AI to fix it?", default=True):
+        if success or auto_yes or interrupted or not Confirm.ask("Ask the AI to fix it?", default=True):
             return success
 
         fix_request = (f"This command failed:\n{command}\n\nLast lines of its error output:\n"
@@ -313,7 +314,15 @@ def handle_special_command(command, state, client, config=None):
     elif name == "/last":
         show_last_command()
     elif name == "/redo":
-        redo_last_command()
+        history = load_history()
+        if not history:
+            console.print("[yellow]No command history yet.[/yellow]")
+            return
+        last = history[-1]
+        steps = last["command"] if isinstance(last["command"], list) else [last["command"]]
+        # Same review as a new request: preview, safety levels, mode, yes / no / edit.
+        review_and_run(last["prompt"], steps, state["mode"] == "plan", False, client, state["model"],
+                       {}, auto_safe=state["mode"] == "auto")
     elif name == "/errors":
         show_error_log()
     else:

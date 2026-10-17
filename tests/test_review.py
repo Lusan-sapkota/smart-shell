@@ -98,3 +98,17 @@ def test_brackets_in_commands_show_exactly_and_do_not_crash(monkeypatch):
     out = buf.getvalue()
     for cmd in plan:
         assert cmd in out
+
+
+def test_interrupted_command_does_not_offer_a_fix(monkeypatch):
+    ok, ran = run_with(monkeypatch, ["y"], [(False, "interrupted by user")], ["sleep 100"])
+    assert not ok and ran == ["sleep 100"]
+
+
+def test_redo_goes_through_review(monkeypatch):
+    calls = []
+    monkeypatch.setattr(main, "load_history", lambda: [{"prompt": "p", "command": ["rm notes.txt"]}])
+    monkeypatch.setattr(main, "review_and_run", lambda *a, **k: calls.append((a, k)))
+    main.handle_special_command("/redo", {"mode": "plan", "model": "m"}, None)
+    (args, kwargs), = calls
+    assert args[1] == ["rm notes.txt"] and args[2] is True and args[3] is False

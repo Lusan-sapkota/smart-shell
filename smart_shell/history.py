@@ -7,12 +7,9 @@ import json
 import uuid
 from datetime import datetime
 from rich.console import Console
-from rich.prompt import Confirm
 from rich.markup import escape
 from rich.syntax import Syntax
 
-from .utils import execute_command
-from .safety import check_command_safety
 
 console = Console()
 
@@ -97,20 +94,3 @@ def show_last_command():
         return
     console.print(f"[blue]Prompt:[/blue] {escape(history[-1]['prompt'])}")
     console.print(Syntax(as_text(history[-1]["command"]), "bash", theme="monokai"))
-
-
-def redo_last_command():
-    """Re-run the last plan after a safety check and confirmation."""
-    history = load_history()
-    if not history:
-        console.print("[yellow]No command history yet.[/yellow]")
-        return
-    command = history[-1]["command"]
-    steps = command if isinstance(command, list) else [command]
-    blocked = [c for c in steps if check_command_safety(c)["status"] == "blocked"]
-    if blocked:
-        console.print(f"[bold red]Refusing to re-run a blocked command:[/bold red] {blocked[0]}")
-        return
-    console.print(f"[blue]Re-running:[/blue] {as_text(command)}")
-    if Confirm.ask("Run it?", default=True):
-        execute_command(as_text(command))

@@ -7,6 +7,7 @@ import json
 import shutil
 import time
 import sys
+import select
 import subprocess
 import re
 from typing import Dict, Any, Optional, Tuple
@@ -74,11 +75,19 @@ def execute_command(command: str) -> Tuple[bool, str]:
         # stderr is echoed live too, keeping the tail for the error hints below.
         process = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, executable=shell_executable)
         tail = b""
+        fd = process.stderr.fileno()
         try:
-            for chunk in iter(lambda: os.read(process.stderr.fileno(), 4096), b""):
-                sys.stderr.buffer.write(chunk)
-                sys.stderr.flush()
-                tail = (tail + chunk)[-4096:]
+            # Read until the shell exits, not until EOF: a background child (`app &`, xdg-open)
+            # keeps the pipe open and would otherwise block us until it quits.
+            while True:
+                ready, _, _ = select.select([fd], [], [], 0.1)
+                chunk = os.read(fd, 4096) if ready else b""
+                if chunk:
+                    sys.stderr.buffer.write(chunk)
+                    sys.stderr.flush()
+                    tail = (tail + chunk)[-4096:]
+                elif ready or process.poll() is not None:
+                    break
             process.wait()
         except KeyboardInterrupt:
             # Ctrl+C already reached the command (same process group); stop it, keep Smart-Shell running.
