@@ -29,10 +29,10 @@ Run `smart-shell setup`. You can also set `SMART_SHELL_API_KEY` and `SMART_SHELL
 No. `sudo` prompts in the terminal. Passwords stored by older versions are removed from the config automatically.
 
 ### `smart-shell: command not found` after installing
-Restart the terminal or run `source ~/.bashrc` (or `~/.zshrc`). Make sure `~/.local/bin` is on your `PATH` (`pipx ensurepath`).
+Restart the terminal or run `source ~/.bashrc` (or `~/.zshrc`). Make sure `~/.local/bin` is on your `PATH` (`uv tool update-shell` or `pipx ensurepath`).
 
 ### pipx or PEP 668 errors during install {#pipx-or-pep668}
-Newer distros block `pip install` into the system Python. Install pipx (`sudo apt install pipx`), run `pipx ensurepath`, open a new terminal and rerun the installer.
+Newer distros block `pip install` into the system Python, which is why the installer uses uv or pipx. Install either one ([uv](https://docs.astral.sh/uv/), or `sudo apt install pipx`), open a new terminal and rerun the installer.
 
 ### Setup says it cannot connect
 Check the API key and base URL. For Ollama, make sure `ollama serve` is running and you have pulled at least one model.
@@ -46,10 +46,10 @@ Check the API key and base URL. For Ollama, make sure `ollama serve` is running 
 Yes, with `smart-shell run "<prompt>"`. Add `-y` to skip confirmations (blocked commands still never run). Review generated commands carefully before automating them.
 
 ### How do I update?
-Use `!update` in interactive mode, or `pipx upgrade smart-shell` if you installed with pipx.
+Use `!update` in interactive mode, or `uv tool upgrade smart-shell-cli` / `pipx upgrade smart-shell-cli`.
 
 ### What is sent to the AI provider?
-Your prompt plus basic OS and shell information so the command fits your system. Command output and file contents are not sent. With a local model, nothing leaves your machine.
+Your prompt plus basic OS and shell information so the command fits your system. In interactive mode, your last five requests from the same session (prompt, generated commands, and whether they succeeded) are included so follow-ups work. Command output and file contents are not sent. With a local model, nothing leaves your machine.
 
 ### What does it cost?
 Smart-Shell is free and open source (Apache 2.0). Cloud providers bill according to their own pricing; local models cost nothing.

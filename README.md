@@ -30,7 +30,7 @@ Smart-Shell turns plain English into Bash or Zsh commands, checks them for risk,
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
 ```
 
-The script installs Smart-Shell (uv if you have it, otherwise pipx; system-wide and virtualenv are also offered), adds a desktop entry and tab completion, and runs the setup wizard.
+The script installs Smart-Shell with uv (or pipx if you don't have uv), adds tab completion and a desktop entry, and runs the setup wizard.
 
 Already use [uv](https://docs.astral.sh/uv/)? Skip the script:
 
@@ -51,11 +51,8 @@ To run fully offline with a local model, see [Using local models (Ollama)](docs/
 ## Uninstall
 
 ```bash
-uv tool uninstall smart-shell             # or: pipx uninstall smart-shell / sudo pip3 uninstall smart-shell
-rm -rf ~/.config/smart-shell ~/.local/share/smart-shell
-rm -f ~/.local/share/applications/smart-shell.desktop
-rm -f ~/.bash_completion.d/smart-shell-completion.bash
-sed -i '/# Smart-Shell completion/,+1d' ~/.bashrc ~/.zshrc
+curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash -s -- --uninstall
+rm -rf ~/.config/smart-shell ~/.local/share/smart-shell   # also delete config and history
 ```
 
 Details in [docs/uninstall.md](docs/uninstall.md).

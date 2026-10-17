@@ -10,9 +10,9 @@ curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/insta
 
 The script:
 
-1. Checks for Python, pip, and uv or pipx.
-2. Installs Smart-Shell using one of four methods: user install with uv (default when uv is installed), user install with pipx (default otherwise), system-wide (sudo), or a virtual environment (for development).
-3. Creates a desktop entry and Bash/Zsh tab completion.
+1. Installs the `smart-shell-cli` package with uv if it is installed, otherwise with pipx.
+2. Removes any older install, including the pre-1.1.0 `smart-shell` package name.
+3. Adds Bash/Zsh tab completion and a desktop entry.
 4. Runs `smart-shell setup`.
 
 ## Install with uv
@@ -24,7 +24,7 @@ uv tool install git+https://github.com/Lusan-sapkota/smart-shell
 smart-shell setup
 ```
 
-Upgrade with `uv tool upgrade smart-shell`, remove with `uv tool uninstall smart-shell`.
+Upgrade with `uv tool upgrade smart-shell-cli`, remove with `uv tool uninstall smart-shell-cli`. With pipx, use `pipx install git+https://github.com/Lusan-sapkota/smart-shell` the same way.
 
 Dependencies are `rich`, `click` and `requests`. To install them yourself (for example behind a restrictive firewall):
 

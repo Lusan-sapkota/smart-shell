@@ -37,7 +37,7 @@ See [Safety](safety.md) for details.
 
 ## Interactive mode
 
-A REPL with readline history, a prompt that shows the current model, and `!` commands: `!help`, `!history`, `!clear`, `!models`, `!model <name>`, `!last`, `!redo`, `!errors`, `!forget-sudo`, `!update`, `!creator`, `!docs`. If you type a `smart-shell ...` CLI command inside the REPL, it tells you to run it from your normal shell instead.
+A REPL with readline history, a prompt that shows the current model, and `!` commands: `!help`, `!history`, `!clear`, `!models`, `!model <name>`, `!explain <cmd>`, `!last`, `!redo`, `!errors`, `!forget-sudo`, `!update`, `!creator`, `!docs`. If you type a `smart-shell ...` CLI command inside the REPL, it tells you to run it from your normal shell instead.
 
 ## Other
 
@@ -46,5 +46,8 @@ A REPL with readline history, a prompt that shows the current model, and `!` com
 - **Error log** of failures, viewable with `!errors`.
 - **Readable errors**: common failures (command not found, permission denied, missing file) get a one-line explanation.
 - **Sudo**: Smart-Shell never stores your sudo password. `sudo` prompts in the terminal; `!forget-sudo` runs `sudo -k`.
-- **Updates**: `!update` checks GitHub and updates via `git pull` (dev checkout) or pip.
+- **Follow-ups**: in interactive mode, recent requests are passed as context, so "now do the same for /var/log" works.
+- **Live output**: commands print as they run, and interactive prompts work.
+- **One-off providers**: `--provider` / `--base-url` switch provider for a single run.
+- **Updates**: `!update` checks PyPI and upgrades with the tool you installed with (uv, pipx or pip).
 - **Desktop entry and tab completion**, set up by the installer.
