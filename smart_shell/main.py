@@ -5,7 +5,8 @@ Smart-Shell - An intelligent terminal assistant that converts natural language i
 import sys
 import os
 import click
-from html import escape
+from html import escape as html_escape
+from rich.markup import escape
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt, Confirm
@@ -15,7 +16,7 @@ from .shell_builder import generate_command_plan, explain_command
 from .safety import check_command_safety, is_auto_safe
 from .setup_logic import setup_config
 from .config import load_config, save_config, ENV_API_KEY
-from .utils import execute_command, mark_input, notify, print_plan_preview, reset_sudo_password, ERROR_LOG_FILE, get_os_info, detect_shell
+from .utils import execute_command, log_error, mark_input, notify, print_plan_preview, reset_sudo_password, ERROR_LOG_FILE, get_os_info, detect_shell
 from .ai_wrapper import PROVIDERS, get_client, resolve_model, is_configured, override_provider, AIError
 from .history import HISTORY_DIR, save_to_history, update_history_result, show_command_history, show_last_command, redo_last_command
 from .updater import handle_update_command, get_current_version
@@ -61,13 +62,13 @@ def display_models():
     try:
         models = get_client(config).list_models()
     except AIError as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+        console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         return
     current = config.get("default_model", "")
     console.print(f"\n[bold blue]Models from {config.get('provider', 'gemini')}:[/bold blue]")
     for name in models:
         marker = "[green]*[/green]" if name == current.removeprefix("models/") else " "
-        console.print(f" {marker} {name}")
+        console.print(f" {marker} {escape(name)}")
     console.print("\nSwitch for one run with [cyan]--model <name>[/cyan] or in interactive mode with [cyan]/model <name>[/cyan].")
 
 @cli.command()
@@ -83,7 +84,7 @@ def run(prompt, dry_run, model, interactive, yes, provider, base_url):
     try:
         config = override_provider(load_config(), provider, base_url)
     except AIError as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+        console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         return
 
     if not is_configured(config):
@@ -116,7 +117,7 @@ RISK_ORDER = ["safe", "info_leak", "medium", "high", "blocked"]
 
 def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False, session=None, auto_safe=False):
     """Generate a plan for the prompt, then review and run it."""
-    console.print(f"\n[bold blue]Prompt:[/bold blue] {user_prompt}")
+    console.print(f"\n[bold blue]Prompt:[/bold blue] {escape(user_prompt)}")
     try:
         model = resolve_model(client, model, config)
         with console.status(f"Thinking ({config.get('provider', 'gemini')}:{model})..."):
@@ -125,7 +126,7 @@ def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False, 
         console.print("\n[yellow]Command generation interrupted.[/yellow]")
         return False
     except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+        console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         console.print("[yellow]If this is an API error, check 'smart-shell setup' and that the provider is reachable.[/yellow]")
         return False
 
@@ -167,7 +168,7 @@ def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry, a
                 color = "red" if worst == "high" else "yellow"
                 for cmd, r in zip(plan, results):
                     if r["status"] == worst:
-                        console.print(f"[{color}]{worst.upper()} risk:[/{color}] {cmd}  [dim]({r['notes']})[/dim]")
+                        console.print(f"[{color}]{worst.upper()} risk:[/{color}] {escape(cmd)}  [dim]({r['notes']})[/dim]")
             default = "n" if worst in ("high", "medium") else "y"
             notify(f"Waiting for you: run {plan[0][:60]}{' ...' if len(plan) > 1 else ''}?")
             choice = Prompt.ask(r"Run it? \[y]es / \[n]o / \[e]dit", choices=["y", "n", "e"], default=default, show_choices=False)
@@ -200,7 +201,7 @@ def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry, a
             with console.status(f"Working on a fix ({model})..."):
                 plan = generate_command_plan(fix_request, client, model, os_info=get_os_info())
         except Exception as e:
-            console.print(f"[bold red]Error:[/bold red] {e}")
+            console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
             return False
         if not plan:
             console.print("[yellow]The AI did not suggest a fix.[/yellow]")
@@ -213,7 +214,7 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
     try:
         current_model = resolve_model(client, model, config)
     except AIError as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+        console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         return
 
     state = {"model": current_model, "mode": "plan" if dry_run else "ask"}
@@ -222,7 +223,7 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
     def status():
         cwd = os.getcwd().replace(os.path.expanduser("~"), "~", 1)
         return (f" <mode-{state['mode']}>{state['mode']} mode</mode-{state['mode']}> · "
-                f"{escape(provider)}:{escape(state['model'])} · {shell_type} · {escape(cwd)}"
+                f"{html_escape(provider)}:{html_escape(state['model'])} · {shell_type} · {html_escape(cwd)}"
                 f"   <key>Shift+Tab</key> mode · <key>/</key> commands · <key>Ctrl+D</key> quit")
 
     def cycle_mode():
@@ -231,7 +232,7 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
 
     read = make_reader(os.path.join(HISTORY_DIR, "input_history"), client.list_models, status, cycle_mode)
     console.print(f"[bold cyan]Smart-Shell[/bold cyan] v{get_current_version()}  "
-                  f"[dim]{provider}:{current_model}  {shell_type}[/dim]", highlight=False)
+                  f"[dim]{escape(provider)}:{escape(current_model)}  {shell_type}[/dim]", highlight=False)
     console.print("[dim]Describe what you want to do. Type / for commands.[/dim]", highlight=False)
 
     session = []
@@ -245,18 +246,22 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
             continue
         if user_prompt.lower() in ("exit", "quit", "bye", "q", "/exit", "/quit"):
             break
-        if user_prompt[0] in "/!":
-            handle_special_command(user_prompt, state, client)
-            continue
         try:
-            process_prompt(user_prompt, state["mode"] == "plan", state["model"], client, config, auto_yes, session,
-                           auto_safe=state["mode"] == "auto")
+            if user_prompt[0] in "/!":
+                handle_special_command(user_prompt, state, client, config)
+            else:
+                process_prompt(user_prompt, state["mode"] == "plan", state["model"], client, config, auto_yes, session,
+                               auto_safe=state["mode"] == "auto")
         except KeyboardInterrupt:
             console.print("\n[yellow]Interrupted.[/yellow]")
+        except Exception as e:
+            # One bad request must not end the session.
+            log_error(f"Unexpected error for {user_prompt!r}: {e!r}")
+            console.print(f"[bold red]Error:[/bold red] {escape(str(e))} [dim](details in /errors)[/dim]")
     console.print("[green]Goodbye![/green]")
 
 
-def handle_special_command(command, state, client):
+def handle_special_command(command, state, client, config=None):
     """Handle a /command (the older !command spelling still works)."""
     name, _, arg = command.strip().partition(" ")
     name = "/" + name[1:].lower()
@@ -276,7 +281,7 @@ def handle_special_command(command, state, client):
             return
         # Keep the original case: model ids like Qwen/Qwen2.5 are case-sensitive.
         state["model"] = arg
-        console.print(f"[green]✓ Switched to model: {arg}[/green]")
+        console.print(f"[green]✓ Switched to model: {escape(arg)}[/green]")
     elif name == "/mode":
         if arg not in MODES:
             console.print(f"Mode is [bold]{state['mode']}[/bold]. Use /mode " + "|".join(MODES) + " or Shift+Tab.")
@@ -291,9 +296,9 @@ def handle_special_command(command, state, client):
         try:
             with console.status("Explaining..."):
                 text = explain_command(client, state["model"], arg)
-            console.print(text)
+            console.print(text, markup=False, highlight=False)
         except AIError as e:
-            console.print(f"[bold red]Error:[/bold red] {e}")
+            console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
     elif name == "/notify":
         config = load_config()
         config["notify"] = config.get("notify") is False
@@ -313,7 +318,7 @@ def handle_special_command(command, state, client):
     elif name == "/errors":
         show_error_log()
     else:
-        console.print(f"[yellow]Unknown command: {command}. Type / to see commands.[/yellow]")
+        console.print(f"[yellow]Unknown command: {escape(command)}. Type / to see commands.[/yellow]")
 
 
 def show_help():
@@ -390,7 +395,7 @@ def main():
         console.print("\n[green]Exiting Smart-Shell. Goodbye![/green]")
         sys.exit(0)
     except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {str(e)}")
+        console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         sys.exit(1)
 
 if __name__ == "__main__":
@@ -417,7 +422,7 @@ def show_error_log():
         console.print("[bold]Recent Error Log (last 10 entries):[/bold]")
         for line in recent_lines:
             if line.strip():
-                console.print(f"[red]{line}[/red]")
+                console.print(f"[red]{escape(line)}[/red]")
         
         if len(lines) > 10:
             console.print(f"\n[dim]... and {len(lines) - 10} more entries in {ERROR_LOG_FILE}[/dim]")

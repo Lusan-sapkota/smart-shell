@@ -78,3 +78,16 @@ def test_auto_mode_still_asks_for_risky_plans(monkeypatch):
     for risky in (["rm notes.txt"], ["ls", "rm -rf build"], ["git reset --hard"]):
         ok, ran = run_with(monkeypatch, ["n"], [], risky, auto_safe=True)
         assert not ok and ran == []
+
+
+def test_brackets_in_commands_show_exactly_and_do_not_crash(monkeypatch):
+    import io
+    from rich.console import Console
+    utils = importlib.import_module("smart_shell.utils")
+    buf = io.StringIO()
+    monkeypatch.setattr(utils, "console", Console(file=buf, width=200))
+    plan = ['grep -E \'[a-z]+\' f.txt', "ls *.[ch]", 'echo "${files[@]}"', "sed 's/[/]/_/g' f.txt", "echo [/x]"]
+    utils.print_plan_preview(plan, [{"status": "safe", "notes": "n"}] * len(plan))
+    out = buf.getvalue()
+    for cmd in plan:
+        assert cmd in out

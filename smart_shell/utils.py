@@ -11,7 +11,9 @@ import subprocess
 import re
 from typing import Dict, Any, Optional, Tuple
 from rich.console import Console
+from rich.markup import escape
 from rich.table import Table
+from rich.text import Text
 from datetime import datetime
 
 from .config import load_config
@@ -61,7 +63,7 @@ def detect_shell() -> str:
 
 def execute_command(command: str) -> Tuple[bool, str]:
     """Run a shell command with live output. Returns (success, tail of stderr)."""
-    console.print(f"[bold green]Executing:[/bold green] {command}")
+    console.print(f"[bold green]Executing:[/bold green] {escape(command)}")
     console.print("─" * console.width)
 
     try:
@@ -98,7 +100,7 @@ def execute_command(command: str) -> Tuple[bool, str]:
             elif "command not found" in stderr_text.lower():
                 missing_command = extract_missing_command(stderr_text)
                 if missing_command:
-                    console.print(f"[bold yellow]✗ Command '{missing_command}' not found. You may need to install it.[/bold yellow]")
+                    console.print(f"[bold yellow]✗ Command '{escape(missing_command)}' not found. You may need to install it.[/bold yellow]")
             else:
                 console.print(f"[bold red]✗ Command failed with exit code {process.returncode}[/bold red]")
             return False, stderr_text
@@ -108,7 +110,7 @@ def execute_command(command: str) -> Tuple[bool, str]:
 
     except Exception as e:
         log_error(f"Failed to execute command '{command}': {e}")
-        console.print(f"[bold red]Error during command execution: {e}[/bold red]")
+        console.print(f"[bold red]Error during command execution: {escape(str(e))}[/bold red]")
         return False, str(e)
 
 def extract_missing_command(error_text: str) -> Optional[str]:
@@ -136,7 +138,7 @@ def print_plan_preview(command_plan: list[str], safety_results: list[dict[str, A
         color = color_map.get(status, "white")
         table.add_row(
             str(i + 1),
-            command,
+            Text(command),
             f"[{color}]{status.upper()}[/{color}]",
             notes
         )

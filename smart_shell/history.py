@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime
 from rich.console import Console
 from rich.prompt import Confirm
+from rich.markup import escape
 from rich.syntax import Syntax
 
 from .utils import execute_command
@@ -82,7 +83,7 @@ def show_command_history():
         if not entry.get("executed"):
             status = "[dim]dry run[/dim]"
         console.print(f"{i}. {status} [blue]{timestamp}[/blue]")
-        console.print(f"   Prompt: {entry['prompt']}")
+        console.print(f"   Prompt: {escape(entry['prompt'])}")
         console.print("   Command: ", end="")
         console.print(Syntax(as_text(entry["command"]), "bash", theme="monokai"))
         console.print("")
@@ -94,7 +95,7 @@ def show_last_command():
     if not history:
         console.print("[yellow]No command history yet.[/yellow]")
         return
-    console.print(f"[blue]Prompt:[/blue] {history[-1]['prompt']}")
+    console.print(f"[blue]Prompt:[/blue] {escape(history[-1]['prompt'])}")
     console.print(Syntax(as_text(history[-1]["command"]), "bash", theme="monokai"))
 
 
