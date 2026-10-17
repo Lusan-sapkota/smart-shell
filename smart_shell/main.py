@@ -207,6 +207,7 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
     except FileNotFoundError:
         pass
     
+    readline.set_history_length(1000)
     atexit.register(readline.write_history_file, readline_history_file)
     
     
