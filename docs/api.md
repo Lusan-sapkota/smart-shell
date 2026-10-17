@@ -1,70 +1,62 @@
 # API Reference
 
-## Main Modules
+An overview of the modules in `smart_shell/`. See the source for details.
 
-- `smart_shell.main`: Entry point, CLI logic, interactive mode, and special commands
-- `smart_shell.ai_wrapper`: Handles AI model communication (Gemini)
-- `smart_shell.safety`: Safety checks, command validation, and user confirmation logic
-- `smart_shell.config`: Configuration, API key management, and model selection
-- `smart_shell.shell_builder`: Bash/Zsh command construction and banner display
-- `smart_shell.utils`: Utility functions (execution, logging, sudo, OS detection)
-- `smart_shell.setup_logic`: Setup and installation logic
+## Modules
 
-## Key Classes & Functions
+| Module | Purpose |
+|--------|---------|
+| `main` | Click CLI (`run`, `setup`, `models`, `history`, `version`, `help`), the interactive REPL and `!` commands |
+| `ai_wrapper` | `AIClient` for OpenAI-compatible APIs and the provider presets |
+| `setup_logic` | The `smart-shell setup` wizard |
+| `shell_builder` | System prompt, plan parsing, banner and welcome message |
+| `safety` | Command risk classification |
+| `history` | Command history in `~/.local/share/smart-shell/history.json` |
+| `updater` | `!update`: version check against GitHub, update via git or pip |
+| `utils` | Command execution, OS and shell detection, previews, error log |
+| `config` | Load and save `~/.config/smart-shell/config.json` |
 
-### ai_wrapper.py
-- `get_wrapper(api_key)`: Returns an AIWrapper instance for Gemini
-- `AIWrapper.list_available_models()`: List supported Gemini models
-- `AIWrapper.generate_command(prompt, model)`: Generate Bash/Zsh command from prompt
+## ai_wrapper.py
 
-### safety.py
-- `check_command_safety(command)`: Returns safety analysis with status ("safe", "medium", "high", "info_leak") and detailed reason
-- Safety levels trigger appropriate confirmation prompts in the main application
+- `PROVIDERS`: `name -> (base_url, default_model or None, needs_api_key)` for gemini, openai, deepseek, openrouter, groq, ollama, lmstudio.
+- `AIClient(base_url, api_key=None)`
+    - `list_models()`: sorted model ids from `GET /models`.
+    - `chat(model, system, user, temperature=0.3, max_tokens=3000)`: text from `POST /chat/completions`, with `<think>` blocks stripped. Retries on connection errors, timeouts, 429 and 5xx.
+- `AIError`: raised for connection, auth, 404 and unexpected-response errors.
+- `get_client(config=None)`: builds a client from the config; `SMART_SHELL_BASE_URL` and `SMART_SHELL_API_KEY` take precedence.
+- `resolve_model(client, model=None, config=None)`: explicit model, else configured default, else provider default, else first listed model.
+- `is_configured(config=None)`: whether a provider or API key is set.
 
-### config.py
-- `load_config()`: Loads config file
-- `save_model(model)`: Saves selected model
-- `get_current_model()`: Gets current model
-- `ENV_API_KEY`: Environment variable for API key
+## shell_builder.py
 
-### shell_builder.py
-- `generate_command_plan(prompt, api_key, model, os_info)`: Returns a list of command(s) for a prompt
-- `display_banner()`: Prints the Smart-Shell banner
-- `BANNER`: Banner string
+- `generate_command_plan(prompt, client, model, os_info=None)`: returns a list of shell commands for the prompt.
+- `display_banner()`, `display_welcome_message(shell_type)`.
 
-### utils.py
-- `execute_command(command)`: Runs a shell command safely
-- `print_plan_preview(plan, safety_results)`: Shows command plan with safety analysis
-- `reset_sudo_password()`: Clears cached sudo password
-- `log_error(error)`: Logs errors to file
-- `get_os_info()`: Returns detailed OS information
-- `detect_shell()`: Detects current shell (Bash or Zsh)
-- `validate_sudo_password(password)`: Validates sudo credentials
+## safety.py
 
-### setup_logic.py
-- `setup_config()`: Runs interactive setup wizard
-- `setup_api_key(config)`: Handles API key configuration with validation
-- `setup_sudo_password(config)`: Handles sudo password setup with security warnings
-- `set_default_model(api_key, config)`: Interactive model selection during setup
+- `check_command_safety(command)`: returns `{"status", "reason", "notes"}` where status is `blocked`, `high`, `medium`, `info_leak` or `safe`. See [Safety](safety.md).
 
-## Special Commands
+## config.py
 
-The interactive mode supports various special commands:
+- `load_config()`: reads the config and removes any legacy stored sudo password.
+- `save_config(config)`: writes the config with `0600` permissions.
+- `ENV_API_KEY`: `"SMART_SHELL_API_KEY"`.
 
-- `!help`: Show comprehensive help
-- `!history`: Display command history
-- `!last`: Show last generated command  
-- `!redo`: Re-execute last command
-- `!clear`: Clear the screen
-- `!models`: List available AI models
-- `!model <name>`: Switch AI model
-- `!web`: Toggle web search integration
-- `!update`: Check for and install updates from GitHub
-- `!errors`: Show error log
-- `!forget-sudo`: Clear cached sudo password
-- `!creator`: Show creator information
-- `!docs`: Show documentation link
+## setup_logic.py
 
----
+- `setup_config()`: full wizard.
+- `setup_provider(config)`: choose provider, base URL and key; returns a working `AIClient` or `None`.
+- `set_default_model(client, config)`: pick a default model from the live list.
 
-For more, see the source code and inline docstrings. All modules are designed for Bash and Zsh compatibility, and safety checks always prompt for confirmation on high-risk commands.
+## utils.py
+
+- `execute_command(command)`: runs a command in the user's shell, returns `True` on success.
+- `print_plan_preview(plan, safety_results)`: shows the plan with safety levels.
+- `get_os_info()`, `detect_shell()`.
+- `reset_sudo_password()`: runs `sudo -k`.
+- `log_error(message)`: appends to `~/.local/share/smart-shell/error.log`.
+
+## history.py
+
+- `save_to_history(prompt, command, executed=False)`, `update_history_result(history_id, success)`.
+- `show_command_history()`, `show_last_command()`, `redo_last_command()`.
