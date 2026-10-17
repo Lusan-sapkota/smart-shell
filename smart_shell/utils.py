@@ -186,7 +186,7 @@ def print_plan_preview(command_plan: list[str], safety_results: list[dict[str, A
     table.add_column("Safety Level", style="bold")
     table.add_column("Details")
 
-    color_map = {"safe": "green", "medium": "yellow", "high": "red"}
+    color_map = {"safe": "green", "info_leak": "blue", "medium": "yellow", "high": "red", "blocked": "bold red"}
 
     for i, (command, result) in enumerate(zip(command_plan, safety_results)):
         status = result.get("status", "safe")
