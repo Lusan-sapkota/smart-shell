@@ -17,7 +17,7 @@ COMMANDS = {
     "/model": "switch model, e.g. /model qwen2.5-coder:3b",
     "/models": "list models from the provider",
     "/explain": "explain a command, e.g. /explain tar -xzf a.tgz",
-    "/dry": "toggle dry run (show plans, run nothing)",
+    "/mode": "ask, auto or plan (Shift+Tab cycles)",
     "/history": "show recent commands",
     "/last": "show the last generated command",
     "/redo": "run the last plan again",
@@ -29,7 +29,16 @@ COMMANDS = {
     "/exit": "quit Smart-Shell",
 }
 
+MODES = {
+    "ask": "every plan asks yes / no / edit",
+    "auto": "safe plans run without asking; risky ones still ask",
+    "plan": "show plans only, run nothing",
+}
+
 STYLE = Style.from_dict({
+    "mode-ask": "fg:ansicyan bold",
+    "mode-auto": "fg:ansiyellow bold",
+    "mode-plan": "fg:ansimagenta bold",
     "prompt": "ansicyan bold",
     "bottom-toolbar": "noreverse bg:default fg:ansibrightblack",
     "bottom-toolbar.key": "fg:ansicyan",
@@ -47,6 +56,12 @@ class SlashCompleter(Completer):
         text = document.text_before_cursor
         if not text.startswith("/"):
             return
+        if text.startswith("/mode "):
+            word = text[len("/mode "):]
+            for mode, meta in MODES.items():
+                if mode.startswith(word):
+                    yield Completion(mode, start_position=-len(word), display_meta=meta)
+            return
         if text.startswith("/model "):
             if self.models is None:
                 try:
@@ -63,13 +78,18 @@ class SlashCompleter(Completer):
                 yield Completion(name, start_position=-len(text), display_meta=meta)
 
 
-def make_reader(history_file, list_models, status):
-    """Return read() -> str; raises EOFError on Ctrl+D. status() gives the status bar text."""
+def make_reader(history_file, list_models, status, cycle_mode):
+    """Return read() -> str; raises EOFError on Ctrl+D. status() gives the status bar, Shift+Tab calls cycle_mode()."""
     if not sys.stdin.isatty():
         # Piped input (scripts, tests): plain input() without the UI.
         return lambda: input("> ")
 
     bindings = KeyBindings()
+
+    @bindings.add("s-tab", eager=True)
+    def _(event):
+        cycle_mode()
+        event.app.invalidate()
 
     @bindings.add("escape", "enter")
     def _(event):

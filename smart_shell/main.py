@@ -19,7 +19,7 @@ from .utils import execute_command, print_plan_preview, reset_sudo_password, ERR
 from .ai_wrapper import PROVIDERS, get_client, resolve_model, is_configured, override_provider, AIError
 from .history import HISTORY_DIR, save_to_history, update_history_result, show_command_history, show_last_command, redo_last_command
 from .updater import handle_update_command, get_current_version
-from .ui import COMMANDS, make_reader
+from .ui import COMMANDS, MODES, make_reader
 
 console = Console()
 
@@ -114,7 +114,7 @@ def run(prompt, dry_run, model, interactive, yes, provider, base_url):
 RISK_ORDER = ["safe", "info_leak", "medium", "high", "blocked"]
 
 
-def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False, session=None):
+def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False, session=None, auto_safe=False):
     """Generate a plan for the prompt, then review and run it."""
     console.print(f"\n[bold blue]Prompt:[/bold blue] {user_prompt}")
     try:
@@ -135,10 +135,10 @@ def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False, 
     entry = {"prompt": user_prompt, "commands": plan, "result": "not run"}
     if session is not None:
         session.append(entry)
-    return review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry)
+    return review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry, auto_safe)
 
 
-def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry):
+def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry, auto_safe=False):
     """Preview, confirm (yes / no / edit), run, and offer an AI fix if it fails."""
     while True:
         results = [check_command_safety(cmd) for cmd in plan]
@@ -154,6 +154,9 @@ def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry):
             console.print("[bold red]Blocked: this plan will not run.[/bold red] You can edit it or cancel.")
             choice = "n" if auto_yes else Prompt.ask(r"\[e]dit or \[n]o", choices=["e", "n"], default="n")
         elif auto_yes:
+            choice = "y"
+        elif auto_safe and worst == "safe":
+            console.print("[dim]Auto mode: running a safe plan without asking.[/dim]")
             choice = "y"
         else:
             if worst in ("high", "medium"):
@@ -205,16 +208,20 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
         console.print(f"[bold red]Error:[/bold red] {e}")
         return
 
-    state = {"model": current_model, "dry_run": dry_run}
+    state = {"model": current_model, "mode": "plan" if dry_run else "ask"}
     provider = config.get("provider", "gemini")
 
     def status():
         cwd = os.getcwd().replace(os.path.expanduser("~"), "~", 1)
-        dry = " · <b>dry run</b>" if state["dry_run"] else ""
-        return (f" {escape(provider)}:{escape(state['model'])} · {shell_type} · {escape(cwd)}{dry}"
-                f"   <key>/</key> commands · <key>Esc Enter</key> new line · <key>Ctrl+D</key> quit")
+        return (f" <mode-{state['mode']}>{state['mode']} mode</mode-{state['mode']}> · "
+                f"{escape(provider)}:{escape(state['model'])} · {shell_type} · {escape(cwd)}"
+                f"   <key>Shift+Tab</key> mode · <key>/</key> commands · <key>Ctrl+D</key> quit")
 
-    read = make_reader(os.path.join(HISTORY_DIR, "input_history"), client.list_models, status)
+    def cycle_mode():
+        names = list(MODES)
+        state["mode"] = names[(names.index(state["mode"]) + 1) % len(names)]
+
+    read = make_reader(os.path.join(HISTORY_DIR, "input_history"), client.list_models, status, cycle_mode)
     console.print(f"[bold cyan]Smart-Shell[/bold cyan] v{get_current_version()}  "
                   f"[dim]{provider}:{current_model}  {shell_type}[/dim]", highlight=False)
     console.print("[dim]Describe what you want to do. Type / for commands.[/dim]", highlight=False)
@@ -233,7 +240,8 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
             handle_special_command(user_prompt, state, client)
             continue
         try:
-            process_prompt(user_prompt, state["dry_run"], state["model"], client, config, auto_yes, session)
+            process_prompt(user_prompt, state["mode"] == "plan", state["model"], client, config, auto_yes, session,
+                           auto_safe=state["mode"] == "auto")
         except KeyboardInterrupt:
             console.print("\n[yellow]Interrupted.[/yellow]")
     console.print("[green]Goodbye![/green]")
@@ -260,9 +268,14 @@ def handle_special_command(command, state, client):
         # Keep the original case: model ids like Qwen/Qwen2.5 are case-sensitive.
         state["model"] = arg
         console.print(f"[green]✓ Switched to model: {arg}[/green]")
-    elif name == "/dry":
-        state["dry_run"] = not state["dry_run"]
-        console.print(f"Dry run is {'on: plans are shown, nothing runs' if state['dry_run'] else 'off'}.")
+    elif name == "/mode":
+        if arg not in MODES:
+            console.print(f"Mode is [bold]{state['mode']}[/bold]. Use /mode " + "|".join(MODES) + " or Shift+Tab.")
+            for mode, description in MODES.items():
+                console.print(f"  [cyan]{mode}[/cyan]  {description}")
+            return
+        state["mode"] = arg
+        console.print(f"[green]✓ {arg} mode:[/green] {MODES[arg]}")
     elif name == "/explain" and arg:
         safety = check_command_safety(arg)
         console.print(f"[bold]Safety level:[/bold] {safety['status'].upper()} ({safety['notes']})")

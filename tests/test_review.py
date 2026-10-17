@@ -14,14 +14,14 @@ class FakeClient:
         return self.replies.pop(0)
 
 
-def run_with(monkeypatch, answers, results, plan, client=None, auto_yes=False):
+def run_with(monkeypatch, answers, results, plan, client=None, auto_yes=False, auto_safe=False):
     answers, results, ran = list(answers), list(results), []
     monkeypatch.setattr(main.Prompt, "ask", staticmethod(lambda *a, **k: answers.pop(0)))
     monkeypatch.setattr(main.Confirm, "ask", staticmethod(lambda *a, **k: answers.pop(0)))
     monkeypatch.setattr(main, "execute_command", lambda cmd: (ran.append(cmd), results.pop(0))[1])
     monkeypatch.setattr(main, "save_to_history", lambda *a, **k: "id")
     monkeypatch.setattr(main, "update_history_result", lambda *a: None)
-    ok = main.review_and_run("req", plan, False, auto_yes, client, "m", {})
+    ok = main.review_and_run("req", plan, False, auto_yes, client, "m", {}, auto_safe)
     return ok, ran
 
 
@@ -63,3 +63,18 @@ def test_history_is_bounded_private_and_tolerates_corruption(tmp_path, monkeypat
     assert [e["prompt"] for e in saved] == ["p2", "p3", "p4"] and saved[-1]["success"] is True
     assert len(set(ids)) == 5
     assert (tmp_path / "h.json").stat().st_mode & 0o777 == 0o600
+
+
+def test_auto_mode_runs_safe_plans_without_asking(monkeypatch):
+    ok, ran = run_with(monkeypatch, [], [(True, "")], ["ls"], auto_safe=True)
+    assert ok and ran == ["ls"]
+
+
+def test_auto_mode_still_asks_for_risky_plans(monkeypatch):
+    ok, ran = run_with(monkeypatch, ["n"], [], ["sudo apt install htop"], auto_safe=True)
+    assert not ok and ran == []
+    ok, ran = run_with(monkeypatch, ["n"], [], ["env"], auto_safe=True)
+    assert not ok and ran == []
+    for risky in (["rm notes.txt"], ["ls", "rm -rf build"], ["git reset --hard"]):
+        ok, ran = run_with(monkeypatch, ["n"], [], risky, auto_safe=True)
+        assert not ok and ran == []

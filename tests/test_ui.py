@@ -10,7 +10,8 @@ def complete(text, models=("qwen2.5:0.5b", "qwen2.5-coder:3b", "llama3")):
 
 
 def test_slash_menu_and_model_names():
-    assert complete("/mo")[0] == ["/model", "/models"]
+    assert complete("/mo")[0] == ["/model", "/models", "/mode"]
+    assert complete("/mode a")[0] == ["ask", "auto"]
     assert complete("/")[0] == list(COMMANDS)
     assert complete("list files")[0] == []
     names, calls = complete("/model qwen")
