@@ -5,10 +5,6 @@ Safety Module for Smart-Shell - Classifies commands into risk levels.
 import re
 from typing import Dict, Any
 
-# ==============================================================================
-# Risk Level Definitions
-# ==============================================================================
-
 # Start of a command: line start, after ; & | ( or `, optionally behind sudo.
 CMD = r"(?:^|[;&|(`]\s*)(?:sudo\s+)?"
 
@@ -77,7 +73,7 @@ MEDIUM_RISK_PATTERNS = {
     r"\b(mount|umount)\b": "Alters filesystem mount state.",
     r"\b(chown|chmod|setfacl|chattr)\b": "Modifies file permissions or attributes.",
     CMD + r"passwd\b": "Resets user passwords.",
-    r"\bcrontab\b": "Schedules jobs that run periodically — may persist undesired actions.",
+    r"\bcrontab\b": "Schedules jobs that run periodically, may persist undesired actions.",
     r"\.(bashrc|profile|zshrc|bash_profile)": "Modifying shell config can break login or shell startup.",
 
     # Dangerous file operations
@@ -95,7 +91,7 @@ INFO_LEAK_PATTERNS = {
     r"cat\s+.*history": "May expose recent terminal usage, including secrets.",
     r"cat\s+\.env": "May reveal environment config secrets.",
     CMD + r"(env|printenv)\s*($|[;&|>])": "Lists all environment variables, which may contain secrets.",
-    r"ps\s+auxww": "Shows full command line — may include keys/passwords.",
+    r"ps\s+auxww": "Shows full command line, may include keys/passwords.",
     r"grep\s+['\"]?(token|key|secret)['\"]?\s+.*": "Actively searching logs or configs for secrets.",
     CMD + r"set\s*($|[;&|>])": "Shows shell environment, often including variables.",
 }
@@ -106,16 +102,7 @@ INFO_LEAK_PATTERNS = {
 SUDO_PATTERN = r"\bsudo\b"
 
 def check_command_safety(command: str) -> Dict[str, Any]:
-    """
-    Check the safety level of a command based on predefined patterns.
-    
-    Args:
-        command (str): The command to check.
-        
-    Returns:
-        A dictionary containing the safety status ('high', 'medium', 'safe')
-        and a reason for the classification.
-    """
+    """Check the safety level of a command based on predefined patterns."""
     for pattern, reason in BLOCKED_PATTERNS.items():
         if re.search(pattern, command, re.IGNORECASE):
             return {

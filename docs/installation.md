@@ -10,10 +10,21 @@ curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/insta
 
 The script:
 
-1. Checks for Python, pip and pipx.
-2. Installs Smart-Shell using one of three methods: system-wide (sudo), user install with pipx (recommended), or a virtual environment (for development).
-3. Creates a desktop entry and Bash/Zsh tab completion.
+1. Installs the `smart-shell-cli` package with uv if it is installed, otherwise with pipx.
+2. Removes any older install, including the pre-1.1.0 `smart-shell` package name.
+3. Adds Bash/Zsh tab completion and a desktop entry.
 4. Runs `smart-shell setup`.
+
+## Install with uv
+
+If you already use [uv](https://docs.astral.sh/uv/), you can skip the script:
+
+```bash
+uv tool install git+https://github.com/Lusan-sapkota/smart-shell
+smart-shell setup
+```
+
+Upgrade with `uv tool upgrade smart-shell-cli`, remove with `uv tool uninstall smart-shell-cli`. With pipx, use `pipx install git+https://github.com/Lusan-sapkota/smart-shell` the same way.
 
 Dependencies are `rich`, `click` and `requests`. To install them yourself (for example behind a restrictive firewall):
 
@@ -71,6 +82,6 @@ Pick the pulled model as your default and you're done. LM Studio works the same 
 
 ## Troubleshooting
 
-- **`smart-shell: command not found`**: make sure `~/.local/bin` is on your `PATH` (`pipx ensurepath`), then open a new terminal.
+- **`smart-shell: command not found`**: make sure `~/.local/bin` is on your `PATH` (`uv tool update-shell` or `pipx ensurepath`), then open a new terminal.
 - **pipx / PEP 668 errors**: install pipx (`sudo apt install pipx`), run `pipx ensurepath`, and rerun the installer. See the [FAQ](faq.md).
 - **Connection check fails during setup**: verify the API key, or for Ollama that `ollama serve` is running.

@@ -45,7 +45,7 @@ smart_shell/
   shell_builder.py  system prompt, plan parsing, banner
   safety.py         command risk classification
   history.py        command history
-  updater.py        `!update` (git pull or pip upgrade)
+  updater.py        `!update` (PyPI version check, upgrade via uv/pipx/pip)
   utils.py          command execution, OS/shell detection, error log
   config.py         load/save ~/.config/smart-shell/config.json
 tests/              pytest suite

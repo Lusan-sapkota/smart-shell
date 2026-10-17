@@ -18,23 +18,11 @@ HISTORY_DIR = os.path.expanduser("~/.local/share/smart-shell")
 HISTORY_FILE = os.path.join(HISTORY_DIR, "history.json")
 
 def save_to_history(prompt, command, executed=False):
-    """
-    Save a command to history.
-    
-    Args:
-        prompt (str): The user's natural language prompt
-        command (str): The generated command
-        executed (bool): Whether the command was executed
-        
-    Returns:
-        str: The ID of the history entry
-    """
+    """Save a command to history."""
     os.makedirs(HISTORY_DIR, exist_ok=True)
     
-    # Generate a unique ID
     history_id = datetime.now().strftime("%Y%m%d%H%M%S")
     
-    # Create history entry
     entry = {
         "id": history_id,
         "timestamp": datetime.now().isoformat(),
@@ -44,7 +32,6 @@ def save_to_history(prompt, command, executed=False):
         "success": None  # Will be updated after execution
     }
     
-    # Load existing history
     history = []
     if os.path.exists(HISTORY_FILE):
         try:
@@ -53,37 +40,26 @@ def save_to_history(prompt, command, executed=False):
         except:
             history = []
     
-    # Add new entry
     history.append(entry)
     
-    # Save history
     with open(HISTORY_FILE, "w") as f:
         json.dump(history, f, indent=2)
     
     return history_id
 
 def update_history_result(history_id, success):
-    """
-    Update the success status of a history entry.
-    
-    Args:
-        history_id (str): The ID of the history entry
-        success (bool): Whether the command executed successfully
-    """
+    """Update the success status of a history entry."""
     if not os.path.exists(HISTORY_FILE):
         return
     
-    # Load history
     with open(HISTORY_FILE, "r") as f:
         history = json.load(f)
     
-    # Update entry
     for entry in history:
         if entry["id"] == history_id:
             entry["success"] = success
             break
     
-    # Save history
     with open(HISTORY_FILE, "w") as f:
         json.dump(history, f, indent=2)
 
@@ -93,7 +69,6 @@ def show_command_history():
         console.print("[yellow]No command history found.[/yellow]")
         return
     
-    # Load history
     with open(HISTORY_FILE, "r") as f:
         history = json.load(f)
     
@@ -101,7 +76,6 @@ def show_command_history():
         console.print("[yellow]Command history is empty.[/yellow]")
         return
     
-    # Display history
     console.print("[bold]Command History:[/bold]")
     for i, entry in enumerate(reversed(history[-10:])):  # Show last 10 entries
         timestamp = datetime.fromisoformat(entry["timestamp"]).strftime("%Y-%m-%d %H:%M:%S")
@@ -138,7 +112,6 @@ def show_last_command():
         console.print(f"[bold]Last Command:[/bold]")
         console.print(f"[blue]Prompt:[/blue] {last_entry['prompt']}")
         
-        # Handle both string and list commands
         command = last_entry['command']
         if isinstance(command, list):
             for i, cmd in enumerate(command, 1):
@@ -168,7 +141,6 @@ def redo_last_command():
         last_entry = history[-1]
         command = last_entry['command']
         
-        # Handle both string and list commands
         if isinstance(command, list):
             blocked = [c for c in command if check_command_safety(c)["status"] == "blocked"]
             if blocked:

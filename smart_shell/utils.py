@@ -3,42 +3,33 @@ Utility functions for Smart-Shell
 """
 
 import os
+import sys
 import subprocess
 import re
 from typing import Dict, Any, Optional
 from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
-from rich.markdown import Markdown
 from datetime import datetime
 
 console = Console()
 
-# Error log file
 ERROR_LOG_DIR = os.path.expanduser("~/.local/share/smart-shell")
 ERROR_LOG_FILE = os.path.join(ERROR_LOG_DIR, "error.log")
 
 def get_os_info() -> Dict[str, str]:
-    """
-    Parses /etc/os-release to get Linux distribution information.
-
-    Returns:
-        A dictionary containing the OS 'id' and 'name'.
-    """
+    """Parses /etc/os-release to get Linux distribution information."""
     os_info = {"id": "unknown", "name": "Unknown Linux"}
     try:
         with open("/etc/os-release") as f:
             for line in f:
                 if "=" in line:
                     key, value = line.strip().split("=", 1)
-                    # Remove quotes from value
                     value = value.strip('"')
                     if key == "ID":
                         os_info["id"] = value
                     elif key == "PRETTY_NAME":
                         os_info["name"] = value
     except FileNotFoundError:
-        # For non-Linux systems or if the file is missing
         import platform
         os_info["id"] = platform.system().lower()
         os_info["name"] = platform.system()
@@ -64,15 +55,7 @@ def detect_shell() -> str:
         return "bash"  # Default fallback
 
 def execute_command(command: str) -> bool:
-    """
-    Execute a shell command, handling sudo and displaying output.
-    
-    Args:
-        command (str): The command to execute.
-        
-    Returns:
-        bool: True if command executed successfully, False otherwise.
-    """
+    """Execute a shell command, handling sudo and displaying output."""
     console.print(f"[bold green]Executing:[/bold green] {command}")
     console.print("─" * console.width)
 
@@ -80,24 +63,16 @@ def execute_command(command: str) -> bool:
         # sudo prompts on the terminal itself, so the password never passes through us.
         shell_type = detect_shell()
         shell_executable = f"/bin/{shell_type}" if shell_type in ("bash", "zsh") else "/bin/bash"
-        process = subprocess.Popen(
-            command,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            executable=shell_executable # Use detected shell
-        )
-
-        # Stream output
-        stdout_text, stderr_text = process.communicate()
-
-        if stdout_text:
-            console.print(stdout_text.strip())
-        if stderr_text:
-            # Don't show the "sudo: password" prompt in stderr
-            if "sudo: password" not in stderr_text.lower() and "try again" not in stderr_text.lower():
-                 console.print(f"[red]{stderr_text.strip()}[/red]")
+        # stdout goes straight to the terminal so output is live and prompts (apt's y/n) work.
+        # stderr is echoed live too, keeping the tail for the error hints below.
+        process = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, executable=shell_executable)
+        tail = b""
+        for chunk in iter(lambda: os.read(process.stderr.fileno(), 4096), b""):
+            sys.stderr.buffer.write(chunk)
+            sys.stderr.flush()
+            tail = (tail + chunk)[-4096:]
+        process.wait()
+        stderr_text = tail.decode(errors="replace")
 
         console.print("─" * console.width)
 
@@ -132,50 +107,9 @@ def extract_missing_command(error_text: str) -> Optional[str]:
         return match.group(1)
     return None
 
-def suggest_package(command: str) -> Optional[str]:
-    """Suggest a package that might provide the missing command."""
-    # Common command to package mappings
-    command_map = {
-        "curl": "curl",
-        "wget": "wget",
-        "git": "git",
-        "pip": "python3-pip",
-        "pip3": "python3-pip",
-        "python": "python3",
-        "python3": "python3",
-        "node": "nodejs",
-        "npm": "npm",
-        "docker": "docker.io",
-        "java": "default-jre",
-        "javac": "default-jdk",
-        "mvn": "maven",
-        "gradle": "gradle",
-        "vim": "vim",
-        "nano": "nano",
-        "zip": "zip",
-        "unzip": "unzip",
-        "tar": "tar",
-        "ssh": "openssh-client",
-        "scp": "openssh-client",
-        "rsync": "rsync",
-        "nc": "netcat",
-        "nmap": "nmap",
-        "convert": "imagemagick",
-        "ffmpeg": "ffmpeg",
-        "gcc": "build-essential",
-        "make": "build-essential",
-    }
-    
-    return command_map.get(command, command)
 
 def print_plan_preview(command_plan: list[str], safety_results: list[dict[str, Any]]) -> None:
-    """
-    Prints a preview of the entire command plan in a table.
-
-    Args:
-        command_plan (list[str]): The list of commands to be executed.
-        safety_results (list[dict[str, Any]]): The safety check results for each command.
-    """
+    """Prints a preview of the entire command plan in a table."""
     table = Table(title="[bold]Execution Plan[/bold]", show_header=True, header_style="bold magenta")
     table.add_column("Step", style="dim", width=5)
     table.add_column("Command", style="cyan")
@@ -197,40 +131,6 @@ def print_plan_preview(command_plan: list[str], safety_results: list[dict[str, A
     
     console.print(table)
 
-def print_command_preview(command: str, safety_result: Dict[str, Any]) -> None:
-    """Print a preview of the command with syntax highlighting and safety info."""
-    status = safety_result.get("status", "safe")
-    reason = safety_result.get("notes", "No notes.")
-    
-    color_map = {
-        "safe": "green",
-        "medium": "yellow",
-        "high": "red"
-    }
-    color = color_map.get(status, "white")
-
-    # Create a panel with the safety info
-    preview_panel = Panel(
-        f"[bold]Command:[/bold] [cyan]{command}[/cyan]\n"
-        f"[bold]Safety Level:[/bold] [{color}]{status.upper()}[/{color}]\n"
-        f"[bold]Details:[/bold] {reason}",
-        title="Command Preview",
-        border_style=color,
-        expand=False
-    )
-    console.print(preview_panel)
-
-def format_help_text(text: str) -> None:
-    """DEPRECATED: No longer needed with rich text."""
-    md = Markdown(text)
-    console.print(md)
-    
-def get_terminal_size() -> Dict[str, int]:
-    """Get the size of the terminal."""
-    return {
-        "width": console.width,
-        "height": console.height
-    }
 
 def log_error(error_message):
     """Logs an error message to the error log file."""

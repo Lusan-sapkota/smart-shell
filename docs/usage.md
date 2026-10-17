@@ -29,6 +29,10 @@ Options for `run`:
 | `--model`, `-m NAME`  | Use a specific model for this run                                  |
 | `--interactive`, `-i` | Start interactive mode                                             |
 | `-y`                  | Skip confirmations (blocked commands still never run)              |
+| `--provider NAME`     | Use another provider for this run (`ollama`, `deepseek`, ...)      |
+| `--base-url URL`      | Use another OpenAI-compatible URL for this run                     |
+
+`--provider` and `--base-url` also work without a subcommand (`smart-shell --provider ollama`) to start interactive mode against that provider. Your saved API key is only sent to the server it was saved for; for a different cloud provider, pass the key in `SMART_SHELL_API_KEY`.
 
 ## Interactive commands
 
@@ -41,11 +45,12 @@ Type these at the `Smart-Shell (model):` prompt:
 | `!clear`         | Clear the screen                          |
 | `!models`        | List models from the provider             |
 | `!model <name>`  | Switch model for this session             |
+| `!explain <cmd>` | Explain what a command does, with its safety level |
 | `!last`          | Show the last generated command           |
 | `!redo`          | Re-run the last plan (all steps, after a safety check) |
 | `!errors`        | Show the error log                        |
 | `!forget-sudo`   | Run `sudo -k` to drop cached sudo credentials |
-| `!update`        | Check GitHub for updates and install them |
+| `!update`        | Check for a new version and upgrade with uv, pipx or pip |
 | `!creator`       | Show creator information                  |
 | `!docs`          | Show the documentation link               |
 
@@ -57,7 +62,9 @@ Exit with `exit`, `quit`, `bye`, `q`, Ctrl+C or Ctrl+D.
 2. Each command is classified (see [Safety](safety.md)) and shown in a preview.
 3. Blocked commands stop the run; you can edit the command instead.
 4. High or medium risk commands ask for y/n confirmation (unless `-y`).
-5. The plan runs in one shell joined with `&&`, stopping at the first failure.
+5. The plan runs in one shell joined with `&&`, stopping at the first failure. Output appears live, and interactive prompts (like `apt`'s y/n) work.
+
+In interactive mode, your last few requests and their commands are sent along with each new one, so follow-ups work: "list the biggest files in ~/Downloads", then "now delete the ones older than a year".
 
 `sudo` asks for your password in the terminal as usual. Smart-Shell never stores it.
 

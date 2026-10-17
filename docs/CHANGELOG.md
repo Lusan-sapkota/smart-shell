@@ -13,10 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `smart-shell setup` now picks a provider, confirms the base URL, checks the connection and offers the live model list.
 - `SMART_SHELL_BASE_URL` environment variable, alongside `SMART_SHELL_API_KEY`.
 - `blocked` safety level for commands that never run (`rm -rf /`, fork bombs, `mkfs` or `dd` onto disks, and similar).
+- `--provider` and `--base-url` options to use another provider for one run. The saved API key is only sent to the server it was saved for.
+- `!explain <command>` explains a command and shows its safety level.
+- Follow-ups in interactive mode: recent requests are sent as context.
+- `install.sh --uninstall`.
+- Installation with uv (`uv tool install`), preferred by the installer when available.
 - pytest suite in `tests/` and a CI workflow running it on Python 3.9 and 3.13.
 
 ### Changed
+- Package renamed to `smart-shell-cli` (the `smart-shell` name on PyPI belongs to another project). The command is still `smart-shell`.
 - Multi-step plans run in one shell joined with `&&` and stop at the first failure.
+- Command output is shown live, so interactive prompts work.
+- Replies from small local models that wrap JSON in code fences, use shell escapes inside JSON, or answer with a bash block are now parsed.
+- `install.sh` rewritten: uv or pipx only, completion generated from the CLI itself.
+- `!update` checks PyPI and upgrades with the tool that installed Smart-Shell; it no longer stashes changes or pulls in a git checkout.
 - Safety rules catch `rm` recursive/force flags in any spelling and piping into a shell, with fewer false positives.
 - Config is written with `0600` permissions. Old configs with only `api_key` are treated as Gemini.
 - `!models` lists models straight from the provider.
@@ -28,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Model pricing info, premium/free warnings and `!models free|premium|legacy|refresh`.
 - Mentions of a `!web` web search command, which never existed.
 - `google-genai`, `google-api-core`, `pyyaml` and `toml` dependencies.
+- System-wide and virtualenv options in `install.sh` (use `pip install -e .` for development).
 - `examples/`, root `uninstall.sh` and `CHANGELOG.md`, `smart_shell/offline.py`, `smart_shell/model_info.py`, and the old `smart_shell/test_smart_shell.py`.
 
 ## [1.0.0] - 2025-06-30

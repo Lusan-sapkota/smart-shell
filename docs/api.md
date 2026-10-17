@@ -12,7 +12,7 @@ An overview of the modules in `smart_shell/`. See the source for details.
 | `shell_builder` | System prompt, plan parsing, banner and welcome message |
 | `safety` | Command risk classification |
 | `history` | Command history in `~/.local/share/smart-shell/history.json` |
-| `updater` | `!update`: version check against GitHub, update via git or pip |
+| `updater` | `!update`: version check against PyPI (GitHub releases as fallback), upgrade via uv, pipx or pip |
 | `utils` | Command execution, OS and shell detection, previews, error log |
 | `config` | Load and save `~/.config/smart-shell/config.json` |
 

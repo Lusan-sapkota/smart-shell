@@ -85,6 +85,25 @@ class AIClient:
         return re.sub(r"<think>.*?</think>", "", text, flags=re.S).strip()
 
 
+def override_provider(config, provider=None, base_url=None):
+    """Config for a one-off run against another provider or URL."""
+    if not provider and not base_url:
+        return config
+    saved = config.get("provider", "gemini" if config.get("api_key") else None)
+    saved_url = config.get("base_url") or PROVIDERS.get(saved, (None,))[0]
+    provider = provider or saved
+    if provider == "custom" and not base_url:
+        raise AIError("--provider custom needs --base-url.")
+    new = dict(config, provider=provider)
+    new["base_url"] = base_url or (saved_url if provider == saved else PROVIDERS[provider][0])
+    if provider != saved:
+        new.pop("default_model", None)
+    # Never send the saved key to a server it wasn't saved for; use SMART_SHELL_API_KEY instead.
+    if new["base_url"] != saved_url:
+        new.pop("api_key", None)
+    return new
+
+
 def is_configured(config=None):
     config = load_config() if config is None else config
     return bool(config.get("provider") or config.get("api_key") or os.environ.get(ENV_API_KEY))

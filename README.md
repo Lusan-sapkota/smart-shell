@@ -1,12 +1,13 @@
 # Smart-Shell
 
+[![Release](https://img.shields.io/github/v/release/Lusan-sapkota/smart-shell)](https://github.com/Lusan-sapkota/smart-shell/releases/latest)
 [![Tests](https://github.com/Lusan-sapkota/smart-shell/actions/workflows/test.yml/badge.svg)](https://github.com/Lusan-sapkota/smart-shell/actions/workflows/test.yml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/Lusan-sapkota/smart-shell/blob/main/LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
-[![AI](https://img.shields.io/badge/AI-OpenAI--compatible-orange)](docs/installation.md#providers)
+[![AI](https://img.shields.io/badge/AI-OpenAI--compatible-orange)](https://smart-shell.lusansapkota.com.np/installation/#providers)
 
 <p align="center">
-  <img src="docs/images/image.png" alt="Smart-Shell Demo" width="500"/>
+  <img src="https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/docs/images/image.png" alt="Smart-Shell Demo" width="500"/>
 </p>
 
 Smart-Shell turns plain English into Bash or Zsh commands, checks them for risk, and runs them after you confirm. It works with any OpenAI-compatible chat API: Gemini, OpenAI, DeepSeek, OpenRouter, Groq, or a local model through Ollama or LM Studio (fully offline).
@@ -29,7 +30,15 @@ Smart-Shell turns plain English into Bash or Zsh commands, checks them for risk,
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
 ```
 
-The script installs Smart-Shell (pipx, system-wide, or a virtualenv), adds a desktop entry and tab completion, and runs the setup wizard. Then:
+The script installs Smart-Shell with uv (or pipx if you don't have uv), adds tab completion and a desktop entry, and runs the setup wizard.
+
+Already use [uv](https://docs.astral.sh/uv/)? Skip the script:
+
+```bash
+uv tool install git+https://github.com/Lusan-sapkota/smart-shell
+```
+
+Then:
 
 ```bash
 smart-shell setup   # pick a provider, enter a key if needed, choose a default model
@@ -37,40 +46,37 @@ smart-shell         # start the interactive shell
 smart-shell run "find files over 100MB in my home folder" --dry-run
 ```
 
-To run fully offline with a local model, see [Using local models (Ollama)](docs/installation.md#using-local-models-ollama). For a manual or development install, see [docs/development.md](docs/development.md).
+To run fully offline with a local model, see [Using local models (Ollama)](https://smart-shell.lusansapkota.com.np/installation/#using-local-models-ollama). For a manual or development install, see [Development](https://smart-shell.lusansapkota.com.np/development/).
 
 ## Uninstall
 
 ```bash
-pipx uninstall smart-shell                 # or: sudo pip3 uninstall smart-shell
-rm -rf ~/.config/smart-shell ~/.local/share/smart-shell
-rm -f ~/.local/share/applications/smart-shell.desktop
-rm -f ~/.bash_completion.d/smart-shell-completion.bash
-sed -i '/# Smart-Shell completion/,+1d' ~/.bashrc ~/.zshrc
+curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash -s -- --uninstall
+rm -rf ~/.config/smart-shell ~/.local/share/smart-shell   # also delete config and history
 ```
 
-Details in [docs/uninstall.md](docs/uninstall.md).
+Details in [Uninstall](https://smart-shell.lusansapkota.com.np/uninstall/).
 
 ## Documentation
 
-- [Features](docs/features.md)
-- [Installation](docs/installation.md)
-- [Usage](docs/usage.md)
-- [Safety](docs/safety.md)
-- [Uninstall](docs/uninstall.md)
-- [Development](docs/development.md)
-- [API Reference](docs/api.md)
-- [FAQ](docs/faq.md)
-- [Changelog](docs/CHANGELOG.md)
-- [Future Changes](docs/futurechanges.md)
-- [Contributing](docs/contributing.md)
-- [Author](docs/author.md)
+- [Features](https://smart-shell.lusansapkota.com.np/features/)
+- [Installation](https://smart-shell.lusansapkota.com.np/installation/)
+- [Usage](https://smart-shell.lusansapkota.com.np/usage/)
+- [Safety](https://smart-shell.lusansapkota.com.np/safety/)
+- [Uninstall](https://smart-shell.lusansapkota.com.np/uninstall/)
+- [Development](https://smart-shell.lusansapkota.com.np/development/)
+- [API Reference](https://smart-shell.lusansapkota.com.np/api/)
+- [FAQ](https://smart-shell.lusansapkota.com.np/faq/)
+- [Changelog](https://smart-shell.lusansapkota.com.np/CHANGELOG/)
+- [Future Changes](https://smart-shell.lusansapkota.com.np/futurechanges/)
+- [Contributing](https://smart-shell.lusansapkota.com.np/contributing/)
+- [Author](https://smart-shell.lusansapkota.com.np/author/)
 
 Full documentation: [smart-shell.lusansapkota.com.np](https://smart-shell.lusansapkota.com.np/).
 
 ## License
 
-Apache 2.0. See [LICENSE](LICENSE).
+Apache 2.0. See [LICENSE](https://github.com/Lusan-sapkota/smart-shell/blob/main/LICENSE).
 
 ## Author
 
