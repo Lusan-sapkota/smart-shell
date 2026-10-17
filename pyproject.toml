@@ -32,3 +32,6 @@ smart-shell = "smart_shell.main:main"
 
 [tool.setuptools.packages.find]
 include = ["smart_shell", "smart_shell.*"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
