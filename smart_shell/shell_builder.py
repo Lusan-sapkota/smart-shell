@@ -8,12 +8,8 @@ import json
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from rich.style import Style
 from rich.align import Align
-from rich.prompt import Confirm
-from rich.table import Table
 from rich.box import ROUNDED, DOUBLE, HEAVY
-from rich.columns import Columns
 
 console = Console()
 

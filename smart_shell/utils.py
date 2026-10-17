@@ -4,14 +4,10 @@ Utility functions for Smart-Shell
 
 import os
 import subprocess
-import sys
-import tempfile
-import shlex
 import re
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, Optional
 from rich.console import Console
 from rich.panel import Panel
-from rich.syntax import Syntax
 from rich.table import Table
 from rich.markdown import Markdown
 from datetime import datetime
