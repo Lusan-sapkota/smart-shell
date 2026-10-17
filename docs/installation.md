@@ -1,6 +1,6 @@
 # Installation
 
-Requires Python 3.9 or newer on Linux, macOS or WSL.
+Requires Python 3.10 or newer on Linux, macOS or WSL.
 
 ## Install
 

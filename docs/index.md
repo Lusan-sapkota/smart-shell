@@ -3,7 +3,7 @@
 ![Smart-Shell Logo](images/image.png)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](license.md)
-[![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
 [![AI](https://img.shields.io/badge/AI-Local%20%2F%20OpenAI--compatible-orange)](installation.md#providers)
 
 Smart-Shell turns plain English into Bash or Zsh commands, checks each one for risk, and runs it after you confirm. It runs on a local AI model through Ollama or LM Studio, fully offline, or on any OpenAI-compatible chat API (Gemini, OpenAI, DeepSeek, OpenRouter, Groq).

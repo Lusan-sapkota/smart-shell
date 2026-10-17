@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Natural language to Bash/Zsh commands with a local AI (Ollama, LM Studio) or any OpenAI-compatible API, with safety checks."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 classifiers = [
     "Programming Language :: Python :: 3",

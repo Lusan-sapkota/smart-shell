@@ -4,7 +4,7 @@ Notes for contributors working on Smart-Shell itself.
 
 ## Setup
 
-Requires Python 3.9 or newer and git.
+Requires Python 3.10 or newer and git.
 
 ```bash
 git clone https://github.com/Lusan-sapkota/smart-shell.git
@@ -33,7 +33,7 @@ smart-shell run "list files in current directory" --dry-run
 pytest -q
 ```
 
-Tests live in `tests/`. CI (`.github/workflows/test.yml`) runs them on Python 3.9 and 3.13 for pushes to `development` and `main` and for pull requests. Add a test for any new safety rule in `tests/test_safety.py`.
+Tests live in `tests/`. CI (`.github/workflows/test.yml`) runs ruff and the tests (Python 3.10 and 3.14) for pushes to `development` and `main` and for pull requests. Add a test for any new safety rule in `tests/test_safety.py`.
 
 ## Project structure
 
