@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A corrupt history file no longer crashes `!history`, `!last` or saving.
 - `!redo` checks single-string commands for blocked patterns too.
 - The installer cleans up the launcher left by pre-1.1.0 installs.
+- Startup failed with "Invalid argument" when the input history file was written by a different readline build (for example after moving to uv's Python). The old file is now kept as `readline_history.old`.
 
 ### Removed
 - `!creator`, the `help` command (use `--help`), and the REPL check that refused any request mentioning `smart-shell` commands.
