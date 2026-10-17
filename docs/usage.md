@@ -42,7 +42,7 @@ Type these at the `Smart-Shell (model):` prompt:
 | `!models`        | List models from the provider             |
 | `!model <name>`  | Switch model for this session             |
 | `!last`          | Show the last generated command           |
-| `!redo`          | Re-run the last command (first step only for a multi-step plan) |
+| `!redo`          | Re-run the last plan (all steps, after a safety check) |
 | `!errors`        | Show the error log                        |
 | `!forget-sudo`   | Run `sudo -k` to drop cached sudo credentials |
 | `!update`        | Check GitHub for updates and install them |

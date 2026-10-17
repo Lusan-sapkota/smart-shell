@@ -10,6 +10,7 @@ from rich.prompt import Confirm
 from rich.syntax import Syntax
 
 from .utils import execute_command
+from .safety import check_command_safety
 
 console = Console()
 
@@ -169,9 +170,11 @@ def redo_last_command():
         
         # Handle both string and list commands
         if isinstance(command, list):
-            if len(command) > 1:
-                console.print("[yellow]Last command was a multi-step plan. Executing first command only.[/yellow]")
-            command_to_execute = command[0] if command else ""
+            blocked = [c for c in command if check_command_safety(c)["status"] == "blocked"]
+            if blocked:
+                console.print(f"[bold red]Refusing to re-run a blocked command:[/bold red] {blocked[0]}")
+                return
+            command_to_execute = " && ".join(command)
         else:
             command_to_execute = command
         
