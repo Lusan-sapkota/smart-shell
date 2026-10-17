@@ -1,14 +1,5 @@
 """
-Smart-Shell - An intelligent terminal assistant that converts nat        console.print("\n[bold green]Usage Examples:[/bold green]")
-        console.print("  smart-shell run --model gemini-2.5-flash \"list all files\"")
-        console.print("  smart-shell run --model gemini-2.5-pro \"complex analysis task\"")
-        console.print("  !model gemini-2.5-flash  (in interactive mode)")
-        
-        console.print("\n[bold yellow]💡 Tips:[/bold yellow]")
-        console.print("  • Use [cyan]!models free[/cyan] to see only free models")
-        console.print("  • Use [cyan]!models premium[/cyan] to see premium models with pricing")
-        console.print("  • Use [cyan]!models refresh[/cyan] to update model info from web")
-        console.print("  • Premium models show cost warnings before switching")guage into executable Bash/Zsh commands.
+Smart-Shell - An intelligent terminal assistant that converts natural language into executable Bash/Zsh commands.
 """
 
 import sys
@@ -36,7 +27,6 @@ from .setup_logic import setup_config
 from .config import load_config, ENV_API_KEY, get_current_model, save_model
 from .utils import execute_command, print_plan_preview, reset_sudo_password, log_error, ERROR_LOG_FILE, get_os_info, detect_shell
 from .ai_wrapper import get_wrapper
-from .model_info import model_info
 from .model_info import model_info
 
 console = Console()
