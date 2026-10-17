@@ -1,0 +1,10 @@
+# CodeRabbit is not used in this repository.
+reviews:
+  auto_review:
+    enabled: false
+  request_changes_workflow: false
+  high_level_summary: false
+  poem: false
+  review_status: false
+chat:
+  auto_reply: false
