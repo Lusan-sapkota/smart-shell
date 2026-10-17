@@ -166,22 +166,82 @@ def check_command_safety(command: str) -> Dict[str, Any]:
 
 
 # Auto mode runs a plan without asking only if every step is a plain pipeline of these read-only
-# commands. An allowlist, because pattern rules for danger will always miss some spelling.
+# commands. An allowlist, because pattern rules for danger will always miss some spelling. Only
+# commands with no flag that writes files or runs other programs belong here; commands that need
+# their arguments checked are handled in _args_ok.
 READ_ONLY = {
-    "ls", "ll", "la", "pwd", "cat", "less", "more", "head", "tail", "wc", "sort", "uniq", "cut", "tr", "nl",
-    "column", "grep", "egrep", "fgrep", "rg", "ag", "awk", "jq", "yq", "diff", "cmp", "comm", "file", "stat",
-    "du", "df", "free", "uptime", "uname", "hostname", "whoami", "id", "groups", "date", "cal", "echo",
-    "printf", "which", "type", "whereis", "ps", "pgrep", "top", "htop", "lsblk", "lscpu", "lsusb", "lspci",
-    "lsof", "ss", "netstat", "ip", "ifconfig", "ping", "dig", "nslookup", "host", "tree", "realpath",
-    "basename", "dirname", "readlink", "md5sum", "sha1sum", "sha256sum", "true", "false", "test", "seq",
-    "history", "man", "tldr", "journalctl", "dmesg", "systemctl", "git", "find", "fd", "sed", "xargs",
-    "locate", "env", "printenv", "nproc", "vmstat", "iostat", "sensors", "zcat", "zgrep", "tac", "rev",
-    "strings", "hexdump", "xxd", "od", "base64",
+    "ls", "pwd", "cat", "head", "tail", "wc", "cut", "tr", "nl", "column", "grep", "egrep", "fgrep", "jq",
+    "diff", "cmp", "comm", "file", "stat", "du", "df", "free", "uptime", "uname", "whoami", "id", "groups",
+    "cal", "echo", "printf", "which", "type", "whereis", "ps", "pgrep", "lsblk", "lscpu", "lsusb", "lspci",
+    "lsof", "netstat", "dig", "nslookup", "host", "realpath", "basename", "dirname", "readlink", "md5sum",
+    "sha1sum", "sha256sum", "true", "false", "test", "seq", "nproc", "vmstat", "iostat", "zcat", "zgrep",
+    "tac", "rev", "strings", "hexdump", "od", "base64",
+    # Argument-checked below.
+    "sort", "uniq", "git", "find", "xargs", "env", "printenv", "systemctl", "journalctl", "ip", "date", "hostname", "ss", "ping",
 }
-GIT_READ_ONLY = {"status", "log", "diff", "show", "branch", "remote", "tag", "blame", "shortlog", "describe",
-                 "rev-parse", "ls-files", "grep", "config", "stash"}
+GIT_READ_ONLY = {"status", "log", "diff", "show", "blame", "shortlog", "describe", "rev-parse", "ls-files", "grep",
+                 "branch", "tag", "remote", "config", "stash"}
+# For these git subcommands every argument must come from this set (no names, so nothing is created or deleted).
+GIT_LISTING = {
+    "branch": {"-a", "--all", "-r", "--remotes", "-l", "--list", "-v", "-vv", "--show-current"},
+    "tag": {"-l", "--list"},
+    "remote": {"-v", "--verbose", "show", "get-url"},
+    "config": {"--get", "--get-all", "-l", "--list", "--show-origin", "--global", "--local", "--system"},
+    "stash": {"list", "show"},
+}
+GIT_EXEC_FLAGS = ("--output", "--ext-diff", "--textconv", "-O", "--open-files-in-pager", "--exec")
+JOURNALCTL_FLAGS = ("-n", "--lines", "-u", "--unit", "-b", "--boot", "-p", "--priority", "--since", "--until",
+                    "-r", "--reverse", "-k", "--dmesg", "--no-pager", "-e", "--pager-end", "-o", "--output", "--utc")
+IP_WRITE_WORDS = {"add", "del", "delete", "set", "flush", "change", "replace", "append", "up", "down", "save",
+                  "restore", "exec", "monitor"}
 SHELL_SYNTAX = re.compile(r"[\n`]|\$\(|<\(|>\(|[{}]|\b(?:do|then|else|done|fi|function)\b")
-SAFE_REDIRECT = re.compile(r"\s*(?:\d?>\s*/dev/null|2>&1|>&2)")
+SAFE_REDIRECT = re.compile(r"\s*(?:\d?>\s*/dev/null(?=\s|$|[|;&])|2>&1|>&2)")
+
+
+def _args_ok(name, args):
+    if name == "git":
+        if not args or args[0] not in GIT_READ_ONLY or any(a.startswith(GIT_EXEC_FLAGS) for a in args):
+            return False
+        allowed = GIT_LISTING.get(args[0])
+        if allowed is not None:
+            rest = args[1:]
+            # Bare `git stash` stashes changes; bare `git config` errors; the others just list.
+            if args[0] in ("stash", "config") and not rest:
+                return False
+            return all(a in allowed or (args[0] == "config" and not a.startswith("-") and "--get" in " ".join(rest))
+                       or (args[0] == "remote" and rest[:1] in (["show"], ["get-url"]) and not a.startswith("-"))
+                       for a in rest)
+        return True
+    if name == "sort":
+        # Plain sort flags only: -o/--output write a file, --compress-program runs one.
+        return all(re.fullmatch(r"-[bdfghiMnrsuVz]+|-[kt]\S*", a) or not a.startswith("-") for a in args)
+    if name == "uniq":
+        # A second file argument is uniq's output file.
+        return (all(re.fullmatch(r"-[cdiu]+", a) for a in args if a.startswith("-"))
+                and len([a for a in args if not a.startswith("-")]) <= 1)
+    if name == "find":
+        return not any(a in ("-delete", "-exec", "-execdir", "-ok", "-okdir", "-fls") or a.startswith("-fprint")
+                       for a in args)
+    if name == "xargs":
+        return [a for a in args if not a.startswith("-")][:1] == ["echo"]
+    if name in ("env", "printenv", "hostname"):
+        return not args
+    if name == "systemctl":
+        return bool(args) and args[0] in ("status", "list-units", "list-unit-files", "list-timers", "is-active",
+                                           "is-enabled", "is-failed", "show", "cat")
+    if name == "journalctl":
+        return all(not a.startswith("-") or a.split("=")[0] in JOURNALCTL_FLAGS for a in args)
+    if name == "ip":
+        return not IP_WRITE_WORDS.intersection(args) and "-batch" not in args and "-b" not in args
+    if name == "date":
+        return all(a.startswith("+") or a in ("-u", "--utc", "-R", "-I", "--iso-8601") for a in args)
+    if name == "ss":
+        return not any(a in ("-K", "--kill") or (a.startswith("-") and not a.startswith("--") and "K" in a)
+                       for a in args)
+    if name == "ping":
+        # Without a count ping never ends; -f floods.
+        return "-c" in args and not any(a.startswith("-f") for a in args)
+    return True
 
 
 def is_auto_safe(command: str) -> bool:
@@ -189,7 +249,8 @@ def is_auto_safe(command: str) -> bool:
     if check_command_safety(command)["status"] != "safe" or SHELL_SYNTAX.search(command):
         return False
     rest = SAFE_REDIRECT.sub(" ", command)
-    if re.search(r"[<>]", rest):
+    # Any other redirect writes or reads a file; a lone & starts a second command we would not check.
+    if re.search(r"[<>]", rest) or re.search(r"(?<!&)&(?!&)", rest):
         return False
     for part in re.split(r"\|\|?|&&|;", rest):
         try:
@@ -198,24 +259,6 @@ def is_auto_safe(command: str) -> bool:
             return False
         if not words:
             continue
-        name, args = words[0], words[1:]
-        if name not in READ_ONLY:
-            return False
-        if name == "git" and (not args or args[0] not in GIT_READ_ONLY
-                              or (args[0] in ("branch", "tag", "remote", "config", "stash") and len(args) > 1
-                                  and args[1] not in ("-a", "-l", "--list", "-v", "-r", "list", "show", "--get"))):
-            return False
-        if name == "find" and any(a in ("-delete", "-exec", "-execdir", "-ok", "-okdir", "-fprint", "-fls")
-                                  or a.startswith("-fprint") for a in args):
-            return False
-        if name == "sed" and any(a.startswith(("-i", "--in-place")) for a in args):
-            return False
-        if name == "xargs" and (not args or [a for a in args if not a.startswith("-")][:1] not in (["echo"], [])):
-            return False
-        if name in ("env", "printenv") and args:
-            return False
-        if name == "systemctl" and (not args or args[0] not in ("status", "list-units", "list-unit-files", "is-active", "is-enabled", "show")):
-            return False
-        if name in ("awk", "journalctl") and re.search(r"system\s*\(|\|\s*\"|--vacuum|--rotate|--flush", part):
+        if words[0] not in READ_ONLY or not _args_ok(words[0], words[1:]):
             return False
     return True

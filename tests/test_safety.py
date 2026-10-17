@@ -97,6 +97,37 @@ def test_risk_level(command, status):
     "python3 x.py",
     "echo $(rm x)",
     "ls `rm x`",
+    # Second review: a lone &, and read-only-looking commands that write or execute through flags.
+    "echo x & touch f",
+    "ls & touch f",
+    "sed 'e touch f' in.txt",
+    "sed -n 'w out' in.txt",
+    "sort -o out in.txt",
+    "sort --compress-program=sh f",
+    "uniq in.txt out.txt",
+    "git log --output=f",
+    "git diff --ext-diff",
+    "git grep -O cat x",
+    "git stash",
+    "git branch -a -D x",
+    "git tag -l -d x",
+    "git config user.name x",
+    "man -P 'touch f' ls",
+    "less +!cmd f",
+    "rg --pre touch hi in.txt",
+    "fd -x touch",
+    "tree -o out",
+    "history -c",
+    "date -s now",
+    "ip link set eth0 down",
+    "ip neigh flush all",
+    "hostname -F f",
+    "ss -K",
+    "dmesg -C",
+    "journalctl --setup-keys",
+    "ping -f host",
+    "ls >/dev/nullx",
+    "ls >/dev/null/../../tmp/x",
 ])
 def test_auto_mode_refuses(command):
     assert not is_auto_safe(command)
@@ -106,6 +137,8 @@ def test_auto_mode_refuses(command):
     "ls -la", "df -h", "du -sh * | sort -h | tail -5", "git log -3 --oneline", "git status",
     "ps aux | grep python", "find . -name '*.py' | wc -l", "grep -rn TODO . 2>/dev/null",
     "ip addr show", "systemctl status ssh", "journalctl -n 50", "grep -E '[a-z]+' f.txt",
+    "sort -t, -k3 f | uniq -c", "git branch -a", "git remote -v", "git config --get user.name", "git stash list",
+    "date +%F", "ping -c 3 example.com", "ss -tlnp", "ls -la > /dev/null 2>&1",
 ])
 def test_auto_mode_runs_read_only(command):
     assert is_auto_safe(command)
