@@ -4,6 +4,22 @@ from smart_shell.safety import check_command_safety
 
 
 @pytest.mark.parametrize("command, status", [
+    # Anything that deletes or discards data must ask, even in auto mode.
+    ("rm notes.txt", "medium"),
+    ("rmdir old", "medium"),
+    ("unlink a", "medium"),
+    ("truncate -s 0 app.log", "medium"),
+    ("> app.log", "medium"),
+    ("cat list | xargs rm", "medium"),
+    ("find . -exec rm {} +", "medium"),
+    ("git clean -fd", "medium"),
+    ("git reset --hard", "medium"),
+    ("git push --force origin main", "medium"),
+    ("docker system prune", "medium"),
+    ("grep -rm 5 x .", "safe"),
+    ("ls > files.txt", "safe"),
+    ("echo hi >> log", "safe"),
+    ("git status", "safe"),
     # blocked
     ("rm -rf /", "blocked"),
     ("sudo rm -rf /*", "blocked"),
@@ -43,7 +59,6 @@ from smart_shell.safety import check_command_safety
     ("reset", "safe"),
     ("hostname -I", "safe"),
     ("git add .", "safe"),
-    ("rm notes.txt", "safe"),
     ("echo 'hello world'", "safe"),
 ])
 def test_risk_level(command, status):

@@ -77,6 +77,10 @@ MEDIUM_RISK_PATTERNS = {
     r"\.(bashrc|profile|zshrc|bash_profile)": "Modifying shell config can break login or shell startup.",
 
     # Dangerous file operations
+    r"(?:" + CMD + r"|\bxargs\s+(?:-\S+\s+)*|-exec\s+)(?:rm|rmdir|unlink|shred|truncate)\b": "Deletes or empties files.",
+    CMD + r":?\s*>\s*[^>&\s]": "Empties a file by redirecting nothing into it.",
+    r"\bgit\s+(?:clean\s+-\w*f|reset\s+--hard|checkout\s+--\s|restore\b|push\s+.*(?:--force|-f\b)|branch\s+-D)": "Discards git work or rewrites history.",
+    r"\b(?:docker|podman)\s+(?:rm|rmi|volume\s+rm|system\s+prune|image\s+prune|container\s+prune)\b": "Deletes containers, images or volumes.",
     r"rm\s+-[^f]*r": "Recursive deletion without force. Risky if paths are wrong.",
     r"find\s+.*\s+-delete": "Find+delete combo is irreversible with wrong flags.",
     r"rsync\s+.*--delete": "Deletes destination files not in source.",
