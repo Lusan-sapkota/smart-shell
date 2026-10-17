@@ -255,20 +255,6 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
             if not user_prompt or not user_prompt.strip():
                 continue
             
-            smart_shell_commands = [
-                "smart-shell setup", "smart-shell --setup", "smart-shell config",
-                "smart-shell version", "smart-shell --version", "smart-shell -v",
-                "smart-shell models", "smart-shell --models", "smart-shell --list-models",
-                "smart-shell help", "smart-shell --help", "smart-shell -h",
-                "smart-shell history", "smart-shell --history"
-            ]
-            
-            user_prompt_lower = user_prompt.lower().strip()
-            if any(cmd in user_prompt_lower for cmd in smart_shell_commands):
-                console.print(f"[yellow]The command '{user_prompt}' should be run outside Smart-Shell.[/yellow]")
-                console.print("[yellow]Please exit Smart-Shell first (type 'exit' or press Ctrl+C) and then run this command.[/yellow]")
-                continue
-                
             if user_prompt.startswith("!"):
                 current_model = handle_special_command(user_prompt, current_model, client)
                 continue
@@ -312,8 +298,6 @@ def handle_special_command(command, current_model, client):
         console.print("[bold blue]Documentation:[/bold blue] https://smart-shell.lusansapkota.com.np/")
     elif cmd == "!update":
         handle_update_command()
-    elif cmd == "!creator":
-        show_creator_info()
     elif cmd == "!last":
         show_last_command()
     elif cmd == "!redo":
@@ -351,7 +335,6 @@ Examples:
 - `!update` - Check for updates and install
 - `!errors` - Show the error log
 - `!forget-sudo` - Clear cached sudo credentials
-- `!creator` - Show information about the creator
 - `!docs` - Show link to documentation
 
 ## Exiting
@@ -390,13 +373,6 @@ def version():
     """Show version information."""
     console.print(f"Smart-Shell v{get_current_version()}")
 
-@click.command('help', context_settings=dict(ignore_unknown_options=True, allow_extra_args=True))
-def cli_help():
-    """Show CLI help information."""
-    click.echo(cli.get_help(click.Context(cli)))
-
-cli.add_command(cli_help)
-
 @cli.command()
 def history():
     """Show command history."""
@@ -421,26 +397,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-def show_creator_info():
-    """Show information about the creator."""
-    creator_panel = Panel(
-        """[bold cyan]Smart-Shell[/bold cyan] was created by [bold]Lusan Sapkota[/bold]
-
-[yellow]About the Creator:[/yellow]
-• Developer passionate about AI and automation
-• Focused on making terminal interactions more intuitive
-• Believes in the power of natural language interfaces
-
-[blue]Connect:[/blue]
-• GitHub: [link]https://github.com/lusan-sapkota[/link]
-• Project: [link]https://github.com/lusan-sapkota/smart-shell[/link]
-
-[green]Smart-Shell makes the terminal accessible to everyone![/green]""",
-        title="[bold white]Creator Information[/bold white]",
-        border_style="cyan",
-        padding=(1, 2)
-    )
-    console.print(creator_panel)
 
 def show_error_log():
     """Show the error log."""
