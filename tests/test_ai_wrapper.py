@@ -93,3 +93,11 @@ def test_override_provider():
         override_provider(saved, "custom")
     legacy = {"api_key": "AIza-old"}
     assert override_provider(legacy, "gemini")["api_key"] == "AIza-old"
+
+
+def test_base_url_flag_beats_env(monkeypatch):
+    from smart_shell.ai_wrapper import override_provider, get_client
+    monkeypatch.setenv("SMART_SHELL_BASE_URL", "http://from-env/v1")
+    saved = {"provider": "ollama", "base_url": "http://localhost:11434/v1"}
+    assert get_client(saved).base_url == "http://from-env/v1"
+    assert get_client(override_provider(saved, base_url="http://flag/v1")).base_url == "http://flag/v1"

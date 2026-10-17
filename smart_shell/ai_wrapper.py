@@ -95,7 +95,8 @@ def override_provider(config, provider=None, base_url=None):
     provider = provider or saved
     if provider == "custom" and not base_url:
         raise AIError("--provider custom needs --base-url.")
-    new = dict(config, provider=provider)
+    # The flag was typed for this run, so it beats SMART_SHELL_BASE_URL.
+    new = dict(config, provider=provider, base_url_from_flag=True)
     new["base_url"] = base_url or (saved_url if provider == saved else PROVIDERS[provider][0])
     if provider != saved:
         new.pop("default_model", None)
@@ -115,7 +116,8 @@ def get_client(config=None):
     config = load_config() if config is None else config
     # Configs from before multi-provider support are Gemini.
     provider = config.get("provider", "gemini")
-    base_url = os.environ.get(ENV_BASE_URL) or config.get("base_url") or PROVIDERS.get(provider, PROVIDERS["gemini"])[0]
+    env_url = None if config.get("base_url_from_flag") else os.environ.get(ENV_BASE_URL)
+    base_url = env_url or config.get("base_url") or PROVIDERS.get(provider, PROVIDERS["gemini"])[0]
     return AIClient(base_url, os.environ.get(ENV_API_KEY) or config.get("api_key"))
 
 

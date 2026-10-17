@@ -49,6 +49,13 @@ def test_default_run_subcommand(monkeypatch):
         main.cli.parse_args(None, args)
     assert seen == [["run", "list", "files"], ["run", "--provider", "ollama", "list"], ["run", "-d", "x"],
                     ["models"], ["--provider", "ollama"], []]
+    seen.clear()
+    main.cli.parse_args(None, ["--provider", "ollama", "run", "x"])
+    main.cli.parse_args(None, ["--base-url=http://h/v1", "models"])
+    assert seen == [["run", "--provider", "ollama", "x"], ["models", "--base-url=http://h/v1"]]
+    import pytest
+    with pytest.raises(main.click.UsageError):
+        main.cli.parse_args(None, ["--provider", "ollama", "setup"])
 
 
 def test_history_is_bounded_private_and_tolerates_corruption(tmp_path, monkeypatch):

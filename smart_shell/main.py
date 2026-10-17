@@ -33,8 +33,13 @@ class DefaultRunGroup(click.Group):
         i = 0
         while i < len(args) and args[i].split("=")[0] in self.GROUP_OPTIONS:
             i += 1 if "=" in args[i] else self.GROUP_OPTIONS[args[i]]
-        rest = args[i:]
-        if rest and rest[0] not in self.commands and rest[0] not in ("--help", "--list-models"):
+        group_opts, rest = args[:i], args[i:]
+        if rest and rest[0] in ("run", "models"):
+            # `smart-shell --provider X models` means `smart-shell models --provider X`.
+            args = rest[:1] + group_opts + rest[1:]
+        elif rest and rest[0] in self.commands and group_opts:
+            raise click.UsageError(f"--provider and --base-url don't apply to '{rest[0]}'.")
+        elif rest and rest[0] not in self.commands and rest[0] not in ("--help", "--list-models"):
             args = ["run"] + args
         return super().parse_args(ctx, args)
 
@@ -47,18 +52,22 @@ class DefaultRunGroup(click.Group):
 def cli(ctx, list_models, provider, base_url):
     """Smart-Shell: Convert natural language to Bash or Zsh commands using AI."""
     if list_models:
-        display_models()
+        display_models(provider, base_url)
         return
         
     if ctx.invoked_subcommand is None:
         ctx.invoke(run, prompt=None, dry_run=False, model=None, interactive=True, provider=provider, base_url=base_url)
 
-def display_models():
+def display_models(provider=None, base_url=None):
     """List the models the configured provider offers."""
-    if not is_configured():
+    try:
+        config = override_provider(load_config(), provider, base_url)
+    except AIError as e:
+        console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
+        return
+    if not is_configured(config):
         console.print("[bold red]No provider configured. Run 'smart-shell setup'.[/bold red]")
         return
-    config = load_config()
     try:
         models = get_client(config).list_models()
     except AIError as e:
@@ -94,20 +103,10 @@ def run(prompt, dry_run, model, interactive, yes, provider, base_url):
     client = get_client(config)
 
     shell_type = detect_shell()
-    if not interactive:
-        console.print(f"[bold blue]Detected shell:[/bold blue] {shell_type}")
-    
-    if interactive:
+    if interactive or not prompt:
         run_interactive_mode(dry_run, model, client, config, yes, shell_type)
         return
-    
-    if not prompt:
-        console.print(Panel.fit(
-            "Please provide a prompt describing what you want to do.",
-            title="Smart-Shell",
-            border_style="blue"
-        ))
-        return
+    console.print(f"[bold blue]Detected shell:[/bold blue] {shell_type}")
 
     user_prompt = " ".join(prompt)
     process_prompt(user_prompt, dry_run, model, client, config, yes)
@@ -383,9 +382,11 @@ def history():
     show_command_history()
 
 @cli.command()
-def models():
-    """List all supported AI models."""
-    display_models()
+@click.option("--provider", type=click.Choice(list(PROVIDERS) + ["custom"]), help="List models of this provider instead")
+@click.option("--base-url", help="List models at this OpenAI-compatible base URL instead")
+def models(provider, base_url):
+    """List the models your provider offers."""
+    display_models(provider, base_url)
 
 def main():
     """Entry point for the application."""
