@@ -49,3 +49,17 @@ def test_default_run_subcommand(monkeypatch):
         main.cli.parse_args(None, args)
     assert seen == [["run", "list", "files"], ["run", "--provider", "ollama", "list"], ["run", "-d", "x"],
                     ["models"], ["--provider", "ollama"], []]
+
+
+def test_history_is_bounded_private_and_tolerates_corruption(tmp_path, monkeypatch):
+    history = importlib.import_module("smart_shell.history")
+    monkeypatch.setattr(history, "HISTORY_DIR", str(tmp_path))
+    monkeypatch.setattr(history, "HISTORY_FILE", str(tmp_path / "h.json"))
+    monkeypatch.setattr(history, "MAX_ENTRIES", 3)
+    (tmp_path / "h.json").write_text("{not json")
+    ids = [history.save_to_history(f"p{i}", ["true"]) for i in range(5)]
+    history.update_history_result(ids[-1], True)
+    saved = history.load_history()
+    assert [e["prompt"] for e in saved] == ["p2", "p3", "p4"] and saved[-1]["success"] is True
+    assert len(set(ids)) == 5
+    assert (tmp_path / "h.json").stat().st_mode & 0o777 == 0o600
