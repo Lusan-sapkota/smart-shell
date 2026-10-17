@@ -5,7 +5,8 @@
 Use the method you installed with:
 
 ```bash
-pipx uninstall smart-shell        # pipx (default)
+uv tool uninstall smart-shell     # uv
+pipx uninstall smart-shell        # pipx
 sudo pip3 uninstall smart-shell   # system-wide
 rm -rf ./venv                     # virtual environment, from the project directory
 ```
