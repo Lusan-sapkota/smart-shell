@@ -382,7 +382,7 @@ def handle_special_command(command, current_model):
             console.print("[yellow]Use !models to see available models.[/yellow]")
     elif cmd == "!forget-sudo":
         reset_sudo_password()
-        console.print("[green]Sudo password reset successfully.[/green]")
+        console.print("[green]Sudo credentials cleared.[/green]")
     elif cmd == "!docs":
         console.print("[bold blue]Documentation:[/bold blue] https://lusan-sapkota.github.io/smart-shell/")
     elif cmd == "!update":
@@ -427,7 +427,7 @@ Examples:
 - `!web` - Toggle web search for commands
 - `!update` - Check for updates and install
 - `!errors` - Show the error log
-- `!forget-sudo` - Clear the session sudo password
+- `!forget-sudo` - Clear cached sudo credentials
 - `!creator` - Show information about the creator
 - `!docs` - Show link to documentation
 

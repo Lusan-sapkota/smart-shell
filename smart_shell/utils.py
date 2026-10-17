@@ -6,7 +6,6 @@ import os
 import subprocess
 import sys
 import tempfile
-import getpass
 import shlex
 import re
 from typing import Dict, Any, Optional, Tuple
@@ -15,29 +14,13 @@ from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.table import Table
 from rich.markdown import Markdown
-from rich.prompt import Prompt
 from datetime import datetime
 
-# Import the new config functions
-from .config import get_sudo_password
-
 console = Console()
-
-# In-memory storage for a sudo password provided for the current session
-SESSION_SUDO_PASSWORD = None
 
 # Error log file
 ERROR_LOG_DIR = os.path.expanduser("~/.local/share/smart-shell")
 ERROR_LOG_FILE = os.path.join(ERROR_LOG_DIR, "error.log")
-
-def get_session_sudo_password():
-    """Gets the sudo password for the current session."""
-    return SESSION_SUDO_PASSWORD
-
-def set_session_sudo_password(password):
-    """Sets the sudo password for the current session."""
-    global SESSION_SUDO_PASSWORD
-    SESSION_SUDO_PASSWORD = password
 
 def get_os_info() -> Dict[str, str]:
     """
@@ -68,40 +51,9 @@ def get_os_info() -> Dict[str, str]:
 
     return os_info
 
-def validate_sudo_password(password: str) -> bool:
-    """
-    Validates the sudo password by running a harmless command.
-
-    Args:
-        password (str): The sudo password to validate.
-
-    Returns:
-        bool: True if the password is valid, False otherwise.
-    """
-    if not password:
-        return False
-    try:
-        # Use sudo's -S flag to read password from stdin, and -v to validate the timestamp
-        command = f"echo '{password}' | sudo -S -v"
-        result = subprocess.run(
-            command,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            executable='/bin/bash'
-        )
-        # A return code of 0 means the password was accepted
-        return result.returncode == 0
-    except Exception as e:
-        log_error(f"Sudo validation failed unexpectedly: {e}")
-        return False
-
 def reset_sudo_password():
-    """Reset the stored sudo password."""
-    # This function is kept for compatibility but session password is the primary mechanism now
-    global SESSION_SUDO_PASSWORD
-    SESSION_SUDO_PASSWORD = None
+    """Drop sudo's cached credentials so the next sudo asks again."""
+    subprocess.run(["sudo", "-k"], check=False)
 
 def detect_shell() -> str:
     """Detect the user's current shell (bash, zsh, etc)."""
@@ -129,27 +81,11 @@ def execute_command(command: str) -> bool:
     console.print("─" * console.width)
 
     try:
-        # Determine if sudo is needed and prepare the command
-        needs_sudo = command.strip().startswith("sudo")
-        final_command = command
+        # sudo prompts on the terminal itself, so the password never passes through us.
         shell_type = detect_shell()
         shell_executable = f"/bin/{shell_type}" if shell_type in ("bash", "zsh") else "/bin/bash"
-        if needs_sudo:
-            # First, try to get password from config file
-            sudo_password = get_sudo_password()
-            # If not in config, check session password
-            if not sudo_password:
-                sudo_password = get_session_sudo_password()
-            # If still no password, prompt the user once for the session
-            if not sudo_password:
-                sudo_password = Prompt.ask("Enter your sudo password for this session", password=True)
-                set_session_sudo_password(sudo_password)
-            # Prepend the password to the command for sudo's -S flag
-            final_command = f"echo '{sudo_password}' | sudo -S -p '' {command.replace('sudo', '', 1).strip()}"
-        # We use shell=True here because we are now constructing a full shell command
-        # with pipes for sudo. This is generally safe as the command has been vetted.
         process = subprocess.Popen(
-            final_command,
+            command,
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -172,7 +108,6 @@ def execute_command(command: str) -> bool:
         if process.returncode != 0:
             if "incorrect password attempt" in stderr_text.lower():
                 console.print("[bold red]✗ Incorrect sudo password.[/bold red]")
-                reset_sudo_password() # Clear the incorrect session password
             elif "no such file or directory" in stderr_text.lower():
                 console.print("[bold yellow]✗ Command failed because a file or directory it references does not exist.[/bold yellow]")
             elif "permission denied" in stderr_text.lower():
