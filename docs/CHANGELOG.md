@@ -17,7 +17,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Startup shows a two-line header instead of the ASCII banner and welcome panel.
 - Safe and info-leak plans now ask before running (default yes) instead of running immediately.
 - Local providers (Ollama, LM Studio) are listed first, and a fresh setup defaults to Ollama.
+- Python 3.10 or newer is required (3.9 reached end of life).
+- Shorter system prompt: small local models return valid JSON far more often, and the detected package manager (apt, dnf, pacman, zypper, apk, brew) is passed to the model.
+- History is capped at 1000 entries and written with `0600` permissions.
+- CI also runs `ruff`.
 - Install docs lead with `pipx install smart-shell-cli` / `uv tool install smart-shell-cli`; the install script is the alternative. The script installs from PyPI.
+
+
+### Fixed
+- `!history` and `!last` printed an object name instead of the command.
+- A corrupt history file no longer crashes `!history`, `!last` or saving.
+- `!redo` checks single-string commands for blocked patterns too.
+- The installer cleans up the launcher left by pre-1.1.0 installs.
+
+### Removed
+- `!creator`, the `help` command (use `--help`), and the REPL check that refused any request mentioning `smart-shell` commands.
 
 ## [1.1.0] - 2026-10-17
 
