@@ -4,26 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smart-shell"
-version = "1.0.0"
+version = "1.1.0"
 authors = [
   { name="Lusan Sapkota", email="sapkotalusan@gmail.com" },
 ]
 description = "An intelligent terminal assistant that converts natural language into executable Bash or Zsh commands."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "google-genai",
     "rich",
     "click",
     "requests",
-    "pyyaml",
-    "google-api-core",
-    "toml"
 ]
 
 [project.urls]
@@ -35,3 +32,6 @@ smart-shell = "smart_shell.main:main"
 
 [tool.setuptools.packages.find]
 include = ["smart_shell", "smart_shell.*"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

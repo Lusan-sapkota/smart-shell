@@ -1,79 +1,76 @@
 # Installation
 
-## Quick Installation (Recommended)
+Requires Python 3.9 or newer on Linux, macOS or WSL.
 
-Smart-Shell is designed for easy installation with a single command that handles all dependencies and environment setup automatically.
-
-**Quick install (recommended for most users):**
+## Quick install
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
 ```
 
-The installation script will:
+The script:
 
-1. Check and install all required dependencies
-2. Install Smart-Shell using pipx (for better isolation)
-3. Create desktop entries for easy access
-4. Set up command completion for Bash and Zsh
-5. Apply fixes for common Python module path issues
-6. Automatically run the setup wizard to configure your API key
+1. Checks for Python, pip and pipx.
+2. Installs Smart-Shell using one of three methods: system-wide (sudo), user install with pipx (recommended), or a virtual environment (for development).
+3. Creates a desktop entry and Bash/Zsh tab completion.
+4. Runs `smart-shell setup`.
 
-> If you're behind a corporate firewall or have restricted internet access, you might need to manually install dependencies first:
-> ```bash
-> pip install --user google-genai rich click pyyaml requests google-api-core
-> ```
-
-After installation, use Smart-Shell from any terminal:
+Dependencies are `rich`, `click` and `requests`. To install them yourself (for example behind a restrictive firewall):
 
 ```bash
-smart-shell
+pip install --user rich click requests
 ```
 
-## CLI Commands
+For a development install, see [Development](development.md).
 
-- `smart-shell` — Start Smart-Shell in interactive mode
-- `smart-shell run <prompt>` — Convert natural language to Bash/Zsh commands
-- `smart-shell --interactive` or `-i` — Start interactive mode explicitly
-- `smart-shell setup` — Configure API key and settings
-- `smart-shell models` — List available AI models
-- `smart-shell history` — Show command history
-- `smart-shell --help` or `smart-shell help` — Show CLI help
-- `smart-shell --version` or `smart-shell version` — Show version information
-- `smart-shell --dry-run` or `-d` — Show command without executing
-- `smart-shell --yes` or `-y` — Auto-confirm all prompts (for automation)
-- `smart-shell --model <name>` or `-m <name>` — Use specific AI model
+## Providers
 
-## Manual Installation Options
+Run the setup wizard at any time:
 
-The install script offers three installation methods:
+```bash
+smart-shell setup
+```
 
-1. **System-wide installation** (requires sudo)
-   - Installs Smart-Shell for all users on the system
-   - Requires administrator privileges
+It asks you to:
 
-2. **User installation** (recommended)
-   - Uses pipx for isolated installation in your user directory
-   - No administrator privileges required
-   - Automatically installed if pipx is not found
+1. Choose a provider: `gemini`, `openai`, `deepseek`, `openrouter`, `groq`, `ollama`, `lmstudio`, or `custom` (any OpenAI-compatible base URL).
+2. Confirm the base URL.
+3. Enter an API key if the provider needs one. The connection is checked by listing models.
+4. Pick a default model from the live model list.
 
-3. **Virtual environment** (for development)
-   - Creates a dedicated virtual environment
-   - Useful for development or testing
+### Configuration
 
-For development setup, see [Development](development.md).
+Settings are saved to `~/.config/smart-shell/config.json` with `0600` permissions:
 
-For troubleshooting and more, see the [FAQ](faq.md).
+```json
+{
+  "provider": "ollama",
+  "base_url": "http://localhost:11434/v1",
+  "default_model": "qwen2.5-coder:latest"
+}
+```
 
-## Dependencies
+Cloud providers also store `api_key`. Environment variables override the saved values:
 
-Smart-Shell requires the following Python packages:
+- `SMART_SHELL_API_KEY`
+- `SMART_SHELL_BASE_URL`
 
-- `google-genai` - Google's Gemini AI SDK
-- `rich` - For beautiful terminal formatting
-- `click` - For command-line interface
-- `pyyaml` - For configuration management
-- `requests` - For API communication
-- `google-api-core` - Core Google API functionality
+Configs from older versions that only contain `api_key` are treated as Gemini.
 
-The installation script handles all these dependencies automatically.
+## Using local models (Ollama)
+
+Smart-Shell works fully offline with [Ollama](https://ollama.com/). No API key is needed.
+
+```bash
+ollama pull qwen2.5-coder   # any chat model works; coder models do well
+ollama serve                # skip if Ollama already runs as a service
+smart-shell setup           # choose "ollama", keep http://localhost:11434/v1
+```
+
+Pick the pulled model as your default and you're done. LM Studio works the same way: start its local server and choose `lmstudio` (`http://localhost:1234/v1`).
+
+## Troubleshooting
+
+- **`smart-shell: command not found`**: make sure `~/.local/bin` is on your `PATH` (`pipx ensurepath`), then open a new terminal.
+- **pipx / PEP 668 errors**: install pipx (`sudo apt install pipx`), run `pipx ensurepath`, and rerun the installer. See the [FAQ](faq.md).
+- **Connection check fails during setup**: verify the API key, or for Ollama that `ollama serve` is running.

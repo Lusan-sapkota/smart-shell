@@ -1,28 +1,27 @@
 # Safety
 
-Smart-Shell includes a comprehensive safety system to protect users from potentially harmful commands.
+Every generated command is checked by pattern rules in `smart_shell/safety.py` before anything runs. The preview shows each command with its level and the reason.
 
-## Safety Levels
+## Levels
 
-- **Safe** 🟢: Commands that are considered safe to run (executed automatically)
-- **Medium** 🟡: Commands that might have consequences like sudo operations (requires y/n confirmation)
-- **High** 🔴: Commands that are potentially dangerous like file deletion (requires y/n confirmation)
-- **Info Leak** 🔵: Commands that might expose sensitive information (requires confirmation)
+| Level       | Behavior                                  | Examples |
+|-------------|-------------------------------------------|----------|
+| `blocked`   | Never runs. You can edit the command; the edited version is checked again. | `rm -rf /`, `rm -rf ~` or `$HOME`, `--no-preserve-root`, fork bomb, `mkfs` on `/dev/...`, `dd of=/dev/sda`, `> /dev/sda` |
+| `high`      | Asks y/n (default no)                     | `rm` with recursive and force flags in any spelling (`-rf`, `-fr`, `-r -f`, `--recursive --force`), piping anything into `sh`/`bash`/`zsh`, `dd`, `shred` on disks, overwriting `/etc/passwd` |
+| `medium`    | Asks y/n (default no)                     | `sudo`, package installs and removals, `kill`, `chmod`/`chown`, `eval`, stopping or disabling services, user and group changes, firewall rules, mounts |
+| `info_leak` | Flagged in the preview                    | `env`, `printenv`, `echo $API_KEY` (any `TOKEN`/`KEY`/`PASS`/`SECRET` variable), `cat ~/.bash_history`, `cat .env` |
+| `safe`      | Runs directly                             | `ls`, `pwd`, `df -h` |
 
-## Safety Checks
+If a plan contains several commands, the highest level among them decides whether you are asked.
 
-- **Risk Assessment:** All commands are analyzed for potential risks before execution
-- **Pattern Matching:** Uses regex to identify risky command patterns (e.g., `sudo`, `rm -rf`, `dd`, `chmod 777`)
-- **Path Analysis:** Detects operations on sensitive system paths (e.g., `/etc/passwd`, system directories)
-- **User Confirmation:** Medium and high-risk commands require explicit y/n confirmation
-- **Command Editing:** Users can edit blocked commands before execution
+## Auto-confirm
 
-## Confirmation System
+`smart-shell run ... -y` skips the high and medium confirmations. Blocked commands still never run.
 
-- All confirmations accept `y`/`yes` or `n`/`no` (case insensitive)
-- Users maintain full control - even high-risk commands can be executed with confirmation
-- Clear explanations are provided for why commands are flagged
+## Sudo
 
-> **Note:** The safety system is designed to inform and protect, not restrict. Users have final control over command execution after being informed of potential risks.
+Smart-Shell does not store or ask for your sudo password. `sudo` prompts in the terminal itself. Passwords saved by older versions are deleted from the config automatically. `!forget-sudo` runs `sudo -k`.
 
-For more details, see the full documentation.
+## Limits
+
+The checks are pattern-based. They catch common destructive commands but cannot prove a command is harmless, so read the preview before confirming. Use `--dry-run` when in doubt.

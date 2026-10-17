@@ -1,7 +1,7 @@
 site_name: Smart-Shell
 repo_url: https://github.com/Lusan-sapkota/smart-shell
 docs_dir: docs
-site_url: https://lusan-sapkota.github.io/smart-shell/
+site_url: https://smart-shell.lusansapkota.com.np/
 nav:
   - Home: index.md
   - Getting Started:
@@ -14,7 +14,7 @@ nav:
     - API Reference: api.md
     - FAQ: faq.md
   - Development:
-    - Development Guide: DEVELOPMENT.md
+    - Development Guide: development.md
     - Contributing: contributing.md
   - Project Info:
     - Changelog: CHANGELOG.md
@@ -35,12 +35,12 @@ markdown_extensions:
   - toc:
       permalink: true
   - footnotes
+  - attr_list
   - tables
   - pymdownx.superfences
   - pymdownx.details
 plugins:
   - search
-  - mkdocstrings
 extra:
   social:
     - icon: fontawesome/brands/github

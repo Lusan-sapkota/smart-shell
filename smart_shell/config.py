@@ -4,8 +4,6 @@ Config Module - Handles loading and saving of configuration data.
 
 import os
 import json
-import base64
-import binascii
 from rich.console import Console
 
 console = Console()
@@ -21,45 +19,23 @@ def load_config():
         return {}
     try:
         with open(CONFIG_FILE, "r") as f:
-            return json.load(f)
+            config = json.load(f)
     except (json.JSONDecodeError, IOError) as e:
         console.print(f"[yellow]Warning: Could not load config file: {e}[/yellow]")
         return {}
+    # Older versions stored the sudo password here; scrub it.
+    if config.pop("sudo_password_b64", None) is not None:
+        save_config(config)
+    return config
 
 def save_config(config):
     """Saves configuration to file."""
     os.makedirs(CONFIG_DIR, exist_ok=True)
     try:
-        with open(CONFIG_FILE, "w") as f:
+        # Holds the API key: owner read/write only.
+        fd = os.open(CONFIG_FILE, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        os.chmod(CONFIG_FILE, 0o600)
+        with os.fdopen(fd, "w") as f:
             json.dump(config, f, indent=2)
     except IOError as e:
         console.print(f"[bold red]Error: Could not save config file: {e}[/bold red]")
-
-def get_current_model():
-    """Gets the current default model from the config file."""
-    config = load_config()
-    return config.get("default_model", "models/gemini-2.5-flash")
-
-def save_model(model_name):
-    """Saves the selected model to the config file."""
-    config = load_config()
-    config["default_model"] = model_name
-    save_config(config)
-
-def get_sudo_password():
-    """Gets the decoded sudo password from the config file."""
-    config = load_config()
-    encoded_pass = config.get("sudo_password_b64")
-    if encoded_pass:
-        try:
-            return base64.b64decode(encoded_pass).decode('utf-8')
-        except (binascii.Error, UnicodeDecodeError):
-            return None
-    return None
-
-def save_sudo_password(password):
-    """Saves the sudo password to the config file in base64 encoding."""
-    config = load_config()
-    encoded_pass = base64.b64encode(password.encode('utf-8')).decode('utf-8')
-    config["sudo_password_b64"] = encoded_pass
-    save_config(config) 

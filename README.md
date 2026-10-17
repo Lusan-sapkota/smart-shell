@@ -1,190 +1,81 @@
 # Smart-Shell
 
-![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen)
+[![Tests](https://github.com/Lusan-sapkota/smart-shell/actions/workflows/test.yml/badge.svg)](https://github.com/Lusan-sapkota/smart-shell/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
-[![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-orange)](https://ai.google.dev/)
-
-> **Smart-Shell is in active development.**
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
+[![AI](https://img.shields.io/badge/AI-OpenAI--compatible-orange)](docs/installation.md#providers)
 
 <p align="center">
   <img src="docs/images/image.png" alt="Smart-Shell Demo" width="500"/>
 </p>
 
-Smart-Shell is an intelligent terminal assistant that converts natural language into executable Bash or Zsh commands using Google's Gemini AI models via the new google-genai SDK.
+Smart-Shell turns plain English into Bash or Zsh commands, checks them for risk, and runs them after you confirm. It works with any OpenAI-compatible chat API: Gemini, OpenAI, DeepSeek, OpenRouter, Groq, or a local model through Ollama or LM Studio (fully offline).
 
-## ✨ Features
+## Features
 
-- 🧠 **Natural Language to Command**  
-  Convert plain English into valid Bash/Zsh commands instantly.
+- **Natural language to commands** for Bash and Zsh, with the shell detected automatically.
+- **Any OpenAI-compatible provider.** Built-in presets for gemini, openai, deepseek, openrouter, groq, ollama and lmstudio, plus `custom` for any base URL.
+- **Offline mode** with Ollama or LM Studio: no API key, nothing leaves your machine.
+- **Safety checks** on every command: blocked, high, medium, info_leak and safe. Blocked commands never run; high and medium need a y/n confirmation.
+- **Multi-step plans** run in one shell, joined with `&&`, stopping at the first failure.
+- **Dry-run mode** (`--dry-run`) to preview without executing.
+- **Interactive REPL** with history and `!` commands (`!models`, `!model <name>`, `!redo`, `!errors`, ...).
+- **No stored sudo password.** `sudo` prompts in your terminal as usual.
+- **Self-update** with `!update`, a desktop entry, and Bash/Zsh tab completion from the installer.
 
-- 🐚 **Shell Auto-Detection**  
-  Automatically detects and supports both **Bash** and **Zsh** environments.
-
-- 💬 **Interactive Mode with Command History**  
-  Rich REPL interface with protected prompt and support for special commands like:  
-  `!help`, `!docs`, `!models`, `!history`, `!clear`, `!redo`, `!last`, `!creator`, `!forget-sudo`, `!update`, `!errors`, `!web`, and more.
-
-- 🛡️ **Built-in Safety System**  
-  Analyzes each command and classifies it into **four risk levels** with detailed reasoning:
-  - ✅ **Safe** – Executed automatically.
-  - 🔵 **Info Leak** – May expose sensitive data (requires confirmation).
-  - 🟡 **Medium** – Sudo operations and system changes (requires y/n confirmation).
-  - 🔴 **High** – Dangerous operations like file deletion (requires y/n confirmation).  
-  This ensures potentially destructive commands are never run without user awareness.
-
-- 🤖 **AI-Powered Command Planning**  
-  Generates and refines shell commands using **Google Gemini** models.
-
-- 🔀 **Multi-Model Support with Smart Warnings**  
-  Easily switch between Gemini **Pro**, **Flash**, and **Legacy** models with detailed cost information and confirmation prompts for premium models.
-
-- 💳 **Smart Cost Awareness**  
-  Real-time model pricing information with detailed cost breakdowns and confirmation prompts when switching to premium models.
-
-- 🧪 **Dry-Run Mode**  
-  Preview the exact command before execution for extra safety and transparency.
-
-- 📟 **Standard CLI Commands**  
-  Includes `--help`, `--version`, and other CLI flags for quick access.
-
-- 🖥️ **Desktop Integration**  
-  Comes with a `.desktop` entry — launch directly from your system's **Application Menu**.
-
-- ⌨️ **Tab Completion**  
-  Supports intelligent tab completion for both **Bash** and **Zsh** shells.
-
-- 🔐 **Simple Setup**  
-  Easy configuration of your API key and sudo password during first run.
-
-- 🌐 **Web Search Integration**  
-  When enabled, Smart-Shell performs relevant **web searches** in real-time to enhance command accuracy.  
-  AI combines local knowledge with live web results to refine its suggestions — giving you smarter, context-aware commands.  
-  You can toggle web search anytime using the `!web` command.
-
-- ⚡ **Modern CLI Experience**  
-  A clean and user-friendly terminal UI with colorful output and rich formatting.
-
-- 🛠️ **Open Source & Extensible**  
-  Easily extend functionality or contribute — fully open and developer-friendly.
-
-## Quick Install (Recommended)
-
-Install Smart-Shell with a single command:
+## Install
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash
 ```
 
-Our intelligent installation script:
-- ✅ Automatically checks and installs all dependencies (including pipx if needed)
-- ✅ Handles package installation with proper isolation
-- ✅ Creates desktop entries and command completion
-- ✅ Fixes common Python module path issues
-- ✅ Runs the setup wizard to configure your API key
-
-After installation, use Smart-Shell from any terminal:
+The script installs Smart-Shell (pipx, system-wide, or a virtualenv), adds a desktop entry and tab completion, and runs the setup wizard. Then:
 
 ```bash
-smart-shell
+smart-shell setup   # pick a provider, enter a key if needed, choose a default model
+smart-shell         # start the interactive shell
+smart-shell run "find files over 100MB in my home folder" --dry-run
 ```
 
-The first time you run Smart-Shell, it will guide you through setting up your Google Gemini API key. You can also run the setup wizard anytime:
+To run fully offline with a local model, see [Using local models (Ollama)](docs/installation.md#using-local-models-ollama). For a manual or development install, see [docs/development.md](docs/development.md).
+
+## Uninstall
 
 ```bash
-smart-shell setup
-```
-
-For manual installation and development instructions, see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
-
-## �️ Uninstall
-
-To completely remove Smart-Shell from your system, run this single command:
-
-```bash
-curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash -s -- --uninstall
-```
-
-### Manual Uninstall
-
-If you prefer to uninstall manually, follow these steps:
-
-**1. Remove the Smart-Shell package:**
-
-```bash
-# If installed with pipx (recommended)
-pipx uninstall smart-shell
-
-# If installed system-wide
-sudo pip3 uninstall smart-shell
-
-# If installed in a virtual environment
-rm -rf ./venv  # (from the project directory)
-```
-
-**2. Remove configuration files:**
-
-```bash
-rm -rf ~/.config/smart-shell
-```
-
-**3. Remove desktop entry:**
-
-```bash
+pipx uninstall smart-shell                 # or: sudo pip3 uninstall smart-shell
+rm -rf ~/.config/smart-shell ~/.local/share/smart-shell
 rm -f ~/.local/share/applications/smart-shell.desktop
+rm -f ~/.bash_completion.d/smart-shell-completion.bash
+sed -i '/# Smart-Shell completion/,+1d' ~/.bashrc ~/.zshrc
 ```
 
-**4. Remove shell completion:**
+Details in [docs/uninstall.md](docs/uninstall.md).
 
-```bash
-rm -f ~/.local/share/bash-completion/completions/smart-shell-completion.bash
-```
-
-**5. Clean up shell configuration:**
-
-```bash
-# Remove from .bashrc
-sed -i '/# Smart-Shell completion/,+1d' ~/.bashrc
-
-# Remove from .zshrc (if exists)
-sed -i '/# Smart-Shell completion/,+1d' ~/.zshrc
-```
-
-**6. Remove any remaining executables:**
-
-```bash
-rm -f ~/.local/bin/smart-shell
-rm -f ~/.local/bin/smart-shell.bak
-```
-
-After completing these steps, restart your terminal or run `source ~/.bashrc` (or `source ~/.zshrc`) to reload your shell configuration.
-
-## �📖 Documentation
+## Documentation
 
 - [Features](docs/features.md)
 - [Installation](docs/installation.md)
-- [Uninstall](docs/uninstall.md)
 - [Usage](docs/usage.md)
 - [Safety](docs/safety.md)
+- [Uninstall](docs/uninstall.md)
 - [Development](docs/development.md)
 - [API Reference](docs/api.md)
-- [Changelog](CHANGELOG.md)
-- [License](LICENSE)
-- [Author](docs/author.md)
-- [Contributing](docs/contributing.md)
 - [FAQ](docs/faq.md)
-- [New-Version](docs/futurechanges.md)
+- [Changelog](docs/CHANGELOG.md)
+- [Future Changes](docs/futurechanges.md)
+- [Contributing](docs/contributing.md)
+- [Author](docs/author.md)
 
-> 📚 **Full documentation is available at the [Smart-Shell MkDocs site](https://lusan-sapkota.github.io/smart-shell/).**
+Full documentation: [smart-shell.lusansapkota.com.np](https://smart-shell.lusansapkota.com.np/).
 
-## 📜 License
+## License
 
-This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
+Apache 2.0. See [LICENSE](LICENSE).
 
-## 👤 Author
+## Author
 
-Created by [Lusan Sapkota](https://lusansapkota.com.np)
+Created by [Lusan Sapkota](https://lusansapkota.com.np).
 
-## ⚠️ Disclaimer
+## Disclaimer
 
-Smart-Shell is an AI assistant and may occasionally generate incorrect or unsafe commands. Always review commands before execution, especially those involving system modifications or sensitive data.
+Smart-Shell is an AI assistant and can generate wrong or unsafe commands. Always read a command before you confirm it, especially anything that modifies the system or touches sensitive data.

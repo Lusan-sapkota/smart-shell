@@ -234,14 +234,10 @@ install_smart_shell() {
             echo -e "Or use the quick install script (recommended):"
             echo -e "  curl -sSL https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/install.sh | bash"
             echo -e "Then run: pipx install smart-shell again if prompted."
-            echo -e "See the FAQ: https://lusan-sapkota.github.io/smart-shell/faq/#pipx-or-pep668"
+            echo -e "See the FAQ: https://smart-shell.lusansapkota.com.np/faq/#pipx-or-pep668"
             exit 1
         fi
         echo -e "\n${BLUE}Installing with pipx (recommended)...${NC}"
-        
-        # First ensure the dependencies are installed
-        echo -e "${BLUE}Ensuring dependencies are installed...${NC}"
-        python3 -m pip install --user --upgrade google-genai toml rich click pyyaml requests google-api-core || true
         
         pipx install . --force || {
             echo -e "${RED}pipx install failed. Please check your environment or see the FAQ.${NC}"
@@ -255,7 +251,7 @@ install_smart_shell() {
             
             echo -e "${RED}Automatic fix failed. Please try the manual steps below:${NC}"
             echo -e "  1. Uninstall any broken install: ${YELLOW}pipx uninstall smart-shell${NC}"
-            echo -e "  2. Install dependencies: ${YELLOW}pip install google-genai rich click pyyaml requests toml google-api-core${NC}"
+            echo -e "  2. Install dependencies: ${YELLOW}pip install rich click requests${NC}"
             echo -e "  3. Clone the repo manually: ${YELLOW}git clone https://github.com/Lusan-sapkota/smart-shell.git && cd smart-shell${NC}"
             echo -e "  4. Install from the repo: ${YELLOW}pipx install . --include-deps${NC}"
             echo -e "  5. Then run: ${YELLOW}smart-shell setup${NC}"
@@ -364,13 +360,13 @@ except ModuleNotFoundError:
     print("Attempting to reinstall Smart-Shell with dependencies...")
     try:
         # First install dependencies
-        subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "google-genai", "rich", "click", "pyyaml", "requests", "google-api-core"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "rich", "click", "requests"], check=True)
         # Then install smart-shell
         subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "smart-shell"], check=True)
         print("Reinstallation complete. Please try running 'smart-shell' again.")
     except Exception as e:
         print(f"Failed to reinstall: {e}")
-        print("Please run manually: pip install google-genai rich click pyyaml toml requests google-api-core smart-shell toml")
+        print("Please run manually: pip install rich click requests smart-shell")
         
     sys.exit(1)
 EOF
@@ -416,16 +412,16 @@ run_smart_shell_setup() {
     # Skip if we're in non-interactive mode
     if [[ "$NON_INTERACTIVE" == "true" ]]; then
         echo -e "${YELLOW}Skipping setup in non-interactive mode.${NC}"
-        echo -e "Run 'smart-shell setup' to configure your API key later."
+        echo -e "Run 'smart-shell setup' to configure your AI provider later."
         return
     fi
     
     # Check if smart-shell command is available
     if command -v smart-shell &> /dev/null; then
         echo -e "${GREEN}Starting setup wizard...${NC}"
-        echo -e "${YELLOW}You'll be asked to enter your Google AI API key.${NC}"
-        echo -e "${YELLOW}If you don't have one, get it from: https://ai.google.dev/tutorials/setup${NC}"
-        echo -e "(It's free to sign up and includes generous free quota)"
+        echo -e "${YELLOW}You'll pick a provider: Gemini, OpenAI, DeepSeek, OpenRouter, Groq,${NC}"
+        echo -e "${YELLOW}a local Ollama or LM Studio server, or any OpenAI-compatible URL.${NC}"
+        echo -e "(Ollama runs fully offline and needs no API key)"
         echo
         
         # Run the setup command

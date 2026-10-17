@@ -9,11 +9,27 @@ from typing import Dict, Any
 # Risk Level Definitions
 # ==============================================================================
 
+# Start of a command: line start, after ; & | ( or `, optionally behind sudo.
+CMD = r"(?:^|[;&|(`]\s*)(?:sudo\s+)?"
+
+# rm with both a recursive and a force flag, in any order or spelling.
+RM_RF = r"\brm\b(?=[^;&|\n]*(?:\s-\w*[rR]|\s--recursive))(?=[^;&|\n]*(?:\s-\w*f|\s--force))"
+
+# BLOCKED: never executed, only editable.
+BLOCKED_PATTERNS = {
+    RM_RF + r"[^;&|\n]*\s(?:/|/\*|~/?|\$HOME/?)(?:\s|$|;|&|\|)": "Deletes the root filesystem or your entire home directory.",
+    r"--no-preserve-root": "Disables rm's protection against deleting /.",
+    r":\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;\s*:": "Fork bomb. Spawns processes until the system hangs.",
+    r"\bmkfs(\.\w+)?\s+[^;&|]*/dev/": "Formats a disk, erasing everything on it.",
+    r"\bdd\b[^;&|]*\bof=/dev/(sd|nvme|vd|hd|mmcblk)": "Writes raw data over a disk.",
+    r">\s*/dev/(sd|nvme|vd|hd|mmcblk)": "Overwrites a raw disk device.",
+}
+
 # HIGH RISK: Commands that can cause irreversible data loss or system failure.
 HIGH_RISK_PATTERNS = {
     # Unrecoverable deletions and disk operations
-    r"\brm\s+-rf\b": "Recursively and forcefully removes files, can wipe critical data.",
-    r"rm\s+-rf\s+--no-preserve-root\s+/": "Deletes the entire filesystem. Extremely dangerous.",
+    RM_RF: "Recursively and forcefully removes files, can wipe critical data.",
+    r"\|\s*(sudo\s+)?(ba|z|da)?sh\b": "Pipes text straight into a shell. Whatever produced it gets executed.",
     r"\bdd\b": "Direct disk writing utility. Misuse can destroy data or filesystems.",
     r"\bmkfs\b": "Formats storage partitions, erasing all existing data.",
     r">\s*/dev/sd[a-z]": "Overwrites entire disk blocks, catastrophic if misused.",
@@ -46,21 +62,21 @@ MEDIUM_RISK_PATTERNS = {
 
     # Package and script management
     r"\b(apt|apt-get|dpkg|yum|dnf|pacman|apk|emerge|nix-env|brew|pip|npm)\s+(install|remove|purge|update|upgrade)\b": "Package manager operations affect system state.",
-    r"\b(wget|curl)\s+.*\|\s*(sh|bash|zsh)": "Pipes external content directly into shell. Dangerous.",
+    CMD + r"eval\b": "Runs a string as code, which hides what actually executes.",
     r"\b(tee|cat)\s+.*\|\s*sponge\s+/etc/.*": "Overwrites system files silently.",
     r"tar\s+.*--overwrite\b": "Unpacks while overwriting files unsafely.",
 
     # Network & identity
     r"\b(iptables|ufw|firewall-cmd)\b": "Modifies firewall behavior, could block access.",
     r"\bifconfig\s+\S+\s+down\b": "Brings down network interface. May cut connectivity.",
-    r"\b(hostname|domainname)\b": "Changes network identification of host.",
+    r"\bhostnamectl\s+set-hostname\b|" + CMD + r"(hostname|domainname)\s+[^-\s]": "Changes network identification of host.",
 
     # User and filesystem
     r"\b(fdisk|parted|gdisk|cfdisk)\b": "Modifies disk partitions.",
     r"\b(useradd|userdel|usermod|groupadd|groupdel|groupmod|deluser|adduser|chage)\b": "Changes users and access control.",
     r"\b(mount|umount)\b": "Alters filesystem mount state.",
     r"\b(chown|chmod|setfacl|chattr)\b": "Modifies file permissions or attributes.",
-    r"passwd": "Resets user passwords.",
+    CMD + r"passwd\b": "Resets user passwords.",
     r"\bcrontab\b": "Schedules jobs that run periodically — may persist undesired actions.",
     r"\.(bashrc|profile|zshrc|bash_profile)": "Modifying shell config can break login or shell startup.",
 
@@ -78,11 +94,10 @@ INFO_LEAK_PATTERNS = {
     r"echo\s+\$.*(TOKEN|KEY|PASS|SECRET)": "May leak sensitive tokens or secrets to screen.",
     r"cat\s+.*history": "May expose recent terminal usage, including secrets.",
     r"cat\s+\.env": "May reveal environment config secrets.",
-    r"env\b": "Lists all environment variables — may contain sensitive values.",
-    r"printenv": "Similar to `env`, could print private variables.",
+    CMD + r"(env|printenv)\s*($|[;&|>])": "Lists all environment variables, which may contain secrets.",
     r"ps\s+auxww": "Shows full command line — may include keys/passwords.",
     r"grep\s+['\"]?(token|key|secret)['\"]?\s+.*": "Actively searching logs or configs for secrets.",
-    r"set\b": "Shows shell environment, often including variables.",
+    CMD + r"set\s*($|[;&|>])": "Shows shell environment, often including variables.",
 }
 
 
@@ -101,6 +116,14 @@ def check_command_safety(command: str) -> Dict[str, Any]:
         A dictionary containing the safety status ('high', 'medium', 'safe')
         and a reason for the classification.
     """
+    for pattern, reason in BLOCKED_PATTERNS.items():
+        if re.search(pattern, command, re.IGNORECASE):
+            return {
+                "status": "blocked",
+                "reason": f"Blocked pattern matched: '{pattern}'.",
+                "notes": reason
+            }
+
     # 1. Check for HIGH risk commands
     for pattern, reason in HIGH_RISK_PATTERNS.items():
         if re.search(pattern, command, re.IGNORECASE):
@@ -141,34 +164,3 @@ def check_command_safety(command: str) -> Dict[str, Any]:
         "reason": "No high or medium risk patterns were detected.",
         "notes": "Command appears to be safe for execution."
     }
-
-# Main block for testing the safety checker
-if __name__ == "__main__":
-    test_commands = [
-        "ls -la",
-        "sudo reboot",
-        "rm -rf /",
-        "apt-get install htop",
-        "kill -9 12345",
-        "chmod 777 sensitive_file.txt",
-        "dd if=/dev/random of=/dev/sda",
-        "echo 'hello world'",
-        "sudo userdel mallory"
-    ]
-
-    print("Running safety checks on test commands:")
-    for cmd in test_commands:
-        result = check_command_safety(cmd)
-        status_color = {
-            "safe": "\033[92m",   # Green
-            "medium": "\033[93m", # Yellow
-            "high": "\033[91m"    # Red
-        }
-        end_color = "\033[0m"
-        print(
-            f"Command: '{cmd}'\n"
-            f"Status: {status_color[result['status']]}{result['status'].upper()}{end_color}\n"
-            f"Reason: {result['reason']}\n"
-            f"Notes: {result['notes']}\n"
-            f"{'-'*30}"
-        ) 
