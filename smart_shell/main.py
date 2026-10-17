@@ -15,7 +15,7 @@ from .shell_builder import generate_command_plan, explain_command
 from .safety import check_command_safety
 from .setup_logic import setup_config
 from .config import load_config, save_config, ENV_API_KEY
-from .utils import execute_command, notify, print_plan_preview, reset_sudo_password, ERROR_LOG_FILE, get_os_info, detect_shell
+from .utils import execute_command, mark_input, notify, print_plan_preview, reset_sudo_password, ERROR_LOG_FILE, get_os_info, detect_shell
 from .ai_wrapper import PROVIDERS, get_client, resolve_model, is_configured, override_provider, AIError
 from .history import HISTORY_DIR, save_to_history, update_history_result, show_command_history, show_last_command, redo_last_command
 from .updater import handle_update_command, get_current_version
@@ -169,6 +169,7 @@ def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry, a
             default = "n" if worst in ("high", "medium") else "y"
             notify(f"Waiting for you: run {plan[0][:60]}{' ...' if len(plan) > 1 else ''}?")
             choice = Prompt.ask(r"Run it? \[y]es / \[n]o / \[e]dit", choices=["y", "n", "e"], default=default, show_choices=False)
+            mark_input()
 
         if choice == "n":
             console.print("[yellow]Cancelled.[/yellow]")
@@ -235,6 +236,7 @@ def run_interactive_mode(dry_run, model, client, config, auto_yes=False, shell_t
     while True:
         try:
             user_prompt = read().strip()
+            mark_input()
         except EOFError:
             break
         if not user_prompt:
@@ -347,7 +349,7 @@ Every plan asks yes / no / edit before running. If it fails, you can ask the AI 
 
 ## CLI Usage
 - `smart-shell` - Start interactive mode
-- `smart-shell "<prompt>"` - Run a one-off request (`-d` dry run, `-m <model>`, `-y` skip prompts)
+- `smart-shell "<prompt>"` - Run a one-off request (`-d` plan only, `-m <model>`, `-y` skip prompts)
 - `smart-shell setup` - Configure provider, API key and model
 - `smart-shell models` - List available models
 - `smart-shell history` - Show command history

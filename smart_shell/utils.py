@@ -3,6 +3,9 @@ Utility functions for Smart-Shell
 """
 
 import os
+import json
+import shutil
+import time
 import sys
 import subprocess
 import re
@@ -141,15 +144,41 @@ def print_plan_preview(command_plan: list[str], safety_results: list[dict[str, A
     console.print(table)
 
 
+NOTIFY_AFTER = 5  # seconds without input before a desktop notification is worth sending
+_last_input = time.monotonic()
+
+
+def mark_input() -> None:
+    """Record that the user just typed something."""
+    global _last_input
+    _last_input = time.monotonic()
+
+
 def notify(message: str) -> None:
-    """Alert the user that Smart-Shell is waiting: terminal bell, plus desktop notifications where supported."""
+    """Tell the user Smart-Shell is waiting, in whatever way their terminal supports."""
     if not sys.stdout.isatty() or load_config().get("notify") is False:
         return
-    # BEL: most terminals flash, beep or mark the tab. OSC 777: GNOME Terminal and other VTE terminals.
-    # OSC 9: iTerm2, Windows Terminal, kitty. Terminals ignore escape codes they don't know.
     message = message.replace("\a", "").replace("\033", "")
-    sys.stdout.write(f"\a\033]777;notify;Smart-Shell;{message}\a\033]9;Smart-Shell: {message}\a")
+    env = os.environ
+    escape = ""
+    if env.get("VTE_VERSION") or env.get("TERM_PROGRAM") in ("ghostty", "WezTerm"):
+        escape = f"\033]777;notify;Smart-Shell;{message}\a"
+    elif env.get("TERM_PROGRAM") == "iTerm.app" or env.get("WT_SESSION"):
+        escape = f"\033]9;Smart-Shell: {message}\a"
+    # The bell always: terminals flash, beep or mark the tab.
+    sys.stdout.write("\a" + escape)
     sys.stdout.flush()
+    if escape or time.monotonic() - _last_input < NOTIFY_AFTER or env.get("SSH_CONNECTION"):
+        return
+    # Konsole, kitty, Alacritty, xterm, Terminal.app...: no escape code, so use the desktop's notifier.
+    if sys.platform == "darwin" and shutil.which("osascript"):
+        command = ["osascript", "-e", f"display notification {json.dumps(message)} with title \"Smart-Shell\""]
+    elif (env.get("DISPLAY") or env.get("WAYLAND_DISPLAY")) and shutil.which("notify-send"):
+        command = ["notify-send", "--app-name=Smart-Shell", "--icon=utilities-terminal", "--expire-time=8000",
+                   "Smart-Shell", message]
+    else:
+        return
+    subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
 
 
 def log_error(error_message):
