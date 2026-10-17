@@ -26,7 +26,7 @@ def parse_plan(text):
     # Ignored the JSON instruction and answered with a ```bash block instead.
     fence = re.search(r'```(?:bash|sh|zsh|shell)?\n(.*?)```', text, re.DOTALL)
     if fence:
-        commands = [l.strip() for l in fence.group(1).splitlines() if l.strip() and not l.strip().startswith("#")]
+        commands = [line.strip() for line in fence.group(1).splitlines() if line.strip() and not line.strip().startswith("#")]
         if commands:
             return {"commands": commands}
     return None
