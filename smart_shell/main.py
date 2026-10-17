@@ -185,8 +185,8 @@ def process_prompt(user_prompt, dry_run, model, client, config, auto_yes=False):
             # Save to history before execution
             history_id = save_to_history(user_prompt, command_plan, executed=True)
             
-            # Execute the command
-            success = execute_command(command_plan[0])
+            # Run the whole plan in one shell so cd/source carry over; stop at the first failure.
+            success = execute_command(" && ".join(command_plan))
             
             # Update history with execution result
             update_history_result(history_id, success)
