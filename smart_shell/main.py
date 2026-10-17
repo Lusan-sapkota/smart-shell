@@ -12,7 +12,7 @@ from rich.prompt import Prompt, Confirm
 from rich.markdown import Markdown
 
 from .shell_builder import generate_command_plan, explain_command
-from .safety import check_command_safety
+from .safety import check_command_safety, is_auto_safe
 from .setup_logic import setup_config
 from .config import load_config, save_config, ENV_API_KEY
 from .utils import execute_command, mark_input, notify, print_plan_preview, reset_sudo_password, ERROR_LOG_FILE, get_os_info, detect_shell
@@ -157,10 +157,12 @@ def review_and_run(user_prompt, plan, dry_run, auto_yes, client, model, entry, a
             choice = "n" if auto_yes else Prompt.ask(r"\[e]dit or \[n]o", choices=["e", "n"], default="n")
         elif auto_yes:
             choice = "y"
-        elif auto_safe and worst == "safe":
-            console.print("[dim]Auto mode: running a safe plan without asking.[/dim]")
+        elif auto_safe and all(is_auto_safe(cmd) for cmd in plan):
+            console.print("[dim]Auto mode: read-only plan, running without asking.[/dim]")
             choice = "y"
         else:
+            if auto_safe:
+                console.print("[dim]Auto mode asks because this plan is not read-only.[/dim]")
             if worst in ("high", "medium"):
                 color = "red" if worst == "high" else "yellow"
                 for cmd, r in zip(plan, results):

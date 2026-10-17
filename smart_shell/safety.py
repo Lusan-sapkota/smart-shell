@@ -3,10 +3,12 @@ Safety Module for Smart-Shell - Classifies commands into risk levels.
 """
 
 import re
+import shlex
 from typing import Dict, Any
 
-# Start of a command: line start, after ; & | ( or `, optionally behind sudo.
-CMD = r"(?:^|[;&|(`]\s*)(?:sudo\s+)?"
+# Start of a command: line start, after ; & | ( ` { ! or a newline, after do/then/else, or behind a
+# wrapper (sudo, nohup, time, command, exec, env) or a leading backslash.
+CMD = r"(?:^|\n|[;&|(`{!]\s*|\b(?:do|then|else)\s+)(?:(?:sudo|nohup|time|command|exec|env)\s+)*\\?"
 
 # rm with both a recursive and a force flag, in any order or spelling.
 RM_RF = r"\brm\b(?=[^;&|\n]*(?:\s-\w*[rR]|\s--recursive))(?=[^;&|\n]*(?:\s-\w*f|\s--force))"
@@ -25,7 +27,10 @@ BLOCKED_PATTERNS = {
 HIGH_RISK_PATTERNS = {
     # Unrecoverable deletions and disk operations
     RM_RF: "Recursively and forcefully removes files, can wipe critical data.",
-    r"\|\s*(sudo\s+)?(ba|z|da)?sh\b": "Pipes text straight into a shell. Whatever produced it gets executed.",
+    r"\|\s*(sudo\s+)?(?:(?:ba|z|da)?sh|python3?|perl|ruby|node)\b": "Pipes text straight into an interpreter. Whatever produced it gets executed.",
+    r"<\(\s*(?:curl|wget)\b": "Runs a downloaded script.",
+    r"\b(?:ba|z|da)?sh\s+-c\b": "Runs a string as a shell script, which hides what actually executes.",
+    r"\b(?:wipefs|blkdiscard)\b": "Erases disk signatures or discards all data on a device.",
     r"\bdd\b": "Direct disk writing utility. Misuse can destroy data or filesystems.",
     r"\bmkfs\b": "Formats storage partitions, erasing all existing data.",
     r">\s*/dev/sd[a-z]": "Overwrites entire disk blocks, catastrophic if misused.",
@@ -77,12 +82,15 @@ MEDIUM_RISK_PATTERNS = {
     r"\.(bashrc|profile|zshrc|bash_profile)": "Modifying shell config can break login or shell startup.",
 
     # Dangerous file operations
-    r"(?:" + CMD + r"|\bxargs\s+(?:-\S+\s+)*|-exec\s+)(?:rm|rmdir|unlink|shred|truncate)\b": "Deletes or empties files.",
+    r"(?:" + CMD + r"|\bxargs\s+(?:-\S+\s+)*|-exec(?:dir)?\s+)(?:rm|rmdir|unlink|shred|truncate)\b": "Deletes or empties files.",
     CMD + r":?\s*>\s*[^>&\s]": "Empties a file by redirecting nothing into it.",
-    r"\bgit\s+(?:clean\s+-\w*f|reset\s+--hard|checkout\s+--\s|restore\b|push\s+.*(?:--force|-f\b)|branch\s+-D)": "Discards git work or rewrites history.",
+    r"(?<![\d&>])>(?!>|&|\s*/dev/null)\s*[^\s|;&]": "Overwrites a file with the command's output.",
+    r"\bsed\s+(?:-\w*\s+)*-i": "Edits files in place.",
+    r"\bln\s+-\w*f": "Replaces existing files with links.",
+    r"\bgit\s+(?:clean\s+-\w*f|reset\s+--hard|checkout\s+(?:--\s|\.(?:\s|$))|restore\b|stash\s+(?:drop|clear)|push\s+.*(?:--force|-f\b)|branch\s+-D)": "Discards git work or rewrites history.",
     r"\b(?:docker|podman)\s+(?:rm|rmi|volume\s+rm|system\s+prune|image\s+prune|container\s+prune)\b": "Deletes containers, images or volumes.",
     r"rm\s+-[^f]*r": "Recursive deletion without force. Risky if paths are wrong.",
-    r"find\s+.*\s+-delete": "Find+delete combo is irreversible with wrong flags.",
+    r"\bfind\b.*\s-delete\b": "Find+delete combo is irreversible with wrong flags.",
     r"rsync\s+.*--delete": "Deletes destination files not in source.",
     r"cp\s+-rf\s+/\s+/tmp": "Copies entire root to another location. Risk of clogging disk.",
     r"chmod\s+777\s+/(.*)": "Exposes full access to critical paths.",
@@ -155,3 +163,59 @@ def check_command_safety(command: str) -> Dict[str, Any]:
         "reason": "No high or medium risk patterns were detected.",
         "notes": "Command appears to be safe for execution."
     }
+
+
+# Auto mode runs a plan without asking only if every step is a plain pipeline of these read-only
+# commands. An allowlist, because pattern rules for danger will always miss some spelling.
+READ_ONLY = {
+    "ls", "ll", "la", "pwd", "cat", "less", "more", "head", "tail", "wc", "sort", "uniq", "cut", "tr", "nl",
+    "column", "grep", "egrep", "fgrep", "rg", "ag", "awk", "jq", "yq", "diff", "cmp", "comm", "file", "stat",
+    "du", "df", "free", "uptime", "uname", "hostname", "whoami", "id", "groups", "date", "cal", "echo",
+    "printf", "which", "type", "whereis", "ps", "pgrep", "top", "htop", "lsblk", "lscpu", "lsusb", "lspci",
+    "lsof", "ss", "netstat", "ip", "ifconfig", "ping", "dig", "nslookup", "host", "tree", "realpath",
+    "basename", "dirname", "readlink", "md5sum", "sha1sum", "sha256sum", "true", "false", "test", "seq",
+    "history", "man", "tldr", "journalctl", "dmesg", "systemctl", "git", "find", "fd", "sed", "xargs",
+    "locate", "env", "printenv", "nproc", "vmstat", "iostat", "sensors", "zcat", "zgrep", "tac", "rev",
+    "strings", "hexdump", "xxd", "od", "base64",
+}
+GIT_READ_ONLY = {"status", "log", "diff", "show", "branch", "remote", "tag", "blame", "shortlog", "describe",
+                 "rev-parse", "ls-files", "grep", "config", "stash"}
+SHELL_SYNTAX = re.compile(r"[\n`]|\$\(|<\(|>\(|[{}]|\b(?:do|then|else|done|fi|function)\b")
+SAFE_REDIRECT = re.compile(r"\s*(?:\d?>\s*/dev/null|2>&1|>&2)")
+
+
+def is_auto_safe(command: str) -> bool:
+    """True if auto mode may run this step without asking: read-only commands only, no shell tricks."""
+    if check_command_safety(command)["status"] != "safe" or SHELL_SYNTAX.search(command):
+        return False
+    rest = SAFE_REDIRECT.sub(" ", command)
+    if re.search(r"[<>]", rest):
+        return False
+    for part in re.split(r"\|\|?|&&|;", rest):
+        try:
+            words = shlex.split(part)
+        except ValueError:
+            return False
+        if not words:
+            continue
+        name, args = words[0], words[1:]
+        if name not in READ_ONLY:
+            return False
+        if name == "git" and (not args or args[0] not in GIT_READ_ONLY
+                              or (args[0] in ("branch", "tag", "remote", "config", "stash") and len(args) > 1
+                                  and args[1] not in ("-a", "-l", "--list", "-v", "-r", "list", "show", "--get"))):
+            return False
+        if name == "find" and any(a in ("-delete", "-exec", "-execdir", "-ok", "-okdir", "-fprint", "-fls")
+                                  or a.startswith("-fprint") for a in args):
+            return False
+        if name == "sed" and any(a.startswith(("-i", "--in-place")) for a in args):
+            return False
+        if name == "xargs" and (not args or [a for a in args if not a.startswith("-")][:1] not in (["echo"], [])):
+            return False
+        if name in ("env", "printenv") and args:
+            return False
+        if name == "systemctl" and (not args or args[0] not in ("status", "list-units", "list-unit-files", "is-active", "is-enabled", "show")):
+            return False
+        if name in ("awk", "journalctl") and re.search(r"system\s*\(|\|\s*\"|--vacuum|--rotate|--flush", part):
+            return False
+    return True
