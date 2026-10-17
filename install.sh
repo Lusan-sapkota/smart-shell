@@ -5,7 +5,7 @@
 set -euo pipefail
 
 PACKAGE="smart-shell-cli"
-SOURCE="${SMART_SHELL_SOURCE:-git+https://github.com/Lusan-sapkota/smart-shell}"
+SOURCE="${SMART_SHELL_SOURCE:-$PACKAGE}"
 DATA_DIR="$HOME/.local/share/smart-shell"
 DESKTOP_FILE="$HOME/.local/share/applications/smart-shell.desktop"
 RC_MARKER="# Smart-Shell completion"
