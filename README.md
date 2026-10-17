@@ -7,7 +7,7 @@
 [![AI](https://img.shields.io/badge/AI-Local%20%2F%20OpenAI--compatible-orange)](https://smart-shell.lusansapkota.com.np/installation/#providers)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/docs/images/image.png" alt="Smart-Shell Demo" width="500"/>
+  <img src="https://raw.githubusercontent.com/Lusan-sapkota/smart-shell/main/docs/images/image.png" alt="Smart-Shell: plan preview, yes/no/edit prompt, live output and the / command menu" width="800"/>
 </p>
 
 Smart-Shell turns plain English into Bash or Zsh commands, checks them for risk, and runs them after you confirm. It runs on a local AI model through Ollama or LM Studio, fully offline with no API key, or on any OpenAI-compatible API: Gemini, OpenAI, DeepSeek, OpenRouter, Groq.
