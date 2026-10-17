@@ -27,6 +27,12 @@ remove_package() {
         if command -v uv &>/dev/null; then uv tool uninstall "$name" &>/dev/null || true; fi
         if command -v pipx &>/dev/null; then pipx uninstall "$name" &>/dev/null || true; fi
     done
+    # Leftovers from the pre-1.1.0 installer: a launcher into a broken pipx venv, and its backup.
+    local old="$HOME/.local/bin/smart-shell"
+    if [ -L "$old" ] && { [ ! -e "$old" ] || readlink "$old" | grep -q "/pipx/venvs/smart-shell/"; }; then
+        rm -f "$old"
+    fi
+    rm -f "$HOME/.local/bin/smart-shell.bak"
 }
 
 uninstall() {
