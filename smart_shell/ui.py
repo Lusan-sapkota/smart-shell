@@ -96,6 +96,10 @@ def make_reader(history_file, list_models, status, cycle_mode):
     def _(event):
         event.current_buffer.insert_text("\n")
 
+    # Requests can contain secrets: owner read/write only, like history.json.
+    os.makedirs(os.path.dirname(history_file), exist_ok=True)
+    os.close(os.open(history_file, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600))
+    os.chmod(history_file, 0o600)
     session = PromptSession(
         history=FileHistory(history_file),
         completer=SlashCompleter(list_models),

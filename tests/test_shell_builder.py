@@ -36,3 +36,10 @@ def test_parse_plan_tolerates_small_model_replies():
     assert parse_plan(r'```json\n{"commands": ["find /etc -exec ls {} \;"]}\n```') == {"commands": [r"find /etc -exec ls {} \;"]}
     assert parse_plan("Use df:\n\n```bash\n# disk usage\ndf -h\n```\nDone.") == {"commands": ["df -h"]}
     assert parse_plan("I can't help with that.") is None
+
+
+def test_parse_plan_ignores_prose_after_json_and_blank_steps():
+    from smart_shell.shell_builder import parse_plan
+    assert parse_plan('{"commands": ["ls"]}\nThat lists files {like this}.') == {"commands": ["ls"]}
+    client = FakeClient(['{"commands": ["ls", "  ", ""]}'])
+    assert generate_command_plan("x", client, "m") == ["ls"]

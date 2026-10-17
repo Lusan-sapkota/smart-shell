@@ -15,12 +15,15 @@ MAX_RETRIES = 2
 
 def parse_plan(text):
     """Pull {"commands": [...]} out of a model reply, tolerating common small-model mistakes."""
-    match = re.search(r'\{.*\}', text, re.DOTALL)
-    if match:
-        raw = match.group(0)
+    start = text.find("{")
+    if start != -1:
+        raw = text[start:]
         for candidate in (raw, re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', raw)):
             try:
-                return json.loads(candidate)
+                # raw_decode stops at the end of the object, so prose after the JSON is fine.
+                parsed, _ = json.JSONDecoder().raw_decode(candidate)
+                if isinstance(parsed, dict):
+                    return parsed
             except json.JSONDecodeError:
                 pass
     # Ignored the JSON instruction and answered with a ```bash block instead.
@@ -92,7 +95,7 @@ Request: find .log files over 10MB in /var/log
         commands = parsed_json.get("commands", [])
         if not isinstance(commands, list) or not all(isinstance(cmd, str) for cmd in commands):
             raise ValueError("The AI model returned an invalid command structure.")
-        return commands
+        return [cmd.strip() for cmd in commands if cmd.strip()]
 
     raise Exception(f"Error generating command plan: {last_error}")
 

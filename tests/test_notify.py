@@ -70,3 +70,11 @@ def test_off_or_not_a_terminal_does_nothing(term, monkeypatch):
     monkeypatch.setattr(utils.sys, "stdout", io.StringIO())
     utils.notify("x")
     assert out.getvalue() == "" and not launched
+
+
+def test_model_text_cannot_break_out_of_the_escape_code(term):
+    tty, launched, env = term
+    out = tty()
+    env(VTE_VERSION="7800")
+    utils.notify("run x\x9c\x1b]0;pwned\x07\nnext")
+    assert "pwned\x07" not in out.getvalue() and "\x9c" not in out.getvalue() and "\n" not in out.getvalue()

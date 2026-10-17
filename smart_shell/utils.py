@@ -169,7 +169,8 @@ def notify(message: str) -> None:
     """Tell the user Smart-Shell is waiting, in whatever way their terminal supports."""
     if not sys.stdout.isatty() or load_config().get("notify") is False:
         return
-    message = message.replace("\a", "").replace("\033", "")
+    # Plan text comes from the model: strip every control character (C0, DEL, C1) so it can't end the escape code.
+    message = re.sub(r"[\x00-\x1f\x7f-\x9f]", " ", message)
     env = os.environ
     escape = ""
     if env.get("VTE_VERSION") or env.get("TERM_PROGRAM") in ("ghostty", "WezTerm"):

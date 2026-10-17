@@ -408,8 +408,6 @@ def main():
         console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         sys.exit(1)
 
-if __name__ == "__main__":
-    main()
 
 
 def show_error_log():
@@ -439,3 +437,7 @@ def show_error_log():
             
     except Exception as e:
         console.print(f"[red]Error reading error log: {e}[/red]")
+
+
+if __name__ == "__main__":
+    main()
