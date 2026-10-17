@@ -36,24 +36,36 @@ Options for `run`:
 
 ## Interactive commands
 
-Type these at the `Smart-Shell (model):` prompt:
+Type `/` at the `>` prompt to open the command menu: it shows each command with a short description, and after `/model ` it completes model names from your provider. The older `!help` style still works.
 
 | Command          | Description                               |
 |------------------|-------------------------------------------|
-| `!help`          | Show help                                 |
-| `!history`       | Show command history                      |
-| `!clear`         | Clear the screen                          |
-| `!models`        | List models from the provider             |
-| `!model <name>`  | Switch model for this session             |
-| `!explain <cmd>` | Explain what a command does, with its safety level |
-| `!last`          | Show the last generated command           |
-| `!redo`          | Re-run the last plan (all steps, after a safety check) |
-| `!errors`        | Show the error log                        |
-| `!forget-sudo`   | Run `sudo -k` to drop cached sudo credentials |
-| `!update`        | Check for a new version and upgrade with uv, pipx or pip |
-| `!docs`          | Show the documentation link               |
+| `/help`          | Show help                                 |
+| `/history`       | Show command history                      |
+| `/clear`         | Clear the screen                          |
+| `/models`        | List models from the provider             |
+| `/model <name>`  | Switch model for this session             |
+| `/explain <cmd>` | Explain what a command does, with its safety level |
+| `/last`          | Show the last generated command           |
+| `/redo`          | Re-run the last plan (all steps, after a safety check) |
+| `/errors`        | Show the error log                        |
+| `/forget-sudo`   | Run `sudo -k` to drop cached sudo credentials |
+| `/update`        | Check for a new version and upgrade with uv, pipx or pip |
+| `/docs`          | Show the documentation link               |
+| `/dry`           | Toggle dry run for this session           |
+| `/exit`          | Quit                                      |
 
-Exit with `exit`, `quit`, `bye`, `q`, Ctrl+C or Ctrl+D.
+### Keys
+
+| Key                 | Action                                  |
+|---------------------|-----------------------------------------|
+| `Tab`, arrow keys   | Pick from the `/` menu                  |
+| `Esc`, then `Enter` | New line inside a request               |
+| `Up`, `Ctrl+R`      | Previous requests, search them          |
+| `Ctrl+C`            | Clear the line (or stop a running command) |
+| `Ctrl+D`            | Quit (as do `/exit`, `exit`, `quit`, `q`) |
+
+The status bar at the bottom shows the provider, model, shell, current folder and whether dry run is on.
 
 ## How a prompt runs
 

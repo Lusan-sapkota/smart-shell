@@ -9,7 +9,7 @@ pipx install smart-shell-cli      # or: uv tool install smart-shell-cli
 smart-shell setup
 ```
 
-Upgrade with `pipx upgrade smart-shell-cli` (or `uv tool upgrade smart-shell-cli`), or `!update` from inside Smart-Shell.
+Upgrade with `pipx upgrade smart-shell-cli` (or `uv tool upgrade smart-shell-cli`), or `/update` from inside Smart-Shell.
 
 ## Install script
 
@@ -28,10 +28,10 @@ The script:
 
 To try the unreleased `development` branch: `pipx install git+https://github.com/Lusan-sapkota/smart-shell@development`.
 
-Dependencies are `rich`, `click` and `requests`. To install them yourself (for example behind a restrictive firewall):
+Dependencies are `rich`, `click`, `requests` and `prompt_toolkit`. To install them yourself (for example behind a restrictive firewall):
 
 ```bash
-pip install --user rich click requests
+pip install --user rich click requests prompt_toolkit
 ```
 
 For a development install, see [Development](development.md).

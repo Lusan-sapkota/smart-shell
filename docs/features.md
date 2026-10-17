@@ -21,7 +21,7 @@ Local models come first: with Ollama or LM Studio everything runs on your machin
 | `groq`       | `https://api.groq.com/openai/v1`                           | yes     |
 | `custom`     | any URL you enter                                          | optional |
 
-Models are listed live from the provider (`!models`, `smart-shell models`) and can be switched per run (`--model`) or per session (`!model <name>`).
+Models are listed live from the provider (`/models`, `smart-shell models`) and can be switched per run (`--model`) or per session (`/model <name>`).
 
 ## Safety
 
@@ -39,18 +39,18 @@ See [Safety](safety.md) for details.
 
 ## Interactive mode
 
-A REPL with readline history, a prompt that shows the current model, and `!` commands: `!help`, `!history`, `!clear`, `!models`, `!model <name>`, `!explain <cmd>`, `!last`, `!redo`, `!errors`, `!forget-sudo`, `!update`, `!docs`.
+An interactive prompt in the style of Claude Code and Gemini CLI: a `/` command menu with descriptions and model-name completion, a status bar (provider, model, shell, folder, dry run), multi-line input (`Esc` `Enter`), and searchable history (`Ctrl+R`). Commands: `/help`, `/model <name>`, `/models`, `/explain <cmd>`, `/dry`, `/history`, `/last`, `/redo`, `/errors`, `/clear`, `/forget-sudo`, `/update`, `/docs`, `/exit`. Commands still run in your real terminal, so `sudo` prompts and live output work.
 
 ## Other
 
 - **Dry run** (`--dry-run`): preview the plan and its safety analysis without executing.
 - **History** of prompts and commands, stored in `~/.local/share/smart-shell/`.
-- **Error log** of failures, viewable with `!errors`.
+- **Error log** of failures, viewable with `/errors`.
 - **Readable errors**: common failures (command not found, permission denied, missing file) get a one-line explanation.
-- **Sudo**: Smart-Shell never stores your sudo password. `sudo` prompts in the terminal; `!forget-sudo` runs `sudo -k`.
+- **Sudo**: Smart-Shell never stores your sudo password. `sudo` prompts in the terminal; `/forget-sudo` runs `sudo -k`.
 - **Fix on failure**: when a command fails, Smart-Shell offers to send the command and the last lines of its error output to the model and proposes a corrected plan, checked and confirmed like any other. Nothing is sent unless you say yes.
 - **Follow-ups**: in interactive mode, recent requests are passed as context, so "now do the same for /var/log" works.
 - **Live output**: commands print as they run, and interactive prompts work.
 - **One-off providers**: `--provider` / `--base-url` switch provider for a single run.
-- **Updates**: `!update` checks PyPI and upgrades with the tool you installed with (uv, pipx or pip).
+- **Updates**: `/update` checks PyPI and upgrades with the tool you installed with (uv, pipx or pip).
 - **Desktop entry and tab completion**, set up by the installer.

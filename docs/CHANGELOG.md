@@ -12,11 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix on failure: after a failed command, Smart-Shell offers to send the command and its error output to the model and shows a corrected plan.
 - Spinner showing the provider and model while the AI is working.
 - `smart-shell "<prompt>"` works without the `run` subcommand.
+- New interactive prompt (prompt_toolkit): `/` command menu with descriptions, model-name completion after `/model`, status bar with provider, model, shell, folder and dry-run state, multi-line input, `Ctrl+R` history search. `Ctrl+C` clears the line or stops a running command instead of quitting.
+- `/dry` toggles dry run inside a session.
 
 ### Changed
+- Interactive commands use `/` (`/help`, `/model`, ...). The `!` spelling still works.
 - Startup shows a two-line header instead of the ASCII banner and welcome panel.
 - Safe and info-leak plans now ask before running (default yes) instead of running immediately.
 - Local providers (Ollama, LM Studio) are listed first, and a fresh setup defaults to Ollama.
+- New dependency: `prompt_toolkit`.
 - Python 3.10 or newer is required (3.9 reached end of life).
 - Shorter system prompt: small local models return valid JSON far more often, and the detected package manager (apt, dnf, pacman, zypper, apk, brew) is passed to the model.
 - History is capped at 1000 entries and written with `0600` permissions.
@@ -29,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A corrupt history file no longer crashes `!history`, `!last` or saving.
 - `!redo` checks single-string commands for blocked patterns too.
 - The installer cleans up the launcher left by pre-1.1.0 installs.
-- Startup failed with "Invalid argument" when the input history file was written by a different readline build (for example after moving to uv's Python). The old file is now kept as `readline_history.old`.
+- Startup failed with "Invalid argument" when the old readline history file came from a different readline build (for example after moving to uv's Python). Input history now lives in `input_history`, managed by prompt_toolkit.
 
 ### Removed
 - `!creator`, the `help` command (use `--help`), and the REPL check that refused any request mentioning `smart-shell` commands.

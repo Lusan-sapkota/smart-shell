@@ -21,9 +21,9 @@ Smart-Shell turns plain English into Bash or Zsh commands, checks them for risk,
 - **Fix on failure.** If a command fails, ask the AI to fix it using the error output.
 - **Multi-step plans** run in one shell, joined with `&&`, stopping at the first failure, with live output.
 - **Dry-run mode** (`--dry-run`) to preview without executing.
-- **Interactive REPL** with history and `!` commands (`!models`, `!model <name>`, `!redo`, `!errors`, ...).
+- **Interactive prompt** like Claude Code or Gemini CLI: `/` command menu with completion, status bar, multi-line input and searchable history.
 - **No stored sudo password.** `sudo` prompts in your terminal as usual.
-- **Self-update** with `!update`, a desktop entry, and Bash/Zsh tab completion from the installer.
+- **Self-update** with `/update`, a desktop entry, and Bash/Zsh tab completion from the installer.
 
 ## Install
 

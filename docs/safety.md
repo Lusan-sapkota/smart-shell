@@ -20,7 +20,7 @@ If a plan contains several commands, the highest level among them sets the defau
 
 ## Sudo
 
-Smart-Shell does not store or ask for your sudo password. `sudo` prompts in the terminal itself. Passwords saved by older versions are deleted from the config automatically. `!forget-sudo` runs `sudo -k`.
+Smart-Shell does not store or ask for your sudo password. `sudo` prompts in the terminal itself. Passwords saved by older versions are deleted from the config automatically. `/forget-sudo` runs `sudo -k`.
 
 ## Limits
 
